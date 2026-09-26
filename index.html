@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Coaching</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Optional: Add a font like Inter for a more modern look -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="main-header">
+        <!-- Logo -->
+        <div class="logo">
+            <span class="logo-icon">🎯</span>
+            <span class="logo-text">P-Coaching</span>
+        </div>
+        
+        <!-- Navigation Menu -->
+        <nav class="desktop-nav">
+            <div class="nav-item active-dropdown">
+                <span>ক্লাস ৯-১২</span>
+                <span class="dropdown-icon">▼</span>
+            </div>
+            <div class="nav-item">
+                <span>ভর্তি পরীক্ষা</span>
+                <span class="dropdown-icon">▼</span>
+            </div>
+            <div class="nav-item">
+                <span>স্কিলস</span>
+                <span class="dropdown-icon">▼</span>
+            </div>
+            <div class="nav-item">
+                <span>বুক স্টোর</span>
+            </div>
+        </nav>
+
+        <!-- Right Side: Search, Lang, Hotline -->
+        <div class="header-right">
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" placeholder="কোর্স সার্চ করুন...">
+            </div>
+            
+            <div class="lang-toggle">
+                <span class="lang active">BN</span>
+                <span class="lang">EN</span>
+            </div>
+
+            <div class="hotline">
+                <span class="phone-icon">📞</span>
+                <span class="phone-number">16910</span>
+            </div>
+
+            <!-- Login / Sign Up Button -->
+            <a href="#" class="btn-login">লগইন</a>
+        </div>
+    </header>
+
+    <main>
+        <section id="hero">
+            <h2>Welcome to Project Coaching</h2>
+            <p>Learn and build amazing projects with our expert-guided courses.</p>
+        </section>
+
+        <section id="courses">
+            <h2 class="section-title">Our Featured Courses</h2>
+            
+            <div class="course-container">
+                <!-- Course 1: Physics -->
+                <div class="course-card">
+                    <div class="course-image">
+                        <img src="https://via.placeholder.com/600x400?text=Physics+Thumbnail" alt="Physics Course Thumbnail">
+                    </div>
+                    
+                    <div class="course-content">
+                        <span class="badge">Recorded</span>
+                        <h3 class="course-title">Physics (Class 9 to 12)</h3>
+                        
+                        <ul class="course-features">
+                            <li><span class="icon">✓</span> কোর্সটি করছেন ৫,২০০+ জন শিক্ষার্থী</li>
+                            <li><span class="icon">✓</span> ১২০+ টি ভিডিও লেকচার ও পিডিএফ নোটস</li>
+                        </ul>
+                        
+                        <div class="course-price">Course Fee: ৳3,500</div>
+                        
+                        <div class="payment-methods" style="margin-bottom: 1.5rem; font-size: 0.95rem; color: #555;">
+                            <strong>পেমেন্ট মাধ্যম:</strong> 
+                            <span style="color: #e2136e; font-weight: 600;">bKash</span>, 
+                            <span style="color: #f05423; font-weight: 600;">Nagad</span>, 
+                            <span style="color: #8c1587; font-weight: 600;">Rocket</span>
+                        </div>
+
+                        <div class="course-actions">
+                            <button class="btn btn-primary">বিস্তারিত দেখো</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Course 2: Chemistry -->
+                <div class="course-card">
+                    <div class="course-image">
+                        <img src="https://via.placeholder.com/600x400?text=Chemistry+Thumbnail" alt="Chemistry Course Thumbnail">
+                    </div>
+                    
+                    <div class="course-content">
+                        <span class="badge" style="background-color: #e6f7ff; color: #007bff;">Live Batch</span>
+                        <h3 class="course-title">Chemistry (Class 9 to 12)</h3>
+                        
+                        <ul class="course-features">
+                            <li><span class="icon">✓</span> কোর্সটি করছেন ৩,৮০০+ জন শিক্ষার্থী</li>
+                            <li><span class="icon">✓</span> ৮০টি লাইভ ক্লাস এবং চ্যাপ্টার ফাইনাল এক্সাম</li>
+                        </ul>
+                        
+                        <div class="course-price">Course Fee: ৳3,000</div>
+                        
+                        <div class="payment-methods" style="margin-bottom: 1.5rem; font-size: 0.95rem; color: #555;">
+                            <strong>পেমেন্ট মাধ্যম:</strong> 
+                            <span style="color: #e2136e; font-weight: 600;">bKash</span>, 
+                            <span style="color: #f05423; font-weight: 600;">Nagad</span>, 
+                            <span style="color: #8c1587; font-weight: 600;">Rocket</span>
+                        </div>
+
+                        <div class="course-actions">
+                            <button class="btn btn-primary">বিস্তারিত দেখো</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Course 3: Biology -->
+                <div class="course-card">
+                    <div class="course-image">
+                        <img src="https://via.placeholder.com/600x400?text=Biology+Thumbnail" alt="Biology Course Thumbnail">
+                    </div>
+                    
+                    <div class="course-content">
+                        <span class="badge" style="background-color: #e6ffed; color: #28a745;">Recorded + Live</span>
+                        <h3 class="course-title">Biology (Class 9 to 12)</h3>
+                        
+                        <ul class="course-features">
+                            <li><span class="icon">✓</span> কোর্সটি করছেন ৪,৫০০+ জন শিক্ষার্থী</li>
+                            <li><span class="icon">✓</span> ১০০+ রেকর্ডেড ক্লাস এবং মেডিকেল এডমিশন গাইডলাইন</li>
+                        </ul>
+                        
+                        <div class="course-price">Course Fee: ৳3,200</div>
+                        
+                        <div class="payment-methods" style="margin-bottom: 1.5rem; font-size: 0.95rem; color: #555;">
+                            <strong>পেমেন্ট মাধ্যম:</strong> 
+                            <span style="color: #e2136e; font-weight: 600;">bKash</span>, 
+                            <span style="color: #f05423; font-weight: 600;">Nagad</span>, 
+                            <span style="color: #8c1587; font-weight: 600;">Rocket</span>
+                        </div>
+
+                        <div class="course-actions">
+                            <button class="btn btn-primary">বিস্তারিত দেখো</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Course 4: Higher Math -->
+                <div class="course-card">
+                    <div class="course-image">
+                        <img src="https://via.placeholder.com/600x400?text=Higher+Math+Thumbnail" alt="Higher Math Course Thumbnail">
+                    </div>
+                    
+                    <div class="course-content">
+                        <span class="badge" style="background-color: #f3e8ff; color: #8b5cf6;">Crash Course</span>
+                        <h3 class="course-title">Higher Math (Class 9 to 12)</h3>
+                        
+                        <ul class="course-features">
+                            <li><span class="icon">✓</span> কোর্সটি করছেন ২,৯০০+ জন শিক্ষার্থী</li>
+                            <li><span class="icon">✓</span> ৫০টি প্রবলেম সলভিং ক্লাস ও শর্ট টেকনিক</li>
+                        </ul>
+                        
+                        <div class="course-price">Course Fee: ৳2,500</div>
+                        
+                        <div class="payment-methods" style="margin-bottom: 1.5rem; font-size: 0.95rem; color: #555;">
+                            <strong>পেমেন্ট মাধ্যম:</strong> 
+                            <span style="color: #e2136e; font-weight: 600;">bKash</span>, 
+                            <span style="color: #f05423; font-weight: 600;">Nagad</span>, 
+                            <span style="color: #8c1587; font-weight: 600;">Rocket</span>
+                        </div>
+
+                        <div class="course-actions">
+                            <button class="btn btn-primary">বিস্তারিত দেখো</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Success Stories Section -->
+        <section id="success-stories">
+            <h2 class="section-title" style="text-align: center; margin-bottom: 2rem;">আমাদের সফল শিক্ষার্থীরা</h2>
+            
+            <div class="marquee-container">
+                <div class="marquee-content">
+                    <!-- Original 5 Students -->
+                    <div class="student-card">
+                        <img src="https://ui-avatars.com/api/?name=Rahim+Mia&background=random&color=fff&size=100" alt="Student" class="student-img">
+                        <h4 class="student-name">রহিম মিয়া</h4>
+                        <p class="student-varsity">BUET</p>
+                    </div>
+                    <div class="student-card">
+                        <img src="https://ui-avatars.com/api/?name=Sadia+Islam&background=random&color=fff&size=100" alt="Student" class="student-img">
+                        <h4 class="student-name">সাদিয়া ইসলাম</h4>
+                        <p class="student-varsity">Dhaka University</p>
+                    </div>
+                    <div class="student-card">
+                        <img src="https://ui-avatars.com/api/?name=Fahim+Rahman&background=random&color=fff&size=100" alt="Student" class="student-img">
+                        <h4 class="student-name">ফাহিম রহমান</h4>
+                        <p class="student-varsity">Dhaka Medical College</p>
+                    </div>
+                    <div class="student-card">
+                        <img src="https://ui-avatars.com/api/?name=Tasnia+Anika&background=random&color=fff&size=100" alt="Student" class="student-img">
+                        <h4 class="student-name">তাসনিয়া আনিকা</h4>
+                        <p class="student-varsity">Rajshahi University</p>
+                    </div>
+                    <div class="student-card">
+                        <img src="https://ui-avatars.com/api/?name=Zubair+Ahmed&background=random&color=fff&size=100" alt="Student" class="student-img">
+                        <h4 class="student-name">জুবায়ের আহমেদ</h4>
+                        <p class="student-varsity">Jahangirnagar University</p>
+                    </div>
+                    
+                    <!-- Duplicated 5 Students for seamless infinite loop -->
+                    <div class="student-card">
+                        <img src="https://ui-avatars.com/api/?name=Rahim+Mia&background=random&color=fff&size=100" alt="Student" class="student-img">
+                        <h4 class="student-name">রহিম মিয়া</h4>
+                        <p class="student-varsity">BUET</p>
+                    </div>
+                    <div class="student-card">
+                        <img src="https://ui-avatars.com/api/?name=Sadia+Islam&background=random&color=fff&size=100" alt="Student" class="student-img">
+                        <h4 class="student-name">সাদিয়া ইসলাম</h4>
+                        <p class="student-varsity">Dhaka University</p>
+                    </div>
+                    <div class="student-card">
+                        <img src="https://ui-avatars.com/api/?name=Fahim+Rahman&background=random&color=fff&size=100" alt="Student" class="student-img">
+                        <h4 class="student-name">ফাহিম রহমান</h4>
+                        <p class="student-varsity">Dhaka Medical College</p>
+                    </div>
+                    <div class="student-card">
+                        <img src="https://ui-avatars.com/api/?name=Tasnia+Anika&background=random&color=fff&size=100" alt="Student" class="student-img">
+                        <h4 class="student-name">তাসনিয়া আনিকা</h4>
+                        <p class="student-varsity">Rajshahi University</p>
+                    </div>
+                    <div class="student-card">
+                        <img src="https://ui-avatars.com/api/?name=Zubair+Ahmed&background=random&color=fff&size=100" alt="Student" class="student-img">
+                        <h4 class="student-name">জুবায়ের আহমেদ</h4>
+                        <p class="student-varsity">Jahangirnagar University</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Project Coaching. All rights reserved.</p>
+    </footer>
+</body>
+</html>
