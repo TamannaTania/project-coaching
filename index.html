@@ -53,7 +53,7 @@
             </div>
 
             <!-- Login / Sign Up Button -->
-            <a href="#" class="btn-login">লগইন</a>
+            <a href="login.html" class="btn-login">লগইন</a>
         </div>
     </header>
 
@@ -256,5 +256,29 @@
     <footer>
         <p>&copy; 2026 Project Coaching. All rights reserved.</p>
     </footer>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const token = localStorage.getItem('token');
+            const username = localStorage.getItem('username');
+            const loginBtn = document.querySelector('.btn-login');
+
+            if (token && username) {
+                // User is logged in
+                loginBtn.outerHTML = `
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <span style="font-weight: 600; color: #1f2937;">স্বাগতম, ${username}</span>
+                        <a href="#" id="logoutBtn" style="color: #ff5722; font-weight: 600; text-decoration: none;">লগআউট</a>
+                    </div>
+                `;
+
+                document.getElementById('logoutBtn').addEventListener('click', (e) => {
+                    e.preventDefault();
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('username');
+                    window.location.reload();
+                });
+            }
+        });
+    </script>
 </body>
 </html>
