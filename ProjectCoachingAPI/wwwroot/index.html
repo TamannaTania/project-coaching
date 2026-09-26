@@ -39,7 +39,7 @@
         <div class="header-right">
             <div class="search-box">
                 <span class="search-icon">🔍</span>
-                <input type="text" placeholder="কোর্স সার্চ করুন...">
+                <input type="text" id="searchInput" placeholder="কোর্স সার্চ করুন...">
             </div>
             
             <div class="lang-toggle">
@@ -139,6 +139,8 @@
         <p>&copy; 2026 Project Coaching. All rights reserved.</p>
     </footer>
     <script>
+        let allCourses = [];
+
         document.addEventListener("DOMContentLoaded", () => {
             const token = localStorage.getItem('token');
             const username = localStorage.getItem('username');
@@ -163,55 +165,73 @@
 
             // Load courses from database
             loadCourses();
+
+            // Search functionality
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                searchInput.addEventListener('input', function(e) {
+                    const searchTerm = e.target.value.toLowerCase();
+                    const filteredCourses = allCourses.filter(course => {
+                        const titleMatch = course.title && course.title.toLowerCase().includes(searchTerm);
+                        const descMatch = course.description && course.description.toLowerCase().includes(searchTerm);
+                        return titleMatch || descMatch;
+                    });
+                    renderCourses(filteredCourses);
+                });
+            }
         });
 
         async function loadCourses() {
             const container = document.getElementById('courseContainer');
             try {
-                // IMPORTANT: Replace YOUR_PORT with your actual Visual Studio port number!
                 const response = await fetch('/api/Courses');
-                const courses = await response.json();
-
-                if (courses.length === 0) {
-                    container.innerHTML = '<p style="text-align:center; font-size: 1.2rem; grid-column: 1 / -1; color: #666;">এখনো কোনো কোর্স এড করা হয়নি!</p>';
-                    return;
-                }
-
-                container.innerHTML = ''; // Clear loading text
-                
-                courses.forEach(course => {
-                    const card = `
-                        <div class="course-card">
-                            <div class="course-image">
-                                <img src="${course.imageUrl || 'https://via.placeholder.com/600x400?text=Course'}" alt="${course.title}">
-                            </div>
-                            
-                            <div class="course-content">
-                                <span class="badge" style="background-color: #e6f7ff; color: #007bff;">${course.badge || 'New'}</span>
-                                <h3 class="course-title">${course.title}</h3>
-                                
-                                <p style="color: #555; margin-bottom: 1rem; font-size: 0.95rem;">${course.description || ''}</p>
-                                
-                                <div class="course-price">Course Fee: ৳${course.price}</div>
-                                
-                                <div class="payment-methods" style="margin-bottom: 1.5rem; font-size: 0.95rem; color: #555;">
-                                    <strong>পেমেন্ট মাধ্যম:</strong> 
-                                    <span style="color: #e2136e; font-weight: 600;">bKash</span>, 
-                                    <span style="color: #f05423; font-weight: 600;">Nagad</span>, 
-                                    <span style="color: #8c1587; font-weight: 600;">Rocket</span>
-                                </div>
-
-                                <div class="course-actions">
-                                    <a href="course-details.html?id=${course.id}" class="btn btn-primary" style="display:block; text-align:center; text-decoration:none;">বিস্তারিত দেখো</a>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                    container.innerHTML += card;
-                });
+                allCourses = await response.json();
+                renderCourses(allCourses);
             } catch (error) {
                 container.innerHTML = '<p style="text-align:center; font-size: 1.2rem; grid-column: 1 / -1; color: red;">সার্ভারের সাথে কানেক্ট করা যাচ্ছে না!</p>';
             }
+        }
+
+        function renderCourses(courses) {
+            const container = document.getElementById('courseContainer');
+            
+            if (!courses || courses.length === 0) {
+                container.innerHTML = '<p style="text-align:center; font-size: 1.2rem; grid-column: 1 / -1; color: #666;">কোনো কোর্স পাওয়া যায়নি!</p>';
+                return;
+            }
+
+            container.innerHTML = ''; // Clear loading text
+            
+            courses.forEach(course => {
+                const card = `
+                    <div class="course-card">
+                        <div class="course-image">
+                            <img src="${course.imageUrl || 'https://via.placeholder.com/600x400?text=Course'}" alt="${course.title || 'Course'}">
+                        </div>
+                        
+                        <div class="course-content">
+                            <span class="badge" style="background-color: #e6f7ff; color: #007bff;">${course.badge || 'New'}</span>
+                            <h3 class="course-title">${course.title || 'Untitled'}</h3>
+                            
+                            <p style="color: #555; margin-bottom: 1rem; font-size: 0.95rem;">${course.description || ''}</p>
+                            
+                            <div class="course-price">Course Fee: ৳${course.price || 0}</div>
+                            
+                            <div class="payment-methods" style="margin-bottom: 1.5rem; font-size: 0.95rem; color: #555;">
+                                <strong>পেমেন্ট মাধ্যম:</strong> 
+                                <span style="color: #e2136e; font-weight: 600;">bKash</span>, 
+                                <span style="color: #f05423; font-weight: 600;">Nagad</span>, 
+                                <span style="color: #8c1587; font-weight: 600;">Rocket</span>
+                            </div>
+
+                            <div class="course-actions">
+                                <a href="course-details.html?id=${course.id}" class="btn btn-primary" style="display:block; text-align:center; text-decoration:none;">বিস্তারিত দেখো</a>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += card;
+            });
         }
     </script>
 </body>

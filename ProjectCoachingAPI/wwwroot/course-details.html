@@ -9,10 +9,10 @@
 </head>
 <body>
     <header class="main-header">
-        <div class="logo">
+        <a href="index.html" class="logo" style="text-decoration: none; color: inherit;">
             <span class="logo-icon">🎯</span>
             <span class="logo-text">P-Coaching</span>
-        </div>
+        </a>
         
         <nav class="nav-menu">
             <ul>
@@ -97,14 +97,41 @@
                 
                 const course = await response.json();
 
+                let videoHtml = '';
+                const vidUrl = course.videoUrl || 'https://www.w3schools.com/html/mov_bbb.mp4';
+                
+                if (vidUrl.includes('youtube.com') || vidUrl.includes('youtu.be')) {
+                    // Convert normal YouTube link to embed link
+                    let videoId = '';
+                    if (vidUrl.includes('youtu.be/')) {
+                        videoId = vidUrl.split('youtu.be/')[1].split('?')[0];
+                    } else if (vidUrl.includes('youtube.com/watch')) {
+                        videoId = new URL(vidUrl).searchParams.get('v');
+                    } else if (vidUrl.includes('youtube.com/embed/')) {
+                        videoId = vidUrl.split('youtube.com/embed/')[1].split('?')[0];
+                    }
+                    
+                    videoHtml = `<iframe width="100%" height="100%" src="https://www.youtube.com/embed/${videoId}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="border-radius:12px; aspect-ratio: 16/9;"></iframe>`;
+                } else {
+                    // Normal MP4 video
+                    videoHtml = `
+                        <video controls poster="${course.imageUrl || 'https://via.placeholder.com/800x450?text=Video+Thumbnail'}" style="width:100%; border-radius:12px; aspect-ratio: 16/9; background:#000;">
+                            <source src="${vidUrl}" type="video/mp4">
+                            Your browser does not support HTML video.
+                        </video>
+                    `;
+                }
+
                 container.innerHTML = `
+                    <div style="grid-column: 1 / -1; margin-bottom: 1rem;">
+                        <a href="index.html" style="text-decoration: none; color: #1a9c5c; font-weight: 600; display: inline-flex; align-items: center; gap: 5px;">
+                            <span>←</span> হোমপেজে ফিরে যান
+                        </a>
+                    </div>
                     <!-- Left Side: Video & Info -->
                     <div class="course-left">
-                        <div class="video-container">
-                            <video controls poster="${course.imageUrl || 'https://via.placeholder.com/800x450?text=Video+Thumbnail'}">
-                                <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
-                                Your browser does not support HTML video.
-                            </video>
+                        <div class="video-container" style="margin-bottom: 2rem;">
+                            ${videoHtml}
                         </div>
                         
                         <div class="course-info">

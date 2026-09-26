@@ -134,7 +134,8 @@
                                 description: { type: "string" },
                                 price: { type: "number", validation: { required: true, min: 0 } },
                                 badge: { type: "string" },
-                                imageUrl: { type: "string" }
+                                imageUrl: { type: "string" },
+                                videoUrl: { type: "string" }
                             }
                         }
                     },
@@ -157,6 +158,7 @@
                     { field: "price", title: "দাম (৳)", width: "120px" },
                     { field: "badge", title: "ব্যাজ", width: "120px" },
                     { field: "imageUrl", title: "ছবির লিংক", width: "200px" },
+                    { field: "videoUrl", title: "ভিডিও লিংক", width: "200px" },
                     { command: ["edit", "destroy"], title: "অ্যাকশন", width: "250px" }
                 ],
                 editable: "inline" // Enable inline editing
