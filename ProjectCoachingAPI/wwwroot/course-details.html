@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Details - P-Coaching</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="main-header">
+        <div class="logo">
+            <span class="logo-icon">🎯</span>
+            <span class="logo-text">P-Coaching</span>
+        </div>
+        
+        <nav class="nav-menu">
+            <ul>
+                <li><a href="index.html">হোম</a></li>
+                <li class="dropdown">
+                    <a href="#">কোর্সসমূহ <span>▼</span></a>
+                </li>
+                <li><a href="#">আমাদের সম্পর্কে</a></li>
+                <li><a href="#">যোগাযোগ</a></li>
+            </ul>
+        </nav>
+
+        <div class="header-right">
+            <div class="search-box">
+                <input type="text" placeholder="কোর্স খুঁজুন...">
+            </div>
+            
+            <div class="hotline">
+                <span class="phone-icon">📞</span>
+                <span class="phone-number">16910</span>
+            </div>
+
+            <!-- Login / Sign Up Button -->
+            <a href="login.html" class="btn-login">লগইন</a>
+        </div>
+    </header>
+
+    <main class="course-details-main" id="detailsContainer">
+        <!-- Details will be loaded here dynamically -->
+        <h2 style="grid-column: 1 / -1; text-align: center; margin-top: 5rem;">লোডিং হচ্ছে...</h2>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Project Coaching. All rights reserved.</p>
+    </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // Check login status for header
+            const token = localStorage.getItem('token');
+            const username = localStorage.getItem('username');
+            const loginBtn = document.querySelector('.btn-login');
+
+            if (token && username) {
+                loginBtn.outerHTML = `
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <span style="font-weight: 600; color: #1f2937;">স্বাগতম, ${username}</span>
+                        <a href="#" id="logoutBtn" style="color: #ff5722; font-weight: 600; text-decoration: none;">লগআউট</a>
+                    </div>
+                `;
+
+                document.getElementById('logoutBtn').addEventListener('click', (e) => {
+                    e.preventDefault();
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('username');
+                    window.location.reload();
+                });
+            }
+
+            loadCourseDetails();
+        });
+
+        async function loadCourseDetails() {
+            // Get ID from URL parameter (e.g. ?id=1)
+            const urlParams = new URLSearchParams(window.location.search);
+            const courseId = urlParams.get('id');
+
+            const container = document.getElementById('detailsContainer');
+
+            if (!courseId) {
+                container.innerHTML = '<h2 style="grid-column: 1 / -1; text-align: center; color: red;">কোনো কোর্স পাওয়া যায়নি!</h2>';
+                return;
+            }
+
+            try {
+                // IMPORTANT: Replace YOUR_PORT with your actual Visual Studio port number!
+                const response = await fetch(`/api/Courses/${courseId}`);
+                
+                if (!response.ok) {
+                    throw new Error("Course not found");
+                }
+                
+                const course = await response.json();
+
+                container.innerHTML = `
+                    <!-- Left Side: Video & Info -->
+                    <div class="course-left">
+                        <div class="video-container">
+                            <video controls poster="${course.imageUrl || 'https://via.placeholder.com/800x450?text=Video+Thumbnail'}">
+                                <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
+                                Your browser does not support HTML video.
+                            </video>
+                        </div>
+                        
+                        <div class="course-info">
+                            <span class="badge" style="background-color: #e6f7ff; color: #007bff; display: inline-block; padding: 4px 12px; border-radius: 50px; font-weight: 600; font-size: 0.85rem; margin-bottom: 0.5rem;">${course.badge || 'New'}</span>
+                            <h1>${course.title}</h1>
+                            <p class="course-description">${course.description || 'এই কোর্সে এনরোল করে আপনার স্কিল ডেভেলপ করুন।'}</p>
+                            
+                            <h3>কোর্সটিতে যা যা থাকছে:</h3>
+                            <ul class="course-features" style="margin-top: 1rem;">
+                                <li><span class="icon">✓</span> একদম বেসিক থেকে এডভান্স লেভেল</li>
+                                <li><span class="icon">✓</span> এক্সক্লুসিভ লাইভ ক্লাস ও রেকর্ডেড ভিডিও</li>
+                                <li><span class="icon">✓</span> কোর্স শেষে সার্টিফিকেট</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Right Side: Checkout Box -->
+                    <div class="course-right">
+                        <div class="checkout-box">
+                            <div class="price-title">কোর্সের ফি</div>
+                            <div class="price-amount">৳${course.price}</div>
+                            
+                            <button class="btn btn-primary" style="width: 100%; font-size: 1.1rem; padding: 15px;">এখুনি কিনে নিন</button>
+                            
+                            <div style="margin-top: 1.5rem; border-top: 1px solid #eee; padding-top: 1.5rem;">
+                                <p style="color: #4b5563; font-weight: 600; margin-bottom: 0.8rem;">পেমেন্ট মাধ্যম:</p>
+                                <div style="display: flex; gap: 10px; align-items: center;">
+                                    <span style="color: #e2136e; font-weight: 800; border: 1px solid #e2136e; padding: 5px 10px; border-radius: 6px;">bKash</span>
+                                    <span style="color: #f05423; font-weight: 800; border: 1px solid #f05423; padding: 5px 10px; border-radius: 6px;">Nagad</span>
+                                    <span style="color: #8c1587; font-weight: 800; border: 1px solid #8c1587; padding: 5px 10px; border-radius: 6px;">Rocket</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                container.innerHTML = '<h2 style="grid-column: 1 / -1; text-align: center; color: red;">সার্ভারের সাথে কানেক্ট করা যাচ্ছে না!</h2>';
+            }
+        }
+    </script>
+</body>
+</html>

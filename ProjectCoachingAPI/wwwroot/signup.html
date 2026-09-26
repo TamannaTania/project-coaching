@@ -139,7 +139,7 @@
             try {
                 // Call our ASP.NET Core API
                 // Assuming HTTPS port 7015 from launchSettings.json
-                const response = await fetch('https://localhost:44307/api/auth/register', {
+                const response = await fetch('/api/auth/register', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ Name: name, Email: email, Password: password })

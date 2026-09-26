@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - P-Coaching (Kendo UI)</title>
+    
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Kendo UI CSS -->
+    <link href="https://kendo.cdn.telerik.com/themes/7.2.1/default/default-main.css" rel="stylesheet" />
+    
+    <!-- jQuery & Kendo UI JS -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://kendo.cdn.telerik.com/2024.1.319/js/kendo.all.min.js"></script>
+    
+    <style>
+        .admin-container {
+            max-width: 1200px;
+            margin: 3rem auto;
+            background: #fff;
+            padding: 2.5rem;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f0f4f8;
+        }
+
+        .admin-header h2 {
+            font-size: 1.8rem;
+            color: #1f2937;
+        }
+
+        /* Customizing Kendo Grid to match our theme */
+        .k-grid {
+            font-family: 'Inter', sans-serif;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .k-grid-header th.k-header {
+            background-color: #f8fafc;
+            font-weight: 600;
+            color: #4b5563;
+        }
+        
+        .k-button-solid-primary {
+            background-color: #1a9c5c;
+            border-color: #1a9c5c;
+        }
+        
+        .k-button-solid-primary:hover {
+            background-color: #15804a;
+        }
+    </style>
+</head>
+<body>
+    <header class="main-header">
+        <div class="logo">
+            <span class="logo-icon">🎯</span>
+            <span class="logo-text">Admin Panel</span>
+        </div>
+        <div class="header-right">
+            <a href="index.html" class="btn-login" style="border:none;">ওয়েবসাইটে যান</a>
+        </div>
+    </header>
+
+    <main>
+        <div class="admin-container">
+            <div class="admin-header">
+                <h2>কোর্স ম্যানেজমেন্ট (Kendo Grid)</h2>
+            </div>
+            
+            <!-- Kendo Grid Container -->
+            <div id="grid"></div>
+            
+        </div>
+    </main>
+
+    <script>
+        $(document).ready(function () {
+            // IMPORTANT: Replace YOUR_PORT with your actual Visual Studio port number!
+            var apiUrl = "/api/Courses";
+
+            $("#grid").kendoGrid({
+                dataSource: {
+                    transport: {
+                        read: {
+                            url: apiUrl,
+                            dataType: "json"
+                        },
+                        update: {
+                            url: function(data) {
+                                return apiUrl + "/" + data.id;
+                            },
+                            type: "PUT",
+                            contentType: "application/json",
+                            dataType: "json" // Wait for 204 NoContent, we don't return JSON but jQuery expects empty ok.
+                        },
+                        destroy: {
+                            url: function(data) {
+                                return apiUrl + "/" + data.id;
+                            },
+                            type: "DELETE"
+                        },
+                        create: {
+                            url: apiUrl,
+                            type: "POST",
+                            contentType: "application/json",
+                            dataType: "json"
+                        },
+                        parameterMap: function(options, operation) {
+                            if (operation !== "read" && options) {
+                                // .NET Core Web API expects the object directly
+                                return kendo.stringify(options);
+                            }
+                        }
+                    },
+                    schema: {
+                        model: {
+                            id: "id",
+                            fields: {
+                                id: { editable: false, nullable: true },
+                                title: { type: "string", validation: { required: true } },
+                                description: { type: "string" },
+                                price: { type: "number", validation: { required: true, min: 0 } },
+                                badge: { type: "string" },
+                                imageUrl: { type: "string" }
+                            }
+                        }
+                    },
+                    pageSize: 10,
+                    error: function(e) {
+                        alert("সার্ভারের সাথে কানেক্ট করতে সমস্যা হয়েছে! কনসোল চেক করুন।");
+                        console.log(e);
+                    }
+                },
+                height: 550,
+                sortable: true,
+                pageable: {
+                    refresh: true,
+                    pageSizes: true,
+                    buttonCount: 5
+                },
+                toolbar: ["create"], // Show Add new record button
+                columns: [
+                    { field: "title", title: "কোর্সের নাম", width: "220px" },
+                    { field: "price", title: "দাম (৳)", width: "120px" },
+                    { field: "badge", title: "ব্যাজ", width: "120px" },
+                    { field: "imageUrl", title: "ছবির লিংক", width: "200px" },
+                    { command: ["edit", "destroy"], title: "অ্যাকশন", width: "250px" }
+                ],
+                editable: "inline" // Enable inline editing
+            });
+        });
+    </script>
+</body>
+</html>
