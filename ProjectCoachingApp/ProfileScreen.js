@@ -1,17 +1,35 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function ProfileScreen({ navigation }) {
+    const [username, setUsername] = useState('');
+
+    useEffect(() => {
+        const loadUser = async () => {
+            const name = await AsyncStorage.getItem('username');
+            if(name) setUsername(name);
+        };
+        loadUser();
+    }, []);
+
     const handleLogout = async () => {
         await AsyncStorage.removeItem('token');
         await AsyncStorage.removeItem('username');
-        navigation.replace('Login');
+        
+        navigation.reset({
+            index: 0,
+            routes: [{ name: 'Login' }],
+        });
     };
 
     return (
         <View style={styles.container}>
-            <Text style={styles.text}>Profile & Settings</Text>
+            <View style={styles.avatar}>
+                <Ionicons name="person" size={60} color="#1a9c5c" />
+            </View>
+            <Text style={styles.text}>Welcome, {username || 'Student'}!</Text>
             
             <TouchableOpacity onPress={handleLogout} style={styles.logoutBtn}>
                 <Text style={styles.logoutBtnText}>Logout</Text>
@@ -26,6 +44,15 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: '#f8fafc',
+    },
+    avatar: {
+        width: 100,
+        height: 100,
+        borderRadius: 50,
+        backgroundColor: '#e6f7ff',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 20,
     },
     text: {
         fontSize: 20,

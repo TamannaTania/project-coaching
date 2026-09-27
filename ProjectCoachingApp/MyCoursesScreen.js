@@ -71,12 +71,16 @@ export default function MyCoursesScreen({ navigation }) {
                     <Text style={styles.emptyText}>You haven't enrolled in any courses yet.</Text>
                 </View>
             ) : (
-                <FlatList
-                    data={courses}
-                    keyExtractor={(item) => item.id.toString()}
-                    renderItem={renderItem}
-                    contentContainerStyle={{ padding: 20 }}
-                />
+                <View style={{ flex: 1, width: '100%', alignItems: 'center' }}>
+                    <FlatList
+                        data={courses}
+                        keyExtractor={(item, index) => (item.courseId ? item.courseId.toString() : index.toString())}
+                        renderItem={renderItem}
+                        contentContainerStyle={{ padding: 20, width: '100%' }}
+                        style={{ width: '100%', maxWidth: 800 }}
+                        showsVerticalScrollIndicator={false}
+                    />
+                </View>
             )}
         </View>
     );
