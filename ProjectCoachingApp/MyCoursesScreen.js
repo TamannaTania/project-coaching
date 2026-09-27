@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, ActivityIndicator, Image, TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const API_URL = 'https://localhost:44307/api/Enrollments/mycourses';
+import { API_BASE, API_HOST } from './config';
+const API_URL = API_BASE + '/Enrollments/mycourses';
 
 export default function MyCoursesScreen({ navigation }) {
     const [courses, setCourses] = useState([]);
@@ -26,7 +27,7 @@ export default function MyCoursesScreen({ navigation }) {
                     let img = item.imageUrl || 'https://via.placeholder.com/400x200?text=Course';
                     if (!img.startsWith('http')) {
                         const prefix = img.startsWith('/') ? '' : '/';
-                        img = 'https://localhost:44307' + prefix + img;
+                        img = API_HOST + prefix + img;
                     }
                     return { ...item, imageUrl: img };
                 });

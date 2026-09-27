@@ -3,7 +3,8 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator,
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Replace 5270 with your actual API port (from launchSettings.json / backend terminal)
-const API_URL = 'https://localhost:44307/api/auth/login';
+import { API_BASE } from './config';
+const API_URL = API_BASE + '/auth/login';
 
 export default function LoginScreen({ navigation }) {
     const [email, setEmail] = useState('');

@@ -3,7 +3,7 @@ import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity, ActivityIn
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const API_BASE = 'https://localhost:44307/api';
+import { API_BASE, API_HOST } from './config';
 
 export default function CourseDetailsScreen({ route, navigation }) {
     const { courseId } = route.params;
@@ -29,7 +29,7 @@ export default function CourseDetailsScreen({ route, navigation }) {
                 let img = data.imageUrl || 'https://via.placeholder.com/600x400?text=Course';
                 if (!img.startsWith('http')) {
                     const prefix = img.startsWith('/') ? '' : '/';
-                    img = 'https://localhost:44307' + prefix + img;
+                    img = API_HOST + prefix + img;
                 }
                 data.imageUrl = img;
                 setCourse(data);

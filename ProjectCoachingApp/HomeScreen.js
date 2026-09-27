@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, Image, TouchableOpacity, StyleSheet, ActivityIndicator, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const API_URL = 'https://localhost:44307/api/Courses';
+import { API_BASE, API_HOST } from './config';
+const API_URL = API_BASE + '/Courses';
 
 export default function HomeScreen({ navigation }) {
     const [courses, setCourses] = useState([]);
@@ -47,7 +48,7 @@ export default function HomeScreen({ navigation }) {
         if (!imageUrl.startsWith('http')) {
             // Append a slash if needed
             const prefix = imageUrl.startsWith('/') ? '' : '/';
-            imageUrl = 'https://localhost:44307' + prefix + imageUrl;
+            imageUrl = API_HOST + prefix + imageUrl;
         }
 
         return (

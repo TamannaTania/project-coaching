@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { API_HOST } from './config';
 
 export default function VideoPlayerScreen({ route, navigation }) {
     const { videoUrl, title } = route.params;
@@ -11,7 +12,7 @@ export default function VideoPlayerScreen({ route, navigation }) {
     if (!finalUrl.startsWith('http')) {
         const prefix = finalUrl.startsWith('/') ? '' : '/';
         // Assuming videos are in a /videos/ folder, or just in root
-        finalUrl = 'https://localhost:44307' + prefix + encodeURI(finalUrl);
+        finalUrl = API_HOST + prefix + encodeURI(finalUrl);
     }
 
     // Convert standard YouTube URLs to embed URLs if needed
