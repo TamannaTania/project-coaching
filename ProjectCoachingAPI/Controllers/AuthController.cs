@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -51,7 +52,7 @@ namespace ProjectCoachingAPI.Controllers
         [HttpPost("login")]
         public async Task<ActionResult<object>> Login(UserLoginDto request)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+             var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
             if (user == null)
             {
                 return BadRequest("User not found!");
@@ -60,6 +61,27 @@ namespace ProjectCoachingAPI.Controllers
             if (!BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
             {
                 return BadRequest("Wrong password!");
+            }
+
+            // --- Device Limit Logic ---
+            if (user.Role != "Admin") 
+            {
+                if (string.IsNullOrEmpty(request.DeviceId)) 
+                {
+                    return BadRequest("ব্রাউজারের ক্যাশ (Cache) ক্লিয়ার করে পেজটি রিলোড (Ctrl+F5) দিন!");
+                }
+
+                if (string.IsNullOrEmpty(user.DeviceId)) 
+                {
+                    // First time login, save this device
+                    user.DeviceId = request.DeviceId;
+                    await _context.SaveChangesAsync();
+                }
+                else if (user.DeviceId != request.DeviceId)
+                {
+                    // Logging in from a different device!
+                    return BadRequest("oops! You are already logged in on another device.");
+                }
             }
 
             string token = CreateToken(user);
@@ -93,6 +115,45 @@ namespace ProjectCoachingAPI.Controllers
             var jwt = new JwtSecurityTokenHandler().WriteToken(token);
 
             return jwt;
+        }
+
+        [Authorize]
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout()
+        {
+            var email = User.FindFirstValue(ClaimTypes.Email);
+            if (string.IsNullOrEmpty(email)) return Unauthorized();
+
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+            if (user != null)
+            {
+                // Clear the allowed device so they can log in from anywhere else
+                user.DeviceId = null;
+                await _context.SaveChangesAsync();
+            }
+
+            return Ok(new { message = "Logged out successfully" });
+        }
+
+        [Authorize]
+        [HttpPut("change-password")]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDto dto)
+        {
+            var email = User.FindFirstValue(ClaimTypes.Email);
+            if (string.IsNullOrEmpty(email)) return Unauthorized();
+
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+            if (user == null) return Unauthorized();
+
+            if (!BCrypt.Net.BCrypt.Verify(dto.OldPassword, user.PasswordHash))
+            {
+                return BadRequest(new { message = "পুরানো পাসওয়ার্ডটি সঠিক নয়!" });
+            }
+
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "পাসওয়ার্ড সফলভাবে পরিবর্তন করা হয়েছে!" });
         }
     }
 }

@@ -9,5 +9,8 @@ namespace ProjectCoachingAPI.Models
         
         // "Admin" or "Student"
         public string Role { get; set; } = "Student"; 
+
+        // To track the allowed device
+        public string? DeviceId { get; set; }
     }
 }

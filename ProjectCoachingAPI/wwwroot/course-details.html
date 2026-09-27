@@ -11,7 +11,7 @@
     <header class="main-header">
         <a href="index.html" class="logo" style="text-decoration: none; color: inherit;">
             <span class="logo-icon">🎯</span>
-            <span class="logo-text">P-Coaching</span>
+            <span class="logo-text">PWS</span>
         </a>
         
         <nav class="nav-menu">
@@ -27,7 +27,7 @@
 
         <div class="header-right">
             <div class="search-box">
-                <input type="text" placeholder="কোর্স খুঁজুন...">
+                <input type="text" id="globalSearchInput" placeholder="কোর্স খুঁজুন...">
             </div>
             
             <div class="hotline">
@@ -50,70 +50,67 @@
     </footer>
 
     <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            // Check login status for header
-            const token = localStorage.getItem('token');
-            const username = localStorage.getItem('username');
-            const loginBtn = document.querySelector('.btn-login');
-
-            if (token && username) {
-                loginBtn.outerHTML = `
-                    <div style="display: flex; align-items: center; gap: 15px;">
-                        <span style="font-weight: 600; color: #1f2937;">স্বাগতম, ${username}</span>
-                        <a href="#" id="logoutBtn" style="color: #ff5722; font-weight: 600; text-decoration: none;">লগআউট</a>
-                    </div>
-                `;
-
-                document.getElementById('logoutBtn').addEventListener('click', (e) => {
-                    e.preventDefault();
-                    localStorage.removeItem('token');
-                    localStorage.removeItem('username');
-                    window.location.reload();
-                });
-            }
-
-            loadCourseDetails();
-        });
-
-        async function loadCourseDetails() {
-            // Get ID from URL parameter (e.g. ?id=1)
+        // @ts-nocheck
+        document.addEventListener("DOMContentLoaded", async () => {
             const urlParams = new URLSearchParams(window.location.search);
             const courseId = urlParams.get('id');
-
-            const container = document.getElementById('detailsContainer');
+            const container = document.getElementById('detailsContainer'); // FIX: ID was 'courseDetailsContainer' but html has 'detailsContainer'
 
             if (!courseId) {
-                container.innerHTML = '<h2 style="grid-column: 1 / -1; text-align: center; color: red;">কোনো কোর্স পাওয়া যায়নি!</h2>';
+                container.innerHTML = '<p style="text-align:center; font-size: 1.2rem; color: red;">কোনো কোর্স সিলেক্ট করা হয়নি।</p>';
                 return;
             }
 
             try {
-                // IMPORTANT: Replace YOUR_PORT with your actual Visual Studio port number!
-                const response = await fetch(`/api/Courses/${courseId}`);
-                
-                if (!response.ok) {
-                    throw new Error("Course not found");
-                }
-                
+                const response = await fetch('/api/Courses/' + courseId);
+                if (!response.ok) throw new Error("Course not found");
                 const course = await response.json();
+
+                const token = localStorage.getItem('token');
+                let isEnrolled = false; let enrollStatus = 'None';
+
+                if (token) {
+                    try {
+                        const checkRes = await fetch('/api/Enrollments/check/' + courseId, {
+                            headers: { 'Authorization': 'Bearer ' + token }
+                        });
+                        const checkData = await checkRes.json();
+                        isEnrolled = checkData.isEnrolled; enrollStatus = checkData.status;
+                    } catch(e) { console.log(e); }
+                }
 
                 let videoHtml = '';
                 const vidUrl = course.videoUrl || 'https://www.w3schools.com/html/mov_bbb.mp4';
                 
-                if (vidUrl.includes('youtube.com') || vidUrl.includes('youtu.be')) {
-                    // Convert normal YouTube link to embed link
+                if (enrollStatus === 'Pending') {
+                    videoHtml = `
+                        <div style="width:100%; aspect-ratio: 16/9; background:#1f2937; border-radius:12px; display:flex; flex-direction:column; align-items:center; justify-content:center; color:white; text-align:center; padding: 2rem;">
+                            <span style="font-size: 4rem; margin-bottom: 1rem;">⏳</span>
+                            <h3>পেমেন্ট ভেরিফিকেশন চলছে...</h3>
+                            <p style="color: #9ca3af; margin-top: 0.5rem;">অ্যাডমিন আপনার পেমেন্ট চেক করে এপ্রুভ করলেই ভিডিওটি আনলক হয়ে যাবে।</p>
+                        </div>
+                    `;
+                } else if (!isEnrolled) {
+                    videoHtml = `
+                        <div style="width:100%; aspect-ratio: 16/9; background:#1f2937; border-radius:12px; display:flex; flex-direction:column; align-items:center; justify-content:center; color:white; text-align:center; padding: 2rem;">
+                            <span style="font-size: 4rem; margin-bottom: 1rem;">🔒</span>
+                            <h3>এই ভিডিওটি লক করা আছে</h3>
+                            <p style="color: #9ca3af; margin-top: 0.5rem;">ভিডিওটি দেখতে আপনাকে কোর্সটি কিনতে হবে।</p>
+                        </div>
+                    `;
+                } else if (vidUrl.includes('youtube.com') || vidUrl.includes('youtu.be')) {
                     let videoId = '';
-                    if (vidUrl.includes('youtu.be/')) {
-                        videoId = vidUrl.split('youtu.be/')[1].split('?')[0];
-                    } else if (vidUrl.includes('youtube.com/watch')) {
-                        videoId = new URL(vidUrl).searchParams.get('v');
-                    } else if (vidUrl.includes('youtube.com/embed/')) {
-                        videoId = vidUrl.split('youtube.com/embed/')[1].split('?')[0];
-                    }
-                    
+                    if (vidUrl.includes('youtu.be/')) videoId = vidUrl.split('youtu.be/')[1].split('?')[0];
+                    else if (vidUrl.includes('youtube.com/watch')) videoId = new URL(vidUrl).searchParams.get('v');
+                    else if (vidUrl.includes('youtube.com/embed/')) videoId = vidUrl.split('youtube.com/embed/')[1].split('?')[0];
                     videoHtml = `<iframe width="100%" height="100%" src="https://www.youtube.com/embed/${videoId}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="border-radius:12px; aspect-ratio: 16/9;"></iframe>`;
+                } else if (vidUrl.includes('facebook.com') || vidUrl.includes('fb.watch')) {
+                    let fbEmbedUrl = vidUrl;
+                    if (!vidUrl.includes('plugins/video.php')) {
+                        fbEmbedUrl = `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(vidUrl)}&show_text=false`;
+                    }
+                    videoHtml = `<iframe src="${fbEmbedUrl}" width="100%" height="100%" style="border:none; overflow:hidden; border-radius:12px; aspect-ratio: 16/9;" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"></iframe>`;
                 } else {
-                    // Normal MP4 video
                     videoHtml = `
                         <video controls poster="${course.imageUrl || 'https://via.placeholder.com/800x450?text=Video+Thumbnail'}" style="width:100%; border-radius:12px; aspect-ratio: 16/9; background:#000;">
                             <source src="${vidUrl}" type="video/mp4">
@@ -122,55 +119,177 @@
                     `;
                 }
 
+                let actionButtonHtml = '';
+                if (enrollStatus === 'Pending') {
+                    actionButtonHtml = `<button class="btn btn-primary" style="background:#f59e0b; cursor:default; width: 100%;">⏳ পেমেন্ট অপেক্ষমান</button>`;
+                } else if (isEnrolled) {
+                    actionButtonHtml = `<button class="btn btn-primary" style="background:#4CAF50; cursor:default; width: 100%;">✅ আপনি কোর্সটি কিনেছেন</button>`;
+                } else {
+                    actionButtonHtml = `<button class="btn btn-primary" id="buyNowBtn" style="width: 100%;">এখুনি কিনে নিন</button>`;
+                }
+
                 container.innerHTML = `
                     <div style="grid-column: 1 / -1; margin-bottom: 1rem;">
                         <a href="index.html" style="text-decoration: none; color: #1a9c5c; font-weight: 600; display: inline-flex; align-items: center; gap: 5px;">
                             <span>←</span> হোমপেজে ফিরে যান
                         </a>
                     </div>
-                    <!-- Left Side: Video & Info -->
                     <div class="course-left">
                         <div class="video-container" style="margin-bottom: 2rem;">
                             ${videoHtml}
                         </div>
-                        
                         <div class="course-info">
                             <span class="badge" style="background-color: #e6f7ff; color: #007bff; display: inline-block; padding: 4px 12px; border-radius: 50px; font-weight: 600; font-size: 0.85rem; margin-bottom: 0.5rem;">${course.badge || 'New'}</span>
                             <h1>${course.title}</h1>
                             <p class="course-description">${course.description || 'এই কোর্সে এনরোল করে আপনার স্কিল ডেভেলপ করুন।'}</p>
-                            
-                            <h3>কোর্সটিতে যা যা থাকছে:</h3>
-                            <ul class="course-features" style="margin-top: 1rem;">
-                                <li><span class="icon">✓</span> একদম বেসিক থেকে এডভান্স লেভেল</li>
-                                <li><span class="icon">✓</span> এক্সক্লুসিভ লাইভ ক্লাস ও রেকর্ডেড ভিডিও</li>
-                                <li><span class="icon">✓</span> কোর্স শেষে সার্টিফিকেট</li>
+                            <h3 style="margin-top: 1.5rem; margin-bottom: 1rem; color: #1f2937;">এই কোর্সে যা থাকছে</h3>
+                            <ul style="list-style: none; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px;">
+                                <li style="display: flex; align-items: center; gap: 10px; color: #4b5563; font-size: 0.95rem;">
+                                    <span style="font-size: 1.2rem;">👥</span> কোর্সটি করছেন ${course.enrolledCount || 0} জন
+                                </li>
+                                <li style="display: flex; align-items: center; gap: 10px; color: #4b5563; font-size: 0.95rem;">
+                                    <span style="font-size: 1.2rem;">⏱️</span> সময় লাগবে ৬ ঘন্টা
+                                </li>
+                                <li style="display: flex; align-items: center; gap: 10px; color: #4b5563; font-size: 0.95rem;">
+                                    <span style="font-size: 1.2rem;">🎬</span> ৩৯টি ভিডিও
+                                </li>
+                                <li style="display: flex; align-items: center; gap: 10px; color: #4b5563; font-size: 0.95rem;">
+                                    <span style="font-size: 1.2rem;">📝</span> ১৪টি নোট
+                                </li>
+                                <li style="display: flex; align-items: center; gap: 10px; color: #4b5563; font-size: 0.95rem;">
+                                    <span style="font-size: 1.2rem;">❓</span> ৫ সেট কুইজ
+                                </li>
+                                <li style="display: flex; align-items: center; gap: 10px; color: #4b5563; font-size: 0.95rem;">
+                                    <span style="font-size: 1.2rem;">📄</span> ৬টি টেমপ্লেট
+                                </li>
+                                <li style="display: flex; align-items: center; gap: 10px; color: #4b5563; font-size: 0.95rem;">
+                                    <span style="font-size: 1.2rem;">⏳</span> কোর্সের মেয়াদ আজীবন
+                                </li>
                             </ul>
                         </div>
                     </div>
-
-                    <!-- Right Side: Checkout Box -->
                     <div class="course-right">
                         <div class="checkout-box">
-                            <div class="price-title">কোর্সের ফি</div>
+                            <p class="price-title">কোর্সের ফি</p>
                             <div class="price-amount">৳${course.price}</div>
-                            
-                            <button class="btn btn-primary" style="width: 100%; font-size: 1.1rem; padding: 15px;">এখুনি কিনে নিন</button>
-                            
-                            <div style="margin-top: 1.5rem; border-top: 1px solid #eee; padding-top: 1.5rem;">
-                                <p style="color: #4b5563; font-weight: 600; margin-bottom: 0.8rem;">পেমেন্ট মাধ্যম:</p>
-                                <div style="display: flex; gap: 10px; align-items: center;">
-                                    <span style="color: #e2136e; font-weight: 800; border: 1px solid #e2136e; padding: 5px 10px; border-radius: 6px;">bKash</span>
-                                    <span style="color: #f05423; font-weight: 800; border: 1px solid #f05423; padding: 5px 10px; border-radius: 6px;">Nagad</span>
-                                    <span style="color: #8c1587; font-weight: 800; border: 1px solid #8c1587; padding: 5px 10px; border-radius: 6px;">Rocket</span>
+                            ${actionButtonHtml}
+                            <div class="payment-methods" style="margin-top: 1.5rem; border-top: 1px solid #f0f4f8; padding-top: 1rem;">
+                                <p style="font-size: 0.9rem; color: #6b7280; margin-bottom: 0.5rem;">পেমেন্ট মাধ্যম:</p>
+                                <div style="display: flex; gap: 10px;">
+                                    <span style="border: 1px solid #e2136e; color: #e2136e; padding: 4px 10px; border-radius: 4px; font-size: 0.85rem; font-weight: 600;">bKash</span>
+                                    <span style="border: 1px solid #f05423; color: #f05423; padding: 4px 10px; border-radius: 4px; font-size: 0.85rem; font-weight: 600;">Nagad</span>
+                                    <span style="border: 1px solid #8c1587; color: #8c1587; padding: 4px 10px; border-radius: 4px; font-size: 0.85rem; font-weight: 600;">Rocket</span>
                                 </div>
                             </div>
                         </div>
                     </div>
+                    
+                    <!-- Payment Modal Overlay -->
+                    <div id="paymentModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; align-items:center; justify-content:center;">
+                        <div style="background:white; padding:2rem; border-radius:12px; width:90%; max-width:400px; box-shadow:0 10px 25px rgba(0,0,0,0.2); position:relative;">
+                            <button id="closeModalBtn" style="position:absolute; top:15px; right:15px; background:transparent; border:none; font-size:1.5rem; cursor:pointer; color:#666;">&times;</button>
+                            
+                            <h3 style="text-align:center; color:#1f2937; margin-bottom:0.5rem;">পেমেন্ট নিশ্চিত করুন</h3>
+                            <p style="text-align:center; color:#e2136e; font-weight:600; margin-bottom:1.5rem;">সর্বমোট প্রদেয়: ৳${course.price}</p>
+                            
+                            <div style="background:#f3f4f6; padding:15px; border-radius:8px; margin-bottom:1.5rem; font-size:0.9rem; color:#4b5563;">
+                                <p style="margin-bottom:5px;">১. নিচের নাম্বারে <strong>Send Money</strong> করুন:</p>
+                                <p style="font-size:1.1rem; font-weight:bold; color:#111; text-align:center; letter-spacing:1px; margin-bottom:5px;">01636464862</p>
+                                <p style="text-align:center; font-size:0.8rem;">(বিকাশ / নগদ / রকেট পার্সোনাল)</p>
+                            </div>
+
+                            <div style="margin-bottom:1rem;">
+                                <label style="display:block; font-size:0.9rem; font-weight:600; margin-bottom:5px; color:#374151;">যে নাম্বার থেকে টাকা পাঠিয়েছেন:</label>
+                                <input type="text" id="payPhone" placeholder="01XXX-XXXXXX" style="width:100%; padding:10px; border:1px solid #d1d5db; border-radius:6px; font-size:1rem;">
+                            </div>
+                            
+                            <div style="margin-bottom:1.5rem;">
+                                <label style="display:block; font-size:0.9rem; font-weight:600; margin-bottom:5px; color:#374151;">ট্রানজেকশন আইডি (TrxID):</label>
+                                <input type="text" id="payTrxId" placeholder="e.g. 8N5G92JXK" style="width:100%; padding:10px; border:1px solid #d1d5db; border-radius:6px; font-size:1rem;">
+                            </div>
+
+                            <button id="confirmPayBtn" class="btn btn-primary" style="width:100%;">পেমেন্ট কনফার্ম করুন</button>
+                        </div>
+                    </div>
                 `;
+
+                if (!isEnrolled && enrollStatus !== 'Pending') {
+                    const paymentModal = document.getElementById('paymentModal');
+                    
+                    // Show Modal
+                    document.getElementById('buyNowBtn').addEventListener('click', () => {
+                        if (!token) {
+                            alert("কোর্সটি কিনতে হলে আপনাকে আগে লগইন করতে হবে!");
+                            window.location.href = "login.html";
+                            return;
+                        }
+                        paymentModal.style.display = 'flex';
+                    });
+
+                    // Close Modal
+                    document.getElementById('closeModalBtn').addEventListener('click', () => {
+                        paymentModal.style.display = 'none';
+                    });
+
+                    // Confirm Payment API Call
+                    document.getElementById('confirmPayBtn').addEventListener('click', async () => {
+                        const phone = document.getElementById('payPhone').value;
+                        const trxId = document.getElementById('payTrxId').value;
+
+                        if(!phone || !trxId) {
+                            alert("দয়া করে ফোন নাম্বার এবং ট্রানজেকশন আইডি (TrxID) সঠিকভাবে প্রদান করুন!");
+                            return;
+                        }
+
+                        const confirmBtn = document.getElementById('confirmPayBtn');
+                        confirmBtn.innerText = "ভেরিফাই করা হচ্ছে...";
+                        confirmBtn.style.opacity = "0.7";
+                        confirmBtn.disabled = true;
+
+                        // Simulate a short delay to make it feel real
+                        setTimeout(async () => {
+                            try {
+                                                                const buyRes = await fetch('/api/Enrollments/' + courseId, {
+                                    method: 'POST',
+                                    headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ phone: phone, trxId: trxId })
+                                });
+                                
+                                if (buyRes.ok) {
+                                    alert("পেমেন্ট সফলভাবে ভেরিফাই হয়েছে! কোর্সটি এখন আপনার।");
+                                    window.location.reload();
+                                } else {
+                                    alert("সার্ভারে কোনো সমস্যা হয়েছে। দয়া করে আবার চেষ্টা করুন।");
+                                    confirmBtn.innerText = "পেমেন্ট কনফার্ম করুন";
+                                    confirmBtn.style.opacity = "1";
+                                    confirmBtn.disabled = false;
+                                }
+                            } catch(e) { 
+                                console.log(e);
+                                confirmBtn.innerText = "পেমেন্ট কনফার্ম করুন";
+                                confirmBtn.style.opacity = "1";
+                                confirmBtn.disabled = false;
+                            }
+                        }, 1500); // 1.5 second fake delay
+                    });
+                }
             } catch (error) {
-                container.innerHTML = '<h2 style="grid-column: 1 / -1; text-align: center; color: red;">সার্ভারের সাথে কানেক্ট করা যাচ্ছে না!</h2>';
+                container.innerHTML = '<p style="text-align:center; font-size: 1.2rem; color: red;">সার্ভারের সাথে কানেক্ট করা যাচ্ছে না!</p>';
             }
-        }
+
+            // Global search logic
+            const gSearch = document.getElementById('globalSearchInput');
+            if (gSearch) {
+                gSearch.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter' && e.target.value.trim() !== '') {
+                        window.location.href = 'index.html?search=' + encodeURIComponent(e.target.value.trim());
+                    }
+                });
+            }
+        });
     </script>
 </body>
 </html>
+
+
+

@@ -128,12 +128,19 @@
             msgBox.style.display = 'none';
             msgBox.className = '';
 
+            // Device Tracking Logic
+            let deviceId = localStorage.getItem('deviceId');
+            if (!deviceId) {
+                deviceId = 'device-' + Math.random().toString(36).substr(2, 9) + '-' + Date.now();
+                localStorage.setItem('deviceId', deviceId);
+            }
+
             try {
                 // IMPORTANT: Replace YOUR_PORT with your actual Visual Studio port number!
                 const response = await fetch('/api/auth/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ Email: email, Password: password })
+                    body: JSON.stringify({ Email: email, Password: password, DeviceId: deviceId })
                 });
 
                 if (response.ok) {

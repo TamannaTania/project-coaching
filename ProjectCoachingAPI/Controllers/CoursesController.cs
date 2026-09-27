@@ -25,7 +25,7 @@ namespace ProjectCoachingAPI.Controllers
 
         // GET: api/Courses/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Course>> GetCourse(int id)
+        public async Task<IActionResult> GetCourse(int id)
         {
             var course = await _context.Courses.Include(c => c.Features).FirstOrDefaultAsync(c => c.Id == id);
 
@@ -34,7 +34,19 @@ namespace ProjectCoachingAPI.Controllers
                 return NotFound();
             }
 
-            return course;
+            var enrolledCount = await _context.Enrollments.CountAsync(e => e.CourseId == id && e.Status == "Approved");
+
+            return Ok(new {
+                course.Id,
+                course.Title,
+                course.Description,
+                course.Badge,
+                course.Price,
+                course.ImageUrl,
+                course.VideoUrl,
+                course.Features,
+                enrolledCount = enrolledCount
+            });
         }
 
         // POST: api/Courses
