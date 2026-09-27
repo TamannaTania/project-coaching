@@ -136,7 +136,9 @@ export default function CourseDetailsScreen({ route, navigation }) {
                     ) : showPayment ? (
                         <View style={styles.paymentBox}>
                             <Text style={styles.paymentTitle}>Complete Payment</Text>
-                            <Text style={styles.paymentDesc}>Send ৳{course.price} to our bKash/Nagad Merchant Number: 01636464862 and enter your details below:</Text>
+                            <Text style={styles.paymentDesc}>
+                                Send ৳{course.price} to our bKash/Nagad Merchant Number: <Text style={{fontWeight: 'bold', color: '#111827'}}>01636464862</Text> and enter your details below:
+                            </Text>
                             
                             <Text style={styles.inputLabel}>Sender Phone Number</Text>
                             <TextInput 
