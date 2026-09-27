@@ -155,5 +155,17 @@ namespace ProjectCoachingAPI.Controllers
 
             return Ok(new { message = "পাসওয়ার্ড সফলভাবে পরিবর্তন করা হয়েছে!" });
         }
+
+        [HttpGet("reset-devices")]
+        public async Task<IActionResult> ResetDevices()
+        {
+            var users = await _context.Users.ToListAsync();
+            foreach(var user in users)
+            {
+                user.DeviceId = null;
+            }
+            await _context.SaveChangesAsync();
+            return Ok("All device limits have been reset! You can now log in from any device.");
+        }
     }
 }
