@@ -203,10 +203,11 @@ const styles = StyleSheet.create({
         backgroundColor: '#143d8d',
         padding: 10,
         borderRadius: 8,
-        alignItems: 'center',
+        alignItems: 'center'
+       
     },
     buyButtonText: {
-        color: '#4b5563',
+        color: 'white',
         fontWeight: '600',
     }
 });
