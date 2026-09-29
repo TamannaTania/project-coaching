@@ -3,171 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - P-Coaching</title>
-    <link rel="stylesheet" href="styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        .auth-container {
-            max-width: 450px;
-            margin: 4rem auto;
-            background: #fff;
-            padding: 2.5rem;
-            border-radius: 16px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
-            border: 1px solid #f0f4f8;
-        }
-
-        .auth-container h2 {
-            text-align: center;
-            font-size: 2rem;
-            color: #1f2937;
-            margin-bottom: 2rem;
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-            color: #4b5563;
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 12px 16px;
-            border: 1px solid #d1d5db;
-            border-radius: 8px;
-            font-size: 1rem;
-            outline: none;
-            transition: border-color 0.3s;
-        }
-
-        .form-group input:focus {
-            border-color: #1a9c5c;
-            box-shadow: 0 0 0 3px rgba(26, 156, 92, 0.1);
-        }
-
-        .auth-footer {
-            text-align: center;
-            margin-top: 1.5rem;
-            color: #6b7280;
-        }
-
-        .auth-footer a {
-            color: #1a9c5c;
-            font-weight: 600;
-            text-decoration: none;
-        }
-
-        #message {
-            margin-top: 1rem;
-            text-align: center;
-            font-weight: 600;
-            padding: 10px;
-            border-radius: 8px;
-            display: none;
-        }
-
-        .msg-success { background: #e6f7ef; color: #1a9c5c; }
-        .msg-error { background: #ffeae6; color: #ff5722; }
-    </style>
+    <title>Login - PhysicsAcademy</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body>
-    <header class="main-header">
-        <div class="logo">
-            <span class="logo-icon">🎯</span>
-            <span class="logo-text">P-Coaching</span>
+<body class="bg-slate-50 font-sans text-slate-800 flex items-center justify-center min-h-screen">
+
+    <div class="bg-white p-8 md:p-12 rounded-2xl shadow-xl max-w-md w-full border border-slate-100">
+        <div class="text-center mb-8">
+            <i class="fa-solid fa-atom text-5xl text-emerald-600 mb-4"></i>
+            <h2 class="text-3xl font-bold text-slate-900">Welcome Back</h2>
+            <p class="text-slate-500 mt-2">Login to your account to enroll in courses.</p>
         </div>
-        
-        <div class="header-right">
-            <a href="index.html" class="btn-login" style="border: none;">হোম পেজে ফিরে যান</a>
-        </div>
-    </header>
 
-    <main>
-        <div class="auth-container">
-            <h2>লগইন করুন</h2>
-            
-            <form id="loginForm">
-                <div class="form-group">
-                    <label>ইমেইল এড্রেস</label>
-                    <input type="email" id="email" placeholder="আপনার ইমেইল দিন" required>
-                </div>
-                
-                <div class="form-group">
-                    <label>পাসওয়ার্ড</label>
-                    <input type="password" id="password" placeholder="আপনার পাসওয়ার্ড দিন" required>
-                </div>
-                
-                <button type="submit" class="btn btn-primary" id="submitBtn">লগইন করুন</button>
-            </form>
-
-            <div id="message"></div>
-
-            <div class="auth-footer">
-                একাউন্ট নেই? <a href="signup.html">সাইন আপ করুন</a>
+        <form id="loginForm" class="space-y-6">
+            <div>
+                <label class="block text-slate-700 font-bold mb-2">Username</label>
+                <input type="text" id="username" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500" required>
             </div>
+            <div>
+                <label class="block text-slate-700 font-bold mb-2">Password</label>
+                <input type="password" id="password" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500" required>
+            </div>
+            
+            <div id="errorMsg" class="hidden bg-red-50 text-red-600 p-3 rounded-lg text-sm font-medium text-center"></div>
+
+            <button type="submit" id="submitBtn" class="w-full bg-emerald-600 text-white font-bold rounded-lg px-4 py-3 hover:bg-emerald-700 transition shadow-lg shadow-emerald-200">
+                Login
+            </button>
+        </form>
+        
+        <div class="mt-6 text-center text-sm text-slate-500">
+            Don't have an account? <a href="register.html" class="text-emerald-600 font-bold hover:underline">Register</a>
         </div>
-    </main>
+    </div>
 
     <script>
-        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
             const btn = document.getElementById('submitBtn');
-            const msgBox = document.getElementById('message');
-            
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            
-            btn.innerText = 'অপেক্ষা করুন...';
+            const errorMsg = document.getElementById('errorMsg');
+            btn.innerText = 'Logging in...';
             btn.disabled = true;
-            msgBox.style.display = 'none';
-            msgBox.className = '';
+            errorMsg.classList.add('hidden');
 
-            // Device Tracking Logic
-            let deviceId = localStorage.getItem('deviceId');
-            if (!deviceId) {
-                deviceId = 'device-' + Math.random().toString(36).substr(2, 9) + '-' + Date.now();
-                localStorage.setItem('deviceId', deviceId);
-            }
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
 
             try {
-                // IMPORTANT: Replace YOUR_PORT with your actual Visual Studio port number!
-                const response = await fetch('/api/auth/login', {
+                // Use random device ID for web
+                const deviceId = localStorage.getItem('deviceId') || 'web-' + Math.random().toString(36).substring(7);
+                localStorage.setItem('deviceId', deviceId);
+
+                const response = await fetch('/api/Auth/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ Email: email, Password: password, DeviceId: deviceId })
+                    body: JSON.stringify({ username, password, deviceId })
                 });
 
+                const data = await response.json();
+
                 if (response.ok) {
-                    const data = await response.json();
-                    
-                    // Save Token and Username to browser local storage
                     localStorage.setItem('token', data.token);
-                    localStorage.setItem('username', data.username);
-
-                    msgBox.innerText = "লগইন সফল হয়েছে! আপনাকে হোমপেজে নিয়ে যাওয়া হচ্ছে...";
-                    msgBox.classList.add('msg-success');
-                    
-                    // Redirect to home page
-                    setTimeout(() => window.location.href = 'index.html', 1500);
+                    localStorage.setItem('username', username);
+                    // Redirect back to course page if came from one
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const returnUrl = urlParams.get('returnUrl') || '/';
+                    window.location.href = returnUrl;
                 } else {
-                    const errorText = await response.text();
-                    msgBox.innerText = errorText || "ভুল ইমেইল বা পাসওয়ার্ড!";
-                    msgBox.classList.add('msg-error');
+                    errorMsg.innerText = data.message || "Invalid credentials.";
+                    errorMsg.classList.remove('hidden');
                 }
-            } catch (error) {
-                msgBox.innerText = "সার্ভারের সাথে কানেক্ট করা যাচ্ছে না। দয়া করে নিশ্চিত করুন আপনার Visual Studio তে API রান করা আছে।";
-                msgBox.classList.add('msg-error');
+            } catch (err) {
+                errorMsg.innerText = "Connection error.";
+                errorMsg.classList.remove('hidden');
+            } finally {
+                btn.innerText = 'Login';
+                btn.disabled = false;
             }
-
-            msgBox.style.display = 'block';
-            btn.innerText = 'লগইন করুন';
-            btn.disabled = false;
         });
     </script>
 </body>

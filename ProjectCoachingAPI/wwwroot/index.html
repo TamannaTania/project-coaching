@@ -3,328 +3,200 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Project Coaching</title>
-    <link rel="stylesheet" href="styles.css">
-    <!-- Optional: Add a font like Inter for a more modern look -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>PhysicsAcademy - Master Physics</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .hero-bg {
+            background: linear-gradient(135deg, #143d8d 0%, #1a9c5c 100%);
+        }
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+    </style>
 </head>
-<body>
-    <header class="main-header">
-        <!-- Logo -->
-        <div class="logo">
-            <span class="logo-icon">🎯</span>
-            <span class="logo-text">PWS</span>
-        </div>
-        
-        <!-- Navigation Menu -->
-        <nav class="desktop-nav">
-            <div class="nav-item active-dropdown">
-                <span data-i18n="nav_class">ক্লাস ৯-১২</span>
-                <span class="dropdown-icon">▼</span>
-            </div>
-            <div class="nav-item">
-                <span data-i18n="nav_admission">ভর্তি পরীক্ষা</span>
-                <span class="dropdown-icon">▼</span>
-            </div>
-            <div class="nav-item">
-                <span data-i18n="nav_skills">স্কিলস</span>
-                <span class="dropdown-icon">▼</span>
-            </div>
-            <div class="nav-item">
-                <span data-i18n="nav_books">বুক স্টোর</span>
-            </div>
-        </nav>
+<body class="bg-slate-50 font-sans text-slate-800">
 
-        <!-- Right Side: Search, Lang, Hotline -->
-        <div class="header-right">
-            <div class="search-box">
-                <span class="search-icon">🔍</span>
-                <input type="text" id="searchInput" placeholder="কোর্স সার্চ করুন...">
-            </div>
-            
-            <div class="lang-toggle">
-                <span class="lang active" id="btn-bn">BN</span>
-                <span class="lang" id="btn-en">EN</span>
-            </div>
-
-            <div class="hotline">
-                <span class="phone-icon">📞</span>
-                <span class="phone-number">16910</span>
-            </div>
-
-            <!-- Login / Sign Up Button -->
-            <a href="login.html" class="btn-login" data-i18n="btn_login">লগইন</a>
-        </div>
-    </header>
-
-    <main>
-        <section id="hero">
-            <h2 data-i18n="hero_title">Welcome to Physic Class With Shovon</h2>
-            <p data-i18n="hero_subtitle">Learn and build amazing projects with our expert-guided courses.</p>
-        </section>
-
-        <section id="courses">
-            <h2 class="section-title" data-i18n="section_courses">Our Featured Courses</h2>
-            
-            <div class="course-container" id="courseContainer">
-                <p style="text-align:center; font-size: 1.2rem; grid-column: 1 / -1;" data-i18n="loading">লোডিং হচ্ছে...</p>
-            </div>
-        </section>
-
-        <!-- Success Stories Section -->
-        <section id="success-stories">
-            <h2 class="section-title" style="text-align: center; margin-bottom: 2rem;" data-i18n="section_success">আমাদের সফল শিক্ষার্থীরা</h2>
-            
-            <div class="marquee-container">
-                <div class="marquee-content">
-                    <!-- Original 5 Students -->
-                    <div class="student-card">
-                        <img src="https://ui-avatars.com/api/?name=Rahim+Mia&background=random&color=fff&size=100" alt="Student" class="student-img">
-                        <h4 class="student-name">রহিম মিয়া</h4>
-                        <p class="student-varsity">BUET</p>
-                    </div>
-                    <div class="student-card">
-                        <img src="https://ui-avatars.com/api/?name=Sadia+Islam&background=random&color=fff&size=100" alt="Student" class="student-img">
-                        <h4 class="student-name">সাদিয়া ইসলাম</h4>
-                        <p class="student-varsity">Dhaka University</p>
-                    </div>
-                    <div class="student-card">
-                        <img src="https://ui-avatars.com/api/?name=Fahim+Rahman&background=random&color=fff&size=100" alt="Student" class="student-img">
-                        <h4 class="student-name">ফাহিম রহমান</h4>
-                        <p class="student-varsity">Dhaka Medical College</p>
-                    </div>
-                    <div class="student-card">
-                        <img src="https://ui-avatars.com/api/?name=Tasnia+Anika&background=random&color=fff&size=100" alt="Student" class="student-img">
-                        <h4 class="student-name">তাসনিয়া আনিকা</h4>
-                        <p class="student-varsity">Rajshahi University</p>
-                    </div>
-                    <div class="student-card">
-                        <img src="https://ui-avatars.com/api/?name=Zubair+Ahmed&background=random&color=fff&size=100" alt="Student" class="student-img">
-                        <h4 class="student-name">জুবায়ের আহমেদ</h4>
-                        <p class="student-varsity">Jahangirnagar University</p>
-                    </div>
-                    
-                    <!-- Duplicated 5 Students for seamless infinite loop -->
-                    <div class="student-card">
-                        <img src="https://ui-avatars.com/api/?name=Rahim+Mia&background=random&color=fff&size=100" alt="Student" class="student-img">
-                        <h4 class="student-name">রহিম মিয়া</h4>
-                        <p class="student-varsity">BUET</p>
-                    </div>
-                    <div class="student-card">
-                        <img src="https://ui-avatars.com/api/?name=Sadia+Islam&background=random&color=fff&size=100" alt="Student" class="student-img">
-                        <h4 class="student-name">সাদিয়া ইসলাম</h4>
-                        <p class="student-varsity">Dhaka University</p>
-                    </div>
-                    <div class="student-card">
-                        <img src="https://ui-avatars.com/api/?name=Fahim+Rahman&background=random&color=fff&size=100" alt="Student" class="student-img">
-                        <h4 class="student-name">ফাহিম রহমান</h4>
-                        <p class="student-varsity">Dhaka Medical College</p>
-                    </div>
-                    <div class="student-card">
-                        <img src="https://ui-avatars.com/api/?name=Tasnia+Anika&background=random&color=fff&size=100" alt="Student" class="student-img">
-                        <h4 class="student-name">তাসনিয়া আনিকা</h4>
-                        <p class="student-varsity">Rajshahi University</p>
-                    </div>
-                    <div class="student-card">
-                        <img src="https://ui-avatars.com/api/?name=Zubair+Ahmed&background=random&color=fff&size=100" alt="Student" class="student-img">
-                        <h4 class="student-name">জুবায়ের আহমেদ</h4>
-                        <p class="student-varsity">Jahangirnagar University</p>
-                    </div>
+    <!-- Top Navbar -->
+    <nav class="glass-nav fixed w-full z-50 border-b border-slate-200 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-20 items-center">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-atom text-3xl text-emerald-600"></i>
+                    <span class="font-bold text-2xl text-slate-900 tracking-tight">PhysicsAcademy</span>
+                </div>
+                <div class="hidden md:flex space-x-8 items-center">
+                    <a href="#" class="text-emerald-600 font-semibold">Home</a>
+                    <a href="#" class="text-slate-600 hover:text-emerald-600 font-medium transition">About</a>
+                    <a href="#courses" class="text-slate-600 hover:text-emerald-600 font-medium transition">Courses</a>
+                    <a href="#" class="text-slate-600 hover:text-emerald-600 font-medium transition">Teachers</a>
+                    <a href="#" class="text-slate-600 hover:text-emerald-600 font-medium transition">Routine</a>
+                    <a href="/admin.html" class="text-slate-600 hover:text-emerald-600 font-medium transition">Admin</a>
+                    <a href="#courses" class="bg-emerald-600 text-white px-6 py-2.5 rounded-full font-bold hover:bg-emerald-700 transition shadow-lg shadow-emerald-200">Enroll Now</a>
                 </div>
             </div>
-        </section>
-    </main>
+        </div>
+    </nav>
 
-    <footer>
-        <p>&copy; 2026 Project Coaching. All rights reserved.</p>
-    </footer>
-    <script>
-        // @ts-nocheck
-        const translations = {
-            'nav_class': { bn: 'ক্লাস ৯-১২', en: 'Class 9-12' },
-            'nav_admission': { bn: 'ভর্তি পরীক্ষা', en: 'Admission Test' },
-            'nav_skills': { bn: 'স্কিলস', en: 'Skills' },
-            'nav_books': { bn: 'বুক স্টোর', en: 'Book Store' },
-            'btn_login': { bn: 'লগইন', en: 'Login' },
-            'hero_title': { bn: 'শোভন ভাইয়ের ফিজিক্স ক্লাসে স্বাগতম', en: 'Welcome to Physics Class With Shovon' },
-            'hero_subtitle': { bn: 'আমাদের এক্সপার্ট গাইডলাইনের মাধ্যমে শিখুন এবং দারুন সব প্রজেক্ট তৈরি করুন।', en: 'Learn and build amazing projects with our expert-guided courses.' },
-            'section_courses': { bn: 'আমাদের জনপ্রিয় কোর্সসমূহ', en: 'Our Featured Courses' },
-            'section_success': { bn: 'আমাদের সফল শিক্ষার্থীরা', en: 'Our Successful Students' },
-            'loading': { bn: 'লোডিং হচ্ছে...', en: 'Loading...' },
-            'course_fee': { bn: 'কোর্স ফি:', en: 'Course Fee:' },
-            'payment_method': { bn: 'পেমেন্ট মাধ্যম:', en: 'Payment Methods:' },
-            'btn_details': { bn: 'বিস্তারিত দেখো', en: 'View Details' },
-            'not_found': { bn: 'কোনো কোর্স পাওয়া যায়নি!', en: 'No courses found!' },
-            'search_placeholder': { bn: 'কোর্স সার্চ করুন...', en: 'Search courses...' }
-        };
+    <!-- Hero Section -->
+    <section class="hero-bg pt-28 pb-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-4xl mx-auto text-center mt-4">
+            <h1 class="text-5xl md:text-6xl font-extrabold text-white leading-tight mb-6">
+                Master Physics. <br>Build Strong Concepts. <br><span class="text-emerald-300">Achieve Better Results.</span>
+            </h1>
+            <p class="text-xl text-blue-100 mb-10 max-w-2xl mx-auto leading-relaxed">
+                Concept-based Physics learning with expert guidance, regular practice, and exam-focused preparation for SSC, HSC & Admission.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="#courses" class="bg-emerald-500 text-white px-8 py-4 rounded-full font-bold text-lg hover:bg-emerald-400 transition shadow-lg flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-graduation-cap"></i> Explore Courses
+                </a>
+                <a href="#contact" class="bg-white text-blue-900 px-8 py-4 rounded-full font-bold text-lg hover:bg-slate-100 transition shadow-lg flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-phone"></i> Contact Us
+                </a>
+            </div>
+        </div>
+    </section>
 
-        let currentLang = localStorage.getItem('lang') || 'bn';
-        let allCourses = [];
-
-        function applyLanguage(lang) {
-            currentLang = lang;
-            localStorage.setItem('lang', lang);
+    <!-- Why Choose Us (Highlights) -->
+    <section class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold text-slate-900">Why Choose Us?</h2>
+                <div class="w-24 h-1 bg-emerald-500 mx-auto mt-4 rounded-full"></div>
+            </div>
             
-            // Update active toggle button
-            document.getElementById('btn-bn').classList.toggle('active', lang === 'bn');
-            document.getElementById('btn-en').classList.toggle('active', lang === 'en');
-
-            // Update all elements with data-i18n
-            document.querySelectorAll('[data-i18n]').forEach(el => {
-                const key = el.getAttribute('data-i18n');
-                if (translations[key] && translations[key][lang]) {
-                    el.innerText = translations[key][lang];
-                }
-            });
-
-            // Update search placeholder
-            const searchInput = document.getElementById('searchInput');
-            if (searchInput) {
-                searchInput.placeholder = translations['search_placeholder'][lang];
-            }
-
-            // Re-render courses if they exist to apply translation to cards
-            if (allCourses.length > 0) {
-                // Keep the current search term when re-rendering
-                const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
-                if (searchTerm) {
-                    const filteredCourses = allCourses.filter(course => 
-                        course.title.toLowerCase().includes(searchTerm) || 
-                        (course.description && course.description.toLowerCase().includes(searchTerm))
-                    );
-                    renderCourses(filteredCourses);
-                } else {
-                    renderCourses(allCourses);
-                }
-            }
-        }
-
-        document.addEventListener("DOMContentLoaded", () => {
-            // Setup language toggle events
-            document.getElementById('btn-bn').addEventListener('click', () => applyLanguage('bn'));
-            document.getElementById('btn-en').addEventListener('click', () => applyLanguage('en'));
-            
-            // Apply initial language
-            applyLanguage(currentLang);
-            const token = localStorage.getItem('token');
-            const username = localStorage.getItem('username');
-            const loginBtn = document.querySelector('.btn-login');
-
-            if (token && username) {
-                // User is logged in
-                loginBtn.outerHTML = `
-                    <div style="display: flex; align-items: center; gap: 15px;">
-                        <a href="admin.html" style="background: #1a9c5c; color: white; padding: 6px 16px; border-radius: 50px; text-decoration: none; font-weight: 600; font-size: 0.9rem;">অ্যাডমিন প্যানেল</a>
-                        <a href="profile.html" title="My Profile" style="font-weight: 600; color: #1f2937; text-decoration: none; display: flex; align-items: center; gap: 5px;">
-                            <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(username)}&background=1a9c5c&color=fff&size=30" style="border-radius: 50%;" />
-                            ${username}
-                        </a>
-                        <a href="#" id="logoutBtn" style="color: #ff5722; font-weight: 600; text-decoration: none;">লগআউট</a>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Feature 1 -->
+                <div class="bg-slate-50 p-8 rounded-2xl text-center hover:-translate-y-2 transition duration-300 border border-slate-100">
+                    <div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-6 text-2xl">
+                        <i class="fa-solid fa-brain"></i>
                     </div>
-                `;
+                    <h3 class="text-xl font-bold text-slate-800 mb-3">Strong Concepts</h3>
+                    <p class="text-slate-600">Deep understanding of core physics principles from the basics.</p>
+                </div>
+                <!-- Feature 2 -->
+                <div class="bg-slate-50 p-8 rounded-2xl text-center hover:-translate-y-2 transition duration-300 border border-slate-100">
+                    <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6 text-2xl">
+                        <i class="fa-solid fa-person-chalkboard"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-800 mb-3">Easy Explanation</h3>
+                    <p class="text-slate-600">Complex topics broken down into simple, digestible lessons.</p>
+                </div>
+                <!-- Feature 3 -->
+                <div class="bg-slate-50 p-8 rounded-2xl text-center hover:-translate-y-2 transition duration-300 border border-slate-100">
+                    <div class="w-16 h-16 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center mx-auto mb-6 text-2xl">
+                        <i class="fa-solid fa-calculator"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-800 mb-3">Numerical Solving</h3>
+                    <p class="text-slate-600">Extensive practice on mathematical problems and theories.</p>
+                </div>
+                <!-- Feature 4 -->
+                <div class="bg-slate-50 p-8 rounded-2xl text-center hover:-translate-y-2 transition duration-300 border border-slate-100">
+                    <div class="w-16 h-16 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center mx-auto mb-6 text-2xl">
+                        <i class="fa-solid fa-file-signature"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-800 mb-3">Regular Exams</h3>
+                    <p class="text-slate-600">Weekly tests and evaluations to track student progress.</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
-                document.getElementById('logoutBtn').addEventListener('click', async (e) => {
-                    e.preventDefault();
-                    
-                    try {
-                        // Notify backend to clear the device session
-                        await fetch('/api/auth/logout', {
-                            method: 'POST',
-                            headers: { 'Authorization': 'Bearer ' + token }
-                        });
-                    } catch(err) { console.log("Logout API error:", err); }
+    <!-- Featured Courses Section -->
+    <section id="courses" class="py-20 bg-slate-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold text-slate-900">Featured Courses</h2>
+                <div class="w-24 h-1 bg-emerald-500 mx-auto mt-4 rounded-full"></div>
+            </div>
 
-                    localStorage.removeItem('token');
-                    localStorage.removeItem('username');
-                    window.location.reload();
-                });
-            }
+            <!-- Dynamic Courses Grid -->
+            <div id="coursesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Courses will be loaded here via JS -->
+            </div>
+        </div>
+    </section>
 
-            // Load courses from database
-            loadCourses();
+    <!-- App Download Section -->
+    <section class="py-16 bg-white border-t border-slate-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-8">
+            <div class="text-center md:text-left">
+                <h2 class="text-3xl font-bold text-slate-900 mb-4">Learn Anywhere, Anytime.</h2>
+                <p class="text-slate-600 text-lg max-w-lg mb-6">Download the PhysicsAcademy mobile app to watch premium video lectures, give exams, and access study materials on the go.</p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+                    <button class="bg-slate-900 text-white px-6 py-3 rounded-xl flex items-center justify-center gap-3 hover:bg-slate-800 transition shadow-lg">
+                        <i class="fa-brands fa-apple text-3xl"></i>
+                        <div class="text-left"><span class="text-xs block">Download on the</span><span class="font-bold text-lg leading-none">App Store</span></div>
+                    </button>
+                    <button class="bg-emerald-600 text-white px-6 py-3 rounded-xl flex items-center justify-center gap-3 hover:bg-emerald-700 transition shadow-lg">
+                        <i class="fa-brands fa-google-play text-2xl"></i>
+                        <div class="text-left"><span class="text-xs block">GET IT ON</span><span class="font-bold text-lg leading-none">Google Play</span></div>
+                    </button>
+                </div>
+            </div>
+            <div class="w-64 h-64 bg-slate-100 rounded-full flex items-center justify-center text-slate-300 text-9xl">
+                <i class="fa-solid fa-mobile-screen"></i>
+            </div>
+        </div>
+    </section>
+    
+    <!-- CTA Section -->
+    <section class="py-20 bg-emerald-600">
+        <div class="max-w-4xl mx-auto text-center px-4 sm:px-6">
+            <h2 class="text-4xl font-bold text-white mb-6">Ready to Make Physics Easier?</h2>
+            <p class="text-emerald-100 text-xl mb-10">Join our upcoming batches and start your journey towards excellence.</p>
+            <a href="#courses" class="bg-white text-emerald-700 px-10 py-4 rounded-full font-bold text-lg hover:bg-slate-100 transition shadow-xl inline-block">
+                Join Our Course Today
+            </a>
+        </div>
+    </section>
 
-            // Search functionality
-            const searchInput = document.getElementById('searchInput');
-            if (searchInput) {
-                searchInput.addEventListener('input', function(e) {
-                    const searchTerm = e.target.value.toLowerCase();
-                    const filteredCourses = allCourses.filter(course => {
-                        const titleMatch = course.title && course.title.toLowerCase().includes(searchTerm);
-                        const descMatch = course.description && course.description.toLowerCase().includes(searchTerm);
-                        return titleMatch || descMatch;
-                    });
-                    renderCourses(filteredCourses);
-                });
-            }
-        });
-
+    <script>
+        // Fetch courses from API and render them
         async function loadCourses() {
-            const container = document.getElementById('courseContainer');
             try {
                 const response = await fetch('/api/Courses');
-                allCourses = await response.json();
+                const courses = await response.json();
                 
-                const urlParams = new URLSearchParams(window.location.search);
-                const query = urlParams.get('search');
-                if (query) {
-                    const searchInput = document.getElementById('searchInput');
-                    if (searchInput) searchInput.value = query;
-                    
-                    const qLower = query.toLowerCase();
-                    const filtered = allCourses.filter(c => 
-                        (c.title && c.title.toLowerCase().includes(qLower)) || 
-                        (c.description && c.description.toLowerCase().includes(qLower))
-                    );
-                    renderCourses(filtered);
-                } else {
-                    renderCourses(allCourses);
-                }
+                const grid = document.getElementById('coursesGrid');
+                grid.innerHTML = '';
+
+                courses.forEach(course => {
+                    let imgUrl = course.imageUrl || 'https://via.placeholder.com/400x200?text=Physics+Course';
+                    if(!imgUrl.startsWith('http')) {
+                        imgUrl = '/' + imgUrl.replace(/^\//, '');
+                    }
+
+                    const card = `
+                        <div class="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition duration-300 border border-slate-100">
+                            <img src="${imgUrl}" alt="${course.title}" class="w-full h-48 object-cover">
+                            <div class="p-6">
+                                <div class="flex justify-between items-start mb-4">
+                                    <h3 class="text-xl font-bold text-slate-900 leading-tight">${course.title}</h3>
+                                </div>
+                                <p class="text-slate-600 mb-6 line-clamp-2">${course.description}</p>
+                                <div class="flex justify-between items-center pt-4 border-t border-slate-100">
+                                    <span class="text-2xl font-extrabold text-emerald-600">৳${course.price}</span>
+                                    <button onclick="window.location.href='course.html?id=${course.id}'" class="bg-blue-900 text-white px-5 py-2 rounded-lg font-bold hover:bg-blue-800 transition">
+                                        View Details
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    grid.innerHTML += card;
+                });
             } catch (error) {
-                container.innerHTML = '<p style="text-align:center; font-size: 1.2rem; grid-column: 1 / -1; color: red;">সার্ভারের সাথে কানেক্ট করা যাচ্ছে না!</p>';
+                console.error("Error loading courses:", error);
             }
         }
 
-        function renderCourses(courses) {
-            const container = document.getElementById('courseContainer');
-            
-            if (!courses || courses.length === 0) {
-                container.innerHTML = `<p style="text-align:center; font-size: 1.2rem; grid-column: 1 / -1; color: #666;">${translations['not_found'][currentLang]}</p>`;
-                return;
-            }
-
-            container.innerHTML = ''; // Clear loading text
-            
-            courses.forEach(course => {
-                const card = `
-                    <div class="course-card">
-                        <div class="course-image">
-                            <img src="${course.imageUrl || 'https://via.placeholder.com/600x400?text=Course'}" alt="${course.title || 'Course'}">
-                        </div>
-                        
-                        <div class="course-content">
-                            <span class="badge" style="background-color: #e6f7ff; color: #007bff;">${course.badge || 'New'}</span>
-                            <h3 class="course-title">${course.title || 'Untitled'}</h3>
-                            
-                            <p style="color: #555; margin-bottom: 1rem; font-size: 0.95rem;">${course.description || ''}</p>
-                            
-                            <div class="course-price">${translations['course_fee'][currentLang]} ৳${course.price || 0}</div>
-                            
-                            <div class="payment-methods" style="margin-bottom: 1.5rem; font-size: 0.95rem; color: #555;">
-                                <strong>${translations['payment_method'][currentLang]}</strong> 
-                                <span style="color: #e2136e; font-weight: 600;">bKash</span>, 
-                                <span style="color: #f05423; font-weight: 600;">Nagad</span>, 
-                                <span style="color: #8c1587; font-weight: 600;">Rocket</span>
-                            </div>
-
-                            <div class="course-actions">
-                                <a href="course-details.html?id=${course.id}" class="btn btn-primary" style="display:block; text-align:center; text-decoration:none;">${translations['btn_details'][currentLang]}</a>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                container.innerHTML += card;
-            });
-        }
+        // Load on page load
+        window.onload = loadCourses;
     </script>
 </body>
 </html>

@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Details - PhysicsAcademy</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+        .locked-video-bg {
+            background-color: #0f172a;
+            background-image: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 font-sans text-slate-800 pt-20">
+
+    <nav class="glass-nav fixed top-0 w-full z-50 border-b border-slate-200 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-20 items-center">
+                <a href="/" class="flex items-center gap-2">
+                    <i class="fa-solid fa-atom text-3xl text-emerald-600"></i>
+                    <span class="font-bold text-2xl text-slate-900 tracking-tight">PhysicsAcademy</span>
+                </a>
+                <div class="hidden md:flex space-x-8 items-center">
+                    <a href="/" class="text-slate-600 hover:text-emerald-600 font-medium transition">Home</a>
+                    <a href="/#courses" class="text-emerald-600 font-semibold">Courses</a>
+                    <a href="/admin.html" class="text-slate-600 hover:text-emerald-600 font-medium transition">Admin</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <div class="mb-8" id="courseHeader">
+            <h1 class="text-3xl md:text-4xl font-bold text-slate-900 mb-2">Loading Course...</h1>
+            <p class="text-slate-500">Please wait</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <div class="lg:col-span-2 space-y-8">
+                
+                <div id="videoContainer" class="locked-video-bg rounded-2xl aspect-video flex flex-col items-center justify-center text-center p-6 shadow-xl relative overflow-hidden group">
+                    <img id="courseImage" src="https://via.placeholder.com/800x400" alt="Course Thumbnail" class="absolute inset-0 w-full h-full object-cover opacity-30">
+                    <div class="absolute inset-0 bg-slate-900/60 flex flex-col items-center justify-center">
+                        <div class="w-20 h-20 bg-slate-800/80 rounded-full flex items-center justify-center mb-4 border border-slate-600 backdrop-blur-sm">
+                            <i class="fa-solid fa-lock text-3xl text-slate-300"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-white mb-2">Video is Locked</h3>
+                        <p class="text-slate-300 max-w-md">Enroll in this course to unlock the premium video lectures and study materials.</p>
+                    </div>
+                </div>
+
+                <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-100">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-4 border-b border-slate-100 pb-4">Course Overview</h2>
+                    <p id="courseDesc" class="text-slate-600 leading-relaxed text-lg mb-8">
+                        Loading description...
+                    </p>
+
+                    <h3 class="text-xl font-bold text-slate-900 mb-4">What You Will Learn</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="flex items-start gap-3"><i class="fa-solid fa-check text-emerald-500 mt-1"></i> <span class="text-slate-700">In-depth Concept Building</span></div>
+                        <div class="flex items-start gap-3"><i class="fa-solid fa-check text-emerald-500 mt-1"></i> <span class="text-slate-700">Complex Numerical Solving</span></div>
+                        <div class="flex items-start gap-3"><i class="fa-solid fa-check text-emerald-500 mt-1"></i> <span class="text-slate-700">Board CQ & MCQ Practice</span></div>
+                        <div class="flex items-start gap-3"><i class="fa-solid fa-check text-emerald-500 mt-1"></i> <span class="text-slate-700">Chapter-wise Model Tests</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lg:col-span-1">
+                <div class="bg-white rounded-2xl shadow-lg border border-slate-100 sticky top-28 overflow-hidden">
+                    <div class="bg-emerald-50 p-6 text-center border-b border-emerald-100">
+                        <p class="text-emerald-700 font-semibold mb-2">One-time payment</p>
+                        <h2 id="coursePrice" class="text-4xl font-extrabold text-slate-900">৳0</h2>
+                    </div>
+                    
+                    <div class="p-6">
+                        <ul class="space-y-4 mb-8">
+                            <li class="flex items-center gap-3 text-slate-600">
+                                <i class="fa-solid fa-users text-blue-500 w-5"></i>
+                                <span><strong id="enrolledCount" class="text-slate-900">0</strong> Students Enrolled</span>
+                            </li>
+                            <li class="flex items-center gap-3 text-slate-600">
+                                <i class="fa-solid fa-video text-blue-500 w-5"></i>
+                                <span>Full Video Access</span>
+                            </li>
+                            <li class="flex items-center gap-3 text-slate-600">
+                                <i class="fa-solid fa-infinity text-blue-500 w-5"></i>
+                                <span>Lifetime Validity</span>
+                            </li>
+                            <li class="flex items-center gap-3 text-slate-600">
+                                <i class="fa-solid fa-mobile-screen text-blue-500 w-5"></i>
+                                <span>Access via App & Web</span>
+                            </li>
+                        </ul>
+
+                        <button id="enrollBtn" onclick="openEnrollModal()" class="w-full bg-emerald-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-emerald-700 transition shadow-lg shadow-emerald-200">
+                            Course টি কিনুন
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Enroll Modal -->
+    <div id="enrollModal" class="hidden fixed inset-0 bg-slate-900 bg-opacity-75 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl p-8 max-w-md w-full relative shadow-2xl">
+            <button onclick="document.getElementById('enrollModal').classList.add('hidden')" class="absolute top-4 right-4 text-slate-400 hover:text-slate-700">
+                <i class="fa-solid fa-times text-2xl"></i>
+            </button>
+            <h3 class="text-2xl font-bold text-slate-900 mb-2 text-center">Enroll Now</h3>
+            <p class="text-slate-500 mb-6 text-center">Complete your payment to access the course.</p>
+            
+            <div class="bg-slate-50 p-4 rounded-lg mb-6 border border-slate-100 text-center">
+                <p class="text-sm text-slate-500 mb-1">Send Money to this bKash/Nagad Number:</p>
+                <p class="text-2xl font-bold text-emerald-600 tracking-wider">01636464862</p>
+            </div>
+
+            <form id="paymentForm" class="space-y-4">
+                <div>
+                    <label class="block text-slate-700 font-bold mb-1 text-sm">Your Phone Number</label>
+                    <input type="text" id="phoneNum" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 focus:outline-none focus:border-emerald-500" required>
+                </div>
+                <div>
+                    <label class="block text-slate-700 font-bold mb-1 text-sm">Transaction ID (TrxID)</label>
+                    <input type="text" id="trxId" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 focus:outline-none focus:border-emerald-500" required>
+                </div>
+                
+                <div id="paymentError" class="hidden bg-red-50 text-red-600 p-3 rounded-lg text-sm font-medium text-center"></div>
+
+                <button type="submit" id="payBtn" class="w-full bg-emerald-600 text-white font-bold rounded-lg px-4 py-4 mt-2 hover:bg-emerald-700 transition">
+                    Submit Payment
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const courseId = urlParams.get('id');
+
+        async function loadCourseDetails() {
+            if(!courseId) {
+                document.getElementById('courseHeader').innerHTML = '<h1 class="text-slate-900 text-3xl font-bold">Course Not Found</h1>';
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/Courses/' + courseId);
+                const course = await response.json();
+
+                if(!course) throw new Error("Not found");
+
+                document.getElementById('courseHeader').innerHTML = `
+                    <h1 class="text-3xl md:text-4xl font-bold text-slate-900 mb-2">${course.title}</h1>
+                    <p class="text-slate-500 font-medium">Complete Physics Preparation Batch</p>
+                `;
+
+                let imgUrl = course.imageUrl || 'https://via.placeholder.com/800x400?text=Physics+Course';
+                if(!imgUrl.startsWith('http')) {
+                    imgUrl = '/' + imgUrl.replace(/^\//, '');
+                }
+                document.getElementById('courseImage').src = imgUrl;
+
+                document.getElementById('coursePrice').innerText = '৳ ' + course.price;
+                document.getElementById('courseDesc').innerText = course.description;
+                document.getElementById('enrolledCount').innerText = course.enrolledCount || 0;
+
+                const token = localStorage.getItem('token');
+                if(token) {
+                    const enrollRes = await fetch('/api/Enrollments/mycourses', {
+                        headers: { 'Authorization': 'Bearer ' + token }
+                    });
+                    if(enrollRes.ok) {
+                        const myCourses = await enrollRes.json();
+                        const isEnrolled = myCourses.find(c => c.courseId == courseId);
+                        
+                        if(isEnrolled) {
+                            const btn = document.getElementById('enrollBtn');
+                            if(isEnrolled.status === 'Approved') {
+                                btn.innerText = '✅ Already Enrolled';
+                                btn.className = 'w-full bg-slate-200 text-slate-600 py-4 rounded-xl font-bold text-lg cursor-not-allowed shadow-none';
+                                btn.onclick = null;
+
+                                // Unlock video player
+                                let embedUrl = course.videoUrl || 'https://www.youtube.com/embed/dQw4w9WgXcQ';
+                                let isMp4 = embedUrl.toLowerCase().endsWith('.mp4');
+                                
+                                if (!embedUrl.startsWith('http')) {
+                                    embedUrl = '/' + embedUrl.replace(/^\//, '');
+                                }
+                                
+                                if (embedUrl.includes('youtube.com/watch?v=')) {
+                                    embedUrl = embedUrl.replace('watch?v=', 'embed/');
+                                } else if (embedUrl.includes('youtu.be/')) {
+                                    embedUrl = embedUrl.replace('youtu.be/', 'youtube.com/embed/');
+                                }
+
+                                const videoContainer = document.getElementById('videoContainer');
+                                if(isMp4) {
+                                    videoContainer.innerHTML = `<video src="${embedUrl}" controls autoplay class="w-full h-full object-cover rounded-2xl"></video>`;
+                                } else {
+                                    videoContainer.innerHTML = `<iframe src="${embedUrl}" class="w-full h-full rounded-2xl" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+                                }
+                                videoContainer.classList.remove('locked-video-bg');
+                                videoContainer.classList.add('bg-black', 'p-0');
+                                
+                            } else {
+                                btn.innerText = '⏳ Pending Approval';
+                                btn.className = 'w-full bg-orange-100 text-orange-600 py-4 rounded-xl font-bold text-lg cursor-not-allowed shadow-none';
+                                btn.onclick = null;
+                            }
+                        }
+                    }
+                }
+
+            } catch (error) {
+                console.error(error);
+                document.getElementById('courseHeader').innerHTML = '<h1 class="text-slate-900 text-3xl font-bold">Error loading course</h1>';
+            }
+        }
+
+        window.onload = loadCourseDetails;
+
+        function openEnrollModal() {
+            const token = localStorage.getItem('token');
+            if(!token) {
+                window.location.href = 'login.html?returnUrl=course.html?id=' + courseId;
+                return;
+            }
+            document.getElementById('enrollModal').classList.remove('hidden');
+        }
+
+        document.getElementById('paymentForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('payBtn');
+            const errorMsg = document.getElementById('paymentError');
+            btn.innerText = 'Submitting...';
+            btn.disabled = true;
+            errorMsg.classList.add('hidden');
+
+            const phone = document.getElementById('phoneNum').value;
+            const trxId = document.getElementById('trxId').value;
+            const token = localStorage.getItem('token');
+
+            try {
+                const response = await fetch('/api/Enrollments/' + courseId, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify({ phone, trxId })
+                });
+
+                if (response.ok) {
+                    alert("Enrollment successful! Please wait for admin approval.");
+                    document.getElementById('enrollModal').classList.add('hidden');
+                    window.location.reload();
+                } else {
+                    const data = await response.json();
+                    errorMsg.innerText = data.message || "Failed to enroll.";
+                    errorMsg.classList.remove('hidden');
+                }
+            } catch (err) {
+                errorMsg.innerText = "Connection error.";
+                errorMsg.classList.remove('hidden');
+            } finally {
+                btn.innerText = 'Submit Payment';
+                btn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
