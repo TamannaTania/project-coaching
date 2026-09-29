@@ -3,8 +3,6 @@ import { View, Text, StyleSheet, TouchableOpacity, Platform, Linking } from 'rea
 import { Ionicons } from '@expo/vector-icons';
 import { API_HOST } from './config';
 
-
-
 export default function VideoPlayerScreen({ route, navigation }) {
     const { videoUrl, title } = route.params;
 
@@ -13,11 +11,9 @@ export default function VideoPlayerScreen({ route, navigation }) {
     // Fix relative URL for local uploads
     if (!finalUrl.startsWith('http')) {
         const prefix = finalUrl.startsWith('/') ? '' : '/';
-        // Assuming videos are in a /videos/ folder, or just in root
         finalUrl = API_HOST + prefix + encodeURI(finalUrl);
     }
 
-    // Convert standard YouTube URLs to embed URLs if needed
     let isMp4 = finalUrl.toLowerCase().endsWith('.mp4');
     let embedUrl = finalUrl;
     
@@ -60,14 +56,23 @@ export default function VideoPlayerScreen({ route, navigation }) {
                                 style={{ color: '#60a5fa', textDecorationLine: 'underline', marginTop: 5, textAlign: 'center' }}
                                 onPress={() => window.open(embedUrl, '_blank')}
                             >
-                                {embedUrl}
+                                Click here to open video
                             </Text>
                         </View>
                     </>
                 ) : (
-                    <View style={styles.placeholder}>
-                        <Ionicons name="play-circle" size={60} color="#1a9c5c" />
-                        <Text style={styles.placeholderText}>Video playback is supported on Web in this demo.</Text>
+                    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f8fafc' }}>
+                        <Ionicons name={isMp4 ? "play-circle" : "logo-youtube"} size={80} color={isMp4 ? "#1a9c5c" : "#ff0000"} />
+                        <Text style={{ fontSize: 18, fontWeight: 'bold', marginTop: 10 }}>Course Video</Text>
+                        <Text style={{ fontSize: 14, color: '#6b7280', textAlign: 'center', marginHorizontal: 20, marginTop: 5 }}>
+                            To watch this video on mobile, please open it using your phone's native player.
+                        </Text>
+                        <TouchableOpacity 
+                            style={{ marginTop: 20, backgroundColor: '#1f2937', paddingHorizontal: 20, paddingVertical: 10, borderRadius: 8 }}
+                            onPress={() => Linking.openURL(finalUrl)}
+                        >
+                            <Text style={{ color: 'white', fontWeight: 'bold' }}>Play Video Now</Text>
+                        </TouchableOpacity>
                     </View>
                 )}
             </View>
@@ -78,7 +83,7 @@ export default function VideoPlayerScreen({ route, navigation }) {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#f3f4f6',
+        backgroundColor: '#f8fafc',
     },
     header: {
         flexDirection: 'row',
@@ -91,31 +96,15 @@ const styles = StyleSheet.create({
     },
     backBtn: {
         marginRight: 15,
+        padding: 5,
     },
     headerTitle: {
-        fontSize: 18,
+        fontSize: 20,
         fontWeight: 'bold',
         color: '#1f2937',
     },
     videoContainer: {
         flex: 1,
-        width: '100%',
-        maxWidth: 800,
-        alignSelf: 'center',
         backgroundColor: '#000',
-        aspectRatio: 16/9,
-        marginTop: 20,
-    },
-    placeholder: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    placeholderText: {
-        color: 'white',
-        marginTop: 10,
     }
 });
-
-
-
