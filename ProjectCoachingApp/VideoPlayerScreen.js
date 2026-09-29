@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Platform, Linking } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { API_HOST } from './config';
-import { Video, ResizeMode } from 'expo-av';
+
 
 
 export default function VideoPlayerScreen({ route, navigation }) {
@@ -116,5 +116,6 @@ const styles = StyleSheet.create({
         marginTop: 10,
     }
 });
+
 
 
