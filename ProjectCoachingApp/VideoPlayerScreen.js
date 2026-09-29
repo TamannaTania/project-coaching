@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Platform, Linking } from 'rea
 import { Ionicons } from '@expo/vector-icons';
 import { API_HOST } from './config';
 import { Video, ResizeMode } from 'expo-av';
-import { WebView } from 'react-native-webview';
+
 
 export default function VideoPlayerScreen({ route, navigation }) {
     const { videoUrl, title } = route.params;
@@ -116,4 +116,5 @@ const styles = StyleSheet.create({
         marginTop: 10,
     }
 });
+
 
