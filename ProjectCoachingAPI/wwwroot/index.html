@@ -10,12 +10,38 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         .hero-bg {
-            background: linear-gradient(135deg, #143d8d 0%, #1a9c5c 100%);
+            background: linear-gradient(150deg, #d4e0c8 0%, #6bc117 40%, #172114 100%);
         }
         .glass-nav {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
         }
+        @keyframes scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        .marquee-container {
+            overflow: hidden;
+            white-space: nowrap;
+            width: 100%;
+        }
+        .marquee-content {
+            display: flex;
+            width: max-content;
+            animation: scroll 20s linear infinite;
+        }
+        .marquee-content:hover {
+            animation-play-state: paused;
+        }
+            @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+        .animate-float { animation: float 4s ease-in-out infinite; }
+        .animate-float-delayed-1 { animation: float 4s ease-in-out infinite 0.5s; }
+        .animate-float-delayed-2 { animation: float 4s ease-in-out infinite 1s; }
+        .animate-float-delayed-3 { animation: float 4s ease-in-out infinite 1.5s; }
     </style>
 </head>
 <body class="bg-slate-50 font-sans text-slate-800">
@@ -29,32 +55,43 @@
                     <span class="font-bold text-2xl text-slate-900 tracking-tight">PhysicsAcademy</span>
                 </div>
                 <div class="hidden md:flex space-x-8 items-center">
-                    <a href="#" class="text-emerald-600 font-semibold">Home</a>
-                    <a href="#" class="text-slate-600 hover:text-emerald-600 font-medium transition">About</a>
-                    <a href="#courses" class="text-slate-600 hover:text-emerald-600 font-medium transition">Courses</a>
-                    <a href="#" class="text-slate-600 hover:text-emerald-600 font-medium transition">Teachers</a>
-                    <a href="#" class="text-slate-600 hover:text-emerald-600 font-medium transition">Routine</a>
+                    <a href="#" id="navHome" class="text-emerald-600 font-semibold">Home</a>
+                    <a href="#" id="navAbout" class="text-slate-600 hover:text-emerald-600 font-medium transition">About</a>
+                    <a href="#courses" id="navCourses" class="text-slate-600 hover:text-emerald-600 font-medium transition">Courses</a>
+                    <a href="#" id="navTeachers" class="text-slate-600 hover:text-emerald-600 font-medium transition">Teachers</a>
+                    <a href="#" id="navRoutine" class="text-slate-600 hover:text-emerald-600 font-medium transition">Routine</a>
+                    
+                    <!-- Language Toggle -->
+                    <div class="flex items-center border border-emerald-200 rounded-full overflow-hidden bg-emerald-50">
+                        <button id="btnBn" onclick="setLanguage('bn')" class="px-3 py-1 text-sm font-bold text-emerald-700 hover:bg-emerald-100 transition">BN</button>
+                        <button id="btnEn" onclick="setLanguage('en')" class="px-3 py-1 text-sm font-bold bg-emerald-600 text-white">EN</button>
+                    </div>
+
                     <a href="/admin.html" class="text-slate-600 hover:text-emerald-600 font-medium transition">Admin</a>
-                    <a href="#courses" class="bg-emerald-600 text-white px-6 py-2.5 rounded-full font-bold hover:bg-emerald-700 transition shadow-lg shadow-emerald-200">Enroll Now</a>
+                    
+                    <!-- Auth Container -->
+                    <div id="authNavContainer" class="flex items-center gap-4 border-l border-slate-200 pl-4 ml-2">
+                        <!-- Auth buttons will be injected here -->
+                    </div>
                 </div>
             </div>
         </div>
     </nav>
 
     <!-- Hero Section -->
-    <section class="hero-bg pt-28 pb-12 px-4 sm:px-6 lg:px-8">
-        <div class="max-w-4xl mx-auto text-center mt-4">
-            <h1 class="text-5xl md:text-6xl font-extrabold text-white leading-tight mb-6">
+    <section class="hero-bg pt-24 pb-10 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-4xl mx-auto text-center mt-6">
+            <h1 id="heroTitle" class="text-3xl md:text-4xl font-extrabold text-white leading-tight mb-4">
                 Master Physics. <br>Build Strong Concepts. <br><span class="text-emerald-300">Achieve Better Results.</span>
             </h1>
-            <p class="text-xl text-blue-100 mb-10 max-w-2xl mx-auto leading-relaxed">
+            <p id="heroSub" class="text-base text-blue-100 mb-8 max-w-xl mx-auto leading-relaxed">
                 Concept-based Physics learning with expert guidance, regular practice, and exam-focused preparation for SSC, HSC & Admission.
             </p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                <a href="#courses" class="bg-emerald-500 text-white px-8 py-4 rounded-full font-bold text-lg hover:bg-emerald-400 transition shadow-lg flex items-center justify-center gap-2">
+                <a href="#courses" id="btnExplore" class="bg-emerald-500 text-white px-6 py-3 rounded-full font-bold text-base hover:bg-emerald-400 transition shadow-lg flex items-center justify-center gap-2">
                     <i class="fa-solid fa-graduation-cap"></i> Explore Courses
                 </a>
-                <a href="#contact" class="bg-white text-blue-900 px-8 py-4 rounded-full font-bold text-lg hover:bg-slate-100 transition shadow-lg flex items-center justify-center gap-2">
+                <a href="#contact" id="btnContact" class="bg-white text-blue-900 px-6 py-3 rounded-full font-bold text-base hover:bg-slate-100 transition shadow-lg flex items-center justify-center gap-2">
                     <i class="fa-solid fa-phone"></i> Contact Us
                 </a>
             </div>
@@ -62,55 +99,47 @@
     </section>
 
     <!-- Why Choose Us (Highlights) -->
-    <section class="py-20 bg-white">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section class="py-20 bg-[#f4fceb] relative overflow-hidden">
+        <!-- Background Drops -->
+        <div class="absolute top-10 left-10 w-24 h-24 bg-[#6bc117] opacity-10 rounded-full blur-2xl animate-float"></div>
+        <div class="absolute bottom-10 right-20 w-32 h-32 bg-[#6bc117] opacity-10 rounded-full blur-2xl animate-float-delayed-2"></div>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div class="text-center mb-16">
-                <h2 class="text-3xl font-bold text-slate-900">Why Choose Us?</h2>
-                <div class="w-24 h-1 bg-emerald-500 mx-auto mt-4 rounded-full"></div>
+                <h2 id="whyTitle" class="text-3xl font-bold text-slate-900">Why Choose Us?</h2>
+                <div class="w-24 h-1 bg-[#6bc117] mx-auto mt-4 rounded-full"></div>
             </div>
             
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                <!-- Feature 1 -->
-                <div class="bg-slate-50 p-8 rounded-2xl text-center hover:-translate-y-2 transition duration-300 border border-slate-100">
-                    <div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-6 text-2xl">
-                        <i class="fa-solid fa-brain"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-slate-800 mb-3">Strong Concepts</h3>
-                    <p class="text-slate-600">Deep understanding of core physics principles from the basics.</p>
+                <div class="bg-white p-8 rounded-2xl text-center border border-emerald-100 shadow-xl shadow-emerald-50 animate-float">
+                    <div class="w-16 h-16 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center mx-auto mb-6 text-2xl shadow-inner"><i class="fa-solid fa-brain"></i></div>
+                    <h3 id="f1Title" class="text-xl font-bold text-slate-800 mb-3">Strong Concepts</h3>
+                    <p id="f1Desc" class="text-slate-600">Deep understanding of core physics principles from the basics.</p>
                 </div>
-                <!-- Feature 2 -->
-                <div class="bg-slate-50 p-8 rounded-2xl text-center hover:-translate-y-2 transition duration-300 border border-slate-100">
-                    <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6 text-2xl">
-                        <i class="fa-solid fa-person-chalkboard"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-slate-800 mb-3">Easy Explanation</h3>
-                    <p class="text-slate-600">Complex topics broken down into simple, digestible lessons.</p>
+                <div class="bg-white p-8 rounded-2xl text-center border border-emerald-100 shadow-xl shadow-emerald-50 animate-float-delayed-1">
+                    <div class="w-16 h-16 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6 text-2xl shadow-inner"><i class="fa-solid fa-person-chalkboard"></i></div>
+                    <h3 id="f2Title" class="text-xl font-bold text-slate-800 mb-3">Easy Explanation</h3>
+                    <p id="f2Desc" class="text-slate-600">Complex topics broken down into simple, digestible lessons.</p>
                 </div>
-                <!-- Feature 3 -->
-                <div class="bg-slate-50 p-8 rounded-2xl text-center hover:-translate-y-2 transition duration-300 border border-slate-100">
-                    <div class="w-16 h-16 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center mx-auto mb-6 text-2xl">
-                        <i class="fa-solid fa-calculator"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-slate-800 mb-3">Numerical Solving</h3>
-                    <p class="text-slate-600">Extensive practice on mathematical problems and theories.</p>
+                <div class="bg-white p-8 rounded-2xl text-center border border-emerald-100 shadow-xl shadow-emerald-50 animate-float-delayed-2">
+                    <div class="w-16 h-16 bg-purple-50 text-purple-500 rounded-full flex items-center justify-center mx-auto mb-6 text-2xl shadow-inner"><i class="fa-solid fa-calculator"></i></div>
+                    <h3 id="f3Title" class="text-xl font-bold text-slate-800 mb-3">Numerical Solving</h3>
+                    <p id="f3Desc" class="text-slate-600">Extensive practice on mathematical problems and theories.</p>
                 </div>
-                <!-- Feature 4 -->
-                <div class="bg-slate-50 p-8 rounded-2xl text-center hover:-translate-y-2 transition duration-300 border border-slate-100">
-                    <div class="w-16 h-16 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center mx-auto mb-6 text-2xl">
-                        <i class="fa-solid fa-file-signature"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-slate-800 mb-3">Regular Exams</h3>
-                    <p class="text-slate-600">Weekly tests and evaluations to track student progress.</p>
+                <div class="bg-white p-8 rounded-2xl text-center border border-emerald-100 shadow-xl shadow-emerald-50 animate-float-delayed-3">
+                    <div class="w-16 h-16 bg-orange-50 text-orange-500 rounded-full flex items-center justify-center mx-auto mb-6 text-2xl shadow-inner"><i class="fa-solid fa-file-signature"></i></div>
+                    <h3 id="f4Title" class="text-xl font-bold text-slate-800 mb-3">Regular Exams</h3>
+                    <p id="f4Desc" class="text-slate-600">Weekly tests and evaluations to track student progress.</p>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- Featured Courses Section -->
-    <section id="courses" class="py-20 bg-slate-50">
+    <section id="courses" class="py-20 bg-gradient-to-br from-blue-50 via-white to-emerald-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-16">
-                <h2 class="text-3xl font-bold text-slate-900">Featured Courses</h2>
+                <h2 id="coursesTitle" class="text-3xl font-bold text-slate-900">Featured Courses</h2>
                 <div class="w-24 h-1 bg-emerald-500 mx-auto mt-4 rounded-full"></div>
             </div>
 
@@ -122,11 +151,11 @@
     </section>
 
     <!-- App Download Section -->
-    <section class="py-16 bg-white border-t border-slate-100">
+    <section class="py-16 bg-emerald-50 border-t border-emerald-100">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-8">
             <div class="text-center md:text-left">
-                <h2 class="text-3xl font-bold text-slate-900 mb-4">Learn Anywhere, Anytime.</h2>
-                <p class="text-slate-600 text-lg max-w-lg mb-6">Download the PhysicsAcademy mobile app to watch premium video lectures, give exams, and access study materials on the go.</p>
+                <h2 id="appTitle" class="text-3xl font-bold text-slate-900 mb-4">Learn Anywhere, Anytime.</h2>
+                <p id="appDesc" class="text-slate-600 text-lg max-w-lg mb-6">Download the <span class="font-bold text-emerald-600 font-sans">PhysicsAcademy</span> mobile app to watch premium video lectures, give exams, and access study materials on the go.</p>
                 <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
                     <button class="bg-slate-900 text-white px-6 py-3 rounded-xl flex items-center justify-center gap-3 hover:bg-slate-800 transition shadow-lg">
                         <i class="fa-brands fa-apple text-3xl"></i>
@@ -144,19 +173,204 @@
         </div>
     </section>
     
+    <!-- Successful Students Section -->
+    <section class="py-20 bg-slate-50 overflow-hidden border-t border-slate-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
+            <div class="text-center">
+                <h2 id="successTitle" class="text-3xl font-bold text-slate-900">Our Pride: Successful Students</h2>
+                <div class="w-24 h-1 bg-emerald-500 mx-auto mt-4 rounded-full"></div>
+                <p id="successDesc" class="text-slate-600 mt-4 text-lg">Hundreds of our students are studying in top universities.</p>
+            </div>
+        </div>
+
+        <div class="marquee-container">
+            <div class="marquee-content gap-6 px-4 pb-8">
+                <!-- Double the items for seamless looping -->
+                <!-- Item 1 -->
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 w-72 flex-shrink-0 flex flex-col items-center">
+                    <img src="https://via.placeholder.com/100" class="w-24 h-24 rounded-full mb-4 border-4 border-emerald-100 object-cover" alt="Student">
+                    <h3 class="text-xl font-bold text-slate-900">Rahim Uddin</h3>
+                    <p class="text-emerald-600 font-bold mb-2">BUET</p>
+                    <div class="bg-slate-100 text-slate-600 text-xs px-3 py-1 rounded-full">HSC Batch 2024</div>
+                </div>
+                <!-- Item 2 -->
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 w-72 flex-shrink-0 flex flex-col items-center">
+                    <img src="https://via.placeholder.com/100" class="w-24 h-24 rounded-full mb-4 border-4 border-blue-100 object-cover" alt="Student">
+                    <h3 class="text-xl font-bold text-slate-900">Sadia Islam</h3>
+                    <p class="text-blue-600 font-bold mb-2">Dhaka Medical College</p>
+                    <div class="bg-slate-100 text-slate-600 text-xs px-3 py-1 rounded-full">HSC Batch 2024</div>
+                </div>
+                <!-- Item 3 -->
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 w-72 flex-shrink-0 flex flex-col items-center">
+                    <img src="https://via.placeholder.com/100" class="w-24 h-24 rounded-full mb-4 border-4 border-purple-100 object-cover" alt="Student">
+                    <h3 class="text-xl font-bold text-slate-900">Tanvir Hasan</h3>
+                    <p class="text-purple-600 font-bold mb-2">Dhaka University</p>
+                    <div class="bg-slate-100 text-slate-600 text-xs px-3 py-1 rounded-full">HSC Batch 2023</div>
+                </div>
+                <!-- Item 4 -->
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 w-72 flex-shrink-0 flex flex-col items-center">
+                    <img src="https://via.placeholder.com/100" class="w-24 h-24 rounded-full mb-4 border-4 border-orange-100 object-cover" alt="Student">
+                    <h3 class="text-xl font-bold text-slate-900">Nusrat Jahan</h3>
+                    <p class="text-orange-600 font-bold mb-2">RUET</p>
+                    <div class="bg-slate-100 text-slate-600 text-xs px-3 py-1 rounded-full">HSC Batch 2023</div>
+                </div>
+                <!-- Item 5 -->
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 w-72 flex-shrink-0 flex flex-col items-center">
+                    <img src="https://via.placeholder.com/100" class="w-24 h-24 rounded-full mb-4 border-4 border-indigo-100 object-cover" alt="Student">
+                    <h3 class="text-xl font-bold text-slate-900">Arif Rahman</h3>
+                    <p class="text-indigo-600 font-bold mb-2">AFMC</p>
+                    <div class="bg-slate-100 text-slate-600 text-xs px-3 py-1 rounded-full">HSC Batch 2024</div>
+                </div>
+
+                <!-- Duplicate Items for seamless infinite scroll -->
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 w-72 flex-shrink-0 flex flex-col items-center">
+                    <img src="https://via.placeholder.com/100" class="w-24 h-24 rounded-full mb-4 border-4 border-emerald-100 object-cover" alt="Student">
+                    <h3 class="text-xl font-bold text-slate-900">Rahim Uddin</h3>
+                    <p class="text-emerald-600 font-bold mb-2">BUET</p>
+                    <div class="bg-slate-100 text-slate-600 text-xs px-3 py-1 rounded-full">HSC Batch 2024</div>
+                </div>
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 w-72 flex-shrink-0 flex flex-col items-center">
+                    <img src="https://via.placeholder.com/100" class="w-24 h-24 rounded-full mb-4 border-4 border-blue-100 object-cover" alt="Student">
+                    <h3 class="text-xl font-bold text-slate-900">Sadia Islam</h3>
+                    <p class="text-blue-600 font-bold mb-2">Dhaka Medical College</p>
+                    <div class="bg-slate-100 text-slate-600 text-xs px-3 py-1 rounded-full">HSC Batch 2024</div>
+                </div>
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 w-72 flex-shrink-0 flex flex-col items-center">
+                    <img src="https://via.placeholder.com/100" class="w-24 h-24 rounded-full mb-4 border-4 border-purple-100 object-cover" alt="Student">
+                    <h3 class="text-xl font-bold text-slate-900">Tanvir Hasan</h3>
+                    <p class="text-purple-600 font-bold mb-2">Dhaka University</p>
+                    <div class="bg-slate-100 text-slate-600 text-xs px-3 py-1 rounded-full">HSC Batch 2023</div>
+                </div>
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 w-72 flex-shrink-0 flex flex-col items-center">
+                    <img src="https://via.placeholder.com/100" class="w-24 h-24 rounded-full mb-4 border-4 border-orange-100 object-cover" alt="Student">
+                    <h3 class="text-xl font-bold text-slate-900">Nusrat Jahan</h3>
+                    <p class="text-orange-600 font-bold mb-2">RUET</p>
+                    <div class="bg-slate-100 text-slate-600 text-xs px-3 py-1 rounded-full">HSC Batch 2023</div>
+                </div>
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 w-72 flex-shrink-0 flex flex-col items-center">
+                    <img src="https://via.placeholder.com/100" class="w-24 h-24 rounded-full mb-4 border-4 border-indigo-100 object-cover" alt="Student">
+                    <h3 class="text-xl font-bold text-slate-900">Arif Rahman</h3>
+                    <p class="text-indigo-600 font-bold mb-2">AFMC</p>
+                    <div class="bg-slate-100 text-slate-600 text-xs px-3 py-1 rounded-full">HSC Batch 2024</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- CTA Section -->
-    <section class="py-20 bg-emerald-600">
+    <section class="py-12 hero-bg">
         <div class="max-w-4xl mx-auto text-center px-4 sm:px-6">
-            <h2 class="text-4xl font-bold text-white mb-6">Ready to Make Physics Easier?</h2>
-            <p class="text-emerald-100 text-xl mb-10">Join our upcoming batches and start your journey towards excellence.</p>
-            <a href="#courses" class="bg-white text-emerald-700 px-10 py-4 rounded-full font-bold text-lg hover:bg-slate-100 transition shadow-xl inline-block">
+            <h2 id="ctaTitle" class="text-3xl md:text-4xl font-bold text-white mb-4">Ready to Make Physics Easier?</h2>
+            <p id="ctaDesc" class="text-white/90 text-lg mb-6">Join our upcoming batches and start your journey towards excellence.</p>
+            <a href="#courses" id="ctaBtn" class="bg-white text-[#6bc117] px-8 py-3 rounded-full font-bold text-base hover:bg-slate-100 transition shadow-xl inline-block">
                 Join Our Course Today
             </a>
         </div>
     </section>
 
     <script>
-        // Fetch courses from API and render them
+        // @ts-nocheck
+        const translations = {
+            en: {
+                navHome: "Home", navAbout: "About", navCourses: "Courses", navTeachers: "Teachers", navRoutine: "Routine", navEnroll: "Enroll Now",
+                heroTitle: "Master Physics. <br>Build Strong Concepts. <br><span class='text-emerald-300'>Achieve Better Results.</span>",
+                heroSub: "Concept-based Physics learning with expert guidance, regular practice, and exam-focused preparation for SSC, HSC & Admission.",
+                btnExplore: "Explore Courses", btnContact: "Contact Us",
+                whyTitle: "Why Choose Us?",
+                f1Title: "Strong Concepts", f1Desc: "Deep understanding of core physics principles from the basics.",
+                f2Title: "Easy Explanation", f2Desc: "Complex topics broken down into simple, digestible lessons.",
+                f3Title: "Numerical Solving", f3Desc: "Extensive practice on mathematical problems and theories.",
+                f4Title: "Regular Exams", f4Desc: "Weekly tests and evaluations to track student progress.",
+                coursesTitle: "Featured Courses",
+                appTitle: "Learn Anywhere, Anytime.", appDesc: "Download the <span class='font-bold text-emerald-600 font-sans'>PhysicsAcademy</span> mobile app to watch premium video lectures, give exams, and access study materials on the go.",
+                successTitle: "Our Pride: Successful Students", successDesc: "Hundreds of our students are studying in top universities.",
+                ctaTitle: "Ready to Make Physics Easier?", ctaDesc: "Join our upcoming batches and start your journey towards excellence.", ctaBtn: "Join Our Course Today"
+            },
+            bn: {
+                navHome: "হোম", navAbout: "আমাদের সম্পর্কে", navCourses: "কোর্সসমূহ", navTeachers: "শিক্ষকগণ", navRoutine: "রুটিন", navEnroll: "ভর্তি হন",
+                heroTitle: "ফিজিক্স শিখুন. <br>কনসেপ্ট ক্লিয়ার করুন. <br><span class='text-emerald-300'>সেরা রেজাল্ট অর্জন করুন.</span>",
+                heroSub: "SSC, HSC এবং এডমিশনের জন্য অভিজ্ঞ গাইডেন্স, নিয়মিত প্র্যাকটিস ও পরীক্ষামুখী প্রস্তুতির মাধ্যমে কনসেপ্ট-ভিত্তিক ফিজিক্স লার্নিং।",
+                btnExplore: "কোর্সসমূহ দেখুন", btnContact: "যোগাযোগ করুন",
+                whyTitle: "আমাদের কেন বেছে নিবেন?",
+                f1Title: "স্ট্রং কনসেপ্ট", f1Desc: "বেসিক থেকে শুরু করে ফিজিক্সের প্রতিটি বিষয়ের গভীর ধারণা।",
+                f2Title: "সহজ ব্যাখ্যা", f2Desc: "কঠিন টপিকগুলো সহজভাবে ভেঙে ভেঙে বোঝানো হয়।",
+                f3Title: "গাণিতিক সমাধান", f3Desc: "গাণিতিক সমস্যা ও থিওরির উপর ব্যাপক প্র্যাকটিস করানো হয়।",
+                f4Title: "নিয়মিত পরীক্ষা", f4Desc: "স্টুডেন্টদের উন্নতি ট্র্যাক করতে সাপ্তাহিক পরীক্ষা নেওয়া হয়।",
+                coursesTitle: "আমাদের কোর্সসমূহ",
+                appTitle: "যেখানে সেখানে, যখন তখন শিখুন।", appDesc: "<span class='font-bold text-emerald-600 font-sans'>PhysicsAcademy</span> মোবাইল অ্যাপ ডাউনলোড করে যেকোনো জায়গা থেকে প্রিমিয়াম ভিডিও লেকচার, পরীক্ষা ও স্টাডি ম্যাটেরিয়াল এক্সেস করুন।",
+                successTitle: "আমাদের গর্ব: সফল ছাত্রছাত্রী", successDesc: "আমাদের শত শত ছাত্রছাত্রী দেশের সেরা বিশ্ববিদ্যালয়গুলোতে পড়াশোনা করছে।",
+                ctaTitle: "ফিজিক্সকে সহজ করতে প্রস্তুত?", ctaDesc: "আমাদের আসন্ন ব্যাচগুলোতে যুক্ত হয়ে সফলতার পথে এগিয়ে যান।", ctaBtn: "আজই কোর্সে ভর্তি হন"
+            }
+        };
+
+        async function logout() {
+            const token = localStorage.getItem('token');
+            if(token) {
+                try {
+                    await fetch('/api/Auth/logout', { 
+                        method: 'POST',
+                        headers: { 'Authorization': 'Bearer ' + token }
+                    });
+                } catch(e) {}
+            }
+            localStorage.removeItem('token');
+            window.location.reload();
+        }
+
+        function updateAuthNav(lang) {
+            const token = localStorage.getItem('token');
+            const container = document.getElementById('authNavContainer');
+            if(!container) return;
+            
+            if(token) {
+                const logoutText = lang === 'bn' ? 'লগআউট' : 'Logout';
+                const profileText = lang === 'bn' ? 'প্রোফাইল' : 'Profile';
+                container.innerHTML = `
+                    <a href="#" class="text-slate-600 hover:text-emerald-600 font-medium transition flex items-center gap-2"><i class="fa-solid fa-user-circle text-xl"></i> <span class="hidden md:inline">` + profileText + `</span></a>
+                    <button onclick="logout()" class="text-red-500 hover:text-red-700 font-bold transition flex items-center gap-2"><i class="fa-solid fa-arrow-right-from-bracket"></i> <span class="hidden md:inline">` + logoutText + `</span></button>
+                `;
+            } else {
+                const loginText = lang === 'bn' ? 'লগইন' : 'Login';
+                container.innerHTML = `<a href="login.html" class="bg-emerald-600 text-white px-5 py-2 rounded-full font-bold hover:bg-emerald-700 transition shadow-lg shadow-emerald-200 flex items-center gap-2"><i class="fa-solid fa-user text-sm"></i> ` + loginText + `</a>`;
+            }
+        }
+
+        function setLanguage(lang) {
+            localStorage.setItem('lang', lang);
+            const t = translations[lang];
+
+            updateAuthNav(lang);
+            document.getElementById('navHome').innerText = t.navHome;
+            document.getElementById('navAbout').innerText = t.navAbout;
+            document.getElementById('navCourses').innerText = t.navCourses;
+            document.getElementById('navTeachers').innerText = t.navTeachers;
+            document.getElementById('navRoutine').innerText = t.navRoutine;
+            
+            document.getElementById('heroTitle').innerHTML = t.heroTitle;
+            document.getElementById('heroSub').innerText = t.heroSub;
+            document.getElementById('btnExplore').innerHTML = `<i class="fa-solid fa-graduation-cap"></i> ` + t.btnExplore;
+            document.getElementById('btnContact').innerHTML = `<i class="fa-solid fa-phone"></i> ` + t.btnContact;
+
+            document.getElementById('whyTitle').innerText = t.whyTitle;
+            document.getElementById('f1Title').innerText = t.f1Title; document.getElementById('f1Desc').innerText = t.f1Desc;
+            document.getElementById('f2Title').innerText = t.f2Title; document.getElementById('f2Desc').innerText = t.f2Desc;
+            document.getElementById('f3Title').innerText = t.f3Title; document.getElementById('f3Desc').innerText = t.f3Desc;
+            document.getElementById('f4Title').innerText = t.f4Title; document.getElementById('f4Desc').innerText = t.f4Desc;
+
+            document.getElementById('coursesTitle').innerText = t.coursesTitle;
+            document.getElementById('appTitle').innerText = t.appTitle; document.getElementById('appDesc').innerHTML = t.appDesc;
+            document.getElementById('successTitle').innerText = t.successTitle; document.getElementById('successDesc').innerText = t.successDesc;
+            document.getElementById('ctaTitle').innerText = t.ctaTitle; document.getElementById('ctaDesc').innerText = t.ctaDesc; document.getElementById('ctaBtn').innerHTML = t.ctaBtn;
+
+            if (lang === 'bn') {
+                document.getElementById('btnBn').className = 'px-3 py-1 text-sm font-bold bg-emerald-600 text-white';
+                document.getElementById('btnEn').className = 'px-3 py-1 text-sm font-bold text-emerald-700 hover:bg-emerald-100 transition';
+            } else {
+                document.getElementById('btnEn').className = 'px-3 py-1 text-sm font-bold bg-emerald-600 text-white';
+                document.getElementById('btnBn').className = 'px-3 py-1 text-sm font-bold text-emerald-700 hover:bg-emerald-100 transition';
+            }
+        }
+
         async function loadCourses() {
             try {
                 const response = await fetch('/api/Courses');
@@ -195,8 +409,24 @@
             }
         }
 
-        // Load on page load
-        window.onload = loadCourses;
+        window.onload = () => {
+            const savedLang = localStorage.getItem('lang') || 'en';
+            setLanguage(savedLang);
+            loadCourses();
+        };
     </script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -6,12 +6,17 @@
     <title>Login - PhysicsAcademy</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .hero-bg {
+            background: linear-gradient(150deg, #d4e0c8 0%, #6bc117 40%, #172114 100%);
+        }
+    </style>
 </head>
 <body class="bg-slate-50 font-sans text-slate-800 flex items-center justify-center min-h-screen">
 
     <div class="bg-white p-8 md:p-12 rounded-2xl shadow-xl max-w-md w-full border border-slate-100">
         <div class="text-center mb-8">
-            <i class="fa-solid fa-atom text-5xl text-emerald-600 mb-4"></i>
+            <i class="fa-solid fa-atom text-5xl text-[#6bc117] mb-4"></i>
             <h2 class="text-3xl font-bold text-slate-900">Welcome Back</h2>
             <p class="text-slate-500 mt-2">Login to your account to enroll in courses.</p>
         </div>
@@ -28,13 +33,13 @@
             
             <div id="errorMsg" class="hidden bg-red-50 text-red-600 p-3 rounded-lg text-sm font-medium text-center"></div>
 
-            <button type="submit" id="submitBtn" class="w-full bg-emerald-600 text-white font-bold rounded-lg px-4 py-3 hover:bg-emerald-700 transition shadow-lg shadow-emerald-200">
+            <button type="submit" id="submitBtn" class="w-full bg-[#6bc117] text-white font-bold rounded-lg px-4 py-3 hover:bg-[#5ba712] transition shadow-lg shadow-[#6bc117]/30">
                 Login
             </button>
         </form>
         
         <div class="mt-6 text-center text-sm text-slate-500">
-            Don't have an account? <a href="register.html" class="text-emerald-600 font-bold hover:underline">Register</a>
+            Don't have an account? <a href="register.html" class="text-[#6bc117] font-bold hover:underline">Register</a>
         </div>
     </div>
 
@@ -47,31 +52,29 @@
             btn.disabled = true;
             errorMsg.classList.add('hidden');
 
-            const username = document.getElementById('username').value;
+            const email = document.getElementById('username').value;
             const password = document.getElementById('password').value;
 
             try {
-                // Use random device ID for web
                 const deviceId = localStorage.getItem('deviceId') || 'web-' + Math.random().toString(36).substring(7);
                 localStorage.setItem('deviceId', deviceId);
 
                 const response = await fetch('/api/Auth/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, password, deviceId })
+                    body: JSON.stringify({ email: email, password: password, deviceId: deviceId })
                 });
 
-                const data = await response.json();
-
                 if (response.ok) {
+                    const data = await response.json();
                     localStorage.setItem('token', data.token);
-                    localStorage.setItem('username', username);
-                    // Redirect back to course page if came from one
+                    localStorage.setItem('username', data.username || email);
                     const urlParams = new URLSearchParams(window.location.search);
                     const returnUrl = urlParams.get('returnUrl') || '/';
                     window.location.href = returnUrl;
                 } else {
-                    errorMsg.innerText = data.message || "Invalid credentials.";
+                    const text = await response.text();
+                    errorMsg.innerText = text || "Invalid credentials.";
                     errorMsg.classList.remove('hidden');
                 }
             } catch (err) {
@@ -85,3 +88,9 @@
     </script>
 </body>
 </html>
+
+
+
+
+
+
