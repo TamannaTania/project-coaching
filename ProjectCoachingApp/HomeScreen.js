@@ -200,7 +200,7 @@ const styles = StyleSheet.create({
         marginBottom: 15,
     },
     buyButton: {
-        backgroundColor: '#f3f4f6',
+        backgroundColor: '#143d8d',
         padding: 10,
         borderRadius: 8,
         alignItems: 'center',
