@@ -117,6 +117,11 @@
             visibility: hidden !important;
             pointer-events: none !important;
         }
+    
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
 <body>
@@ -182,13 +187,29 @@
         </div>
 
         <!-- Courses View -->
-        <div id="viewCourses" style="display: none;">
-            <div id="grid"></div>
+        <!-- Courses View -->
+        <div id="viewCourses" style="display: none; animation: fadeIn 0.4s ease;">
+            <div style="background: white; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); overflow: hidden; margin-top: 10px; border: 1px solid #f3f4f6;">
+                <div style="background: linear-gradient(135deg, #1e293b 0%, #475569 100%); padding: 25px 30px; display: flex; flex-direction: column; gap: 5px;">
+                    <h2 style="margin: 0; color: white; font-size: 1.8rem; font-weight: 800; letter-spacing: -0.5px;">Course Management</h2>
+                    <p style="margin: 0; color: #cbd5e1; font-size: 0.95rem; font-weight: 500;">Add, edit or delete courses for your coaching platform.</p>
+                </div>
+                <div style="padding: 30px; background: #f8fafc;">
+                    <div id="grid" style="box-shadow: 0 4px 6px rgba(0,0,0,0.02); border-radius: 8px;"></div>
+                </div>
+            </div>
         </div>
 
         <!-- Payments View -->
-        <div id="viewPayments" style="display: none;">
-            <table style="width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+        <!-- Payments View -->
+        <div id="viewPayments" style="display: none; animation: fadeIn 0.4s ease;">
+            <div style="background: white; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); overflow: hidden; margin-top: 10px; border: 1px solid #f3f4f6;">
+                <div style="background: linear-gradient(135deg, #065f46 0%, #10b981 100%); padding: 25px 30px; display: flex; flex-direction: column; gap: 5px;">
+                    <h2 style="margin: 0; color: white; font-size: 1.8rem; font-weight: 800; letter-spacing: -0.5px;">Payment Requests</h2>
+                    <p style="margin: 0; color: #d1fae5; font-size: 0.95rem; font-weight: 500;">Review student enrollment requests, verify TrxID, and approve access.</p>
+                </div>
+                <div style="padding: 30px; background: #f8fafc;">
+                    <table style="width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
                 <thead style="background: #f8fafc; text-align: left;">
                     <tr>
                         <th style="padding: 15px; border-bottom: 1px solid #e5e7eb;">তারিখ</th>
@@ -204,6 +225,8 @@
                     <tr><td colspan="7" style="padding: 20px; text-align: center;">Loading...</td></tr>
                 </tbody>
             </table>
+                </div>
+            </div>
         </div>
     </main>
 
