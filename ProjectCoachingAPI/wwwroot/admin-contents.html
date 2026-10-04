@@ -1,0 +1,249 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Course Contents</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-50 text-slate-900 font-sans p-8">
+
+    <div class="max-w-4xl mx-auto">
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-3xl font-bold text-slate-800">Manage Course Contents</h1>
+            <a href="admin.html" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-4 py-2 rounded-lg font-medium transition">Back to Dashboard</a>
+        </div>
+
+        <!-- Course Selector -->
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 mb-8">
+            <label class="block text-sm font-bold text-slate-700 mb-2">Select a Course</label>
+            <select id="courseSelect" onchange="loadCourseDetails()" class="w-full border border-slate-300 rounded-lg px-4 py-2 focus:ring focus:ring-emerald-200 outline-none">
+                <option value="">-- Choose a Course --</option>
+            </select>
+        </div>
+
+        <div id="contentArea" class="hidden space-y-6">
+            <div class="flex justify-between items-center">
+                <h2 class="text-2xl font-bold text-slate-800" id="courseTitleDisplay">Chapters</h2>
+                <button onclick="showChapterModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg font-medium transition shadow-sm">
+                    <i class="fa-solid fa-plus mr-1"></i> Add Chapter
+                </button>
+            </div>
+
+            <div id="chaptersContainer" class="space-y-4">
+                <!-- Chapters will be rendered here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Chapter Modal -->
+    <div id="chapterModal" class="hidden fixed inset-0 bg-slate-900/50 flex items-center justify-center p-4">
+        <div class="bg-white p-6 rounded-xl shadow-xl w-full max-w-md">
+            <h3 class="text-xl font-bold mb-4">Add New Chapter</h3>
+            <div class="mb-4">
+                <label class="block text-sm font-bold mb-1">Chapter Title</label>
+                <input type="text" id="chapterTitle" class="w-full border rounded px-3 py-2">
+            </div>
+            <div class="mb-6">
+                <label class="block text-sm font-bold mb-1">Order Index (e.g. 1, 2, 3)</label>
+                <input type="number" id="chapterOrder" value="1" class="w-full border rounded px-3 py-2">
+            </div>
+            <div class="flex justify-end gap-2">
+                <button onclick="hideChapterModal()" class="px-4 py-2 bg-slate-200 rounded hover:bg-slate-300">Cancel</button>
+                <button onclick="saveChapter()" class="px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Content Modal -->
+    <div id="contentModal" class="hidden fixed inset-0 bg-slate-900/50 flex items-center justify-center p-4">
+        <div class="bg-white p-6 rounded-xl shadow-xl w-full max-w-md">
+            <h3 class="text-xl font-bold mb-4">Add New Content (Video/PDF)</h3>
+            <input type="hidden" id="contentChapterId">
+            <div class="mb-4">
+                <label class="block text-sm font-bold mb-1">Content Title</label>
+                <input type="text" id="contentTitle" placeholder="e.g. Lecture 1: Basics" class="w-full border rounded px-3 py-2">
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-bold mb-1">Type</label>
+                <select id="contentType" class="w-full border rounded px-3 py-2">
+                    <option value="Video">Video</option>
+                    <option value="PDF">PDF</option>
+                </select>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-bold mb-1">URL / Link</label>
+                <input type="text" id="contentUrl" placeholder="https://..." class="w-full border rounded px-3 py-2">
+            </div>
+            <div class="mb-6">
+                <label class="block text-sm font-bold mb-1">Order Index</label>
+                <input type="number" id="contentOrder" value="1" class="w-full border rounded px-3 py-2">
+            </div>
+            <div class="flex justify-end gap-2">
+                <button onclick="hideContentModal()" class="px-4 py-2 bg-slate-200 rounded hover:bg-slate-300">Cancel</button>
+                <button onclick="saveContent()" class="px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const token = localStorage.getItem('token');
+        if(!token) {
+            window.location.href = 'login.html?returnUrl=admin-contents.html';
+        }
+
+        async function loadCourses() {
+            try {
+                const res = await fetch('/api/Courses');
+                const courses = await res.json();
+                const select = document.getElementById('courseSelect');
+                courses.forEach(c => {
+                    const opt = document.createElement('option');
+                    opt.value = c.id;
+                    opt.textContent = c.title;
+                    select.appendChild(opt);
+                });
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        async function loadCourseDetails() {
+            const courseId = document.getElementById('courseSelect').value;
+            if(!courseId) {
+                document.getElementById('contentArea').classList.add('hidden');
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/Courses/' + courseId, {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                const course = await res.json();
+                
+                document.getElementById('courseTitleDisplay').innerText = `Chapters for: ${course.title}`;
+                document.getElementById('contentArea').classList.remove('hidden');
+
+                const container = document.getElementById('chaptersContainer');
+                container.innerHTML = '';
+
+                if(course.chapters && course.chapters.length > 0) {
+                    course.chapters.forEach(ch => {
+                        let html = `
+                        <div class="bg-white border rounded-xl shadow-sm overflow-hidden mb-4">
+                            <div class="bg-slate-100 p-4 flex justify-between items-center border-b">
+                                <div class="font-bold text-lg"><i class="fa-solid fa-folder-open text-emerald-600 mr-2"></i>${ch.title} <span class="text-xs text-slate-400 font-normal ml-2">Order: ${ch.orderIndex}</span></div>
+                                <div class="flex gap-2">
+                                    <button onclick="showContentModal(${ch.id})" class="text-sm bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded transition">Add Content</button>
+                                    <button onclick="deleteChapter(${ch.id})" class="text-sm bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded transition"><i class="fa-solid fa-trash"></i></button>
+                                </div>
+                            </div>
+                            <div class="p-0 divide-y">
+                        `;
+                        
+                        if(ch.contents && ch.contents.length > 0) {
+                            ch.contents.forEach(co => {
+                                let icon = co.type === 'Video' ? 'fa-video text-blue-500' : 'fa-file-pdf text-red-500';
+                                html += `
+                                <div class="p-3 flex justify-between items-center hover:bg-slate-50">
+                                    <div class="flex items-center gap-3">
+                                        <i class="fa-solid ${icon}"></i>
+                                        <span class="font-medium">${co.title}</span>
+                                        <a href="${co.url}" target="_blank" class="text-xs text-blue-500 hover:underline">Link</a>
+                                    </div>
+                                    <button onclick="deleteContent(${co.id})" class="text-red-400 hover:text-red-600"><i class="fa-solid fa-times"></i></button>
+                                </div>
+                                `;
+                            });
+                        } else {
+                            html += `<div class="p-4 text-sm text-slate-500 text-center">No contents yet.</div>`;
+                        }
+
+                        html += `</div></div>`;
+                        container.innerHTML += html;
+                    });
+                } else {
+                    container.innerHTML = `<div class="text-center p-8 bg-white border border-dashed rounded-xl text-slate-500">No chapters found for this course.</div>`;
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        // Modals
+        function showChapterModal() { document.getElementById('chapterModal').classList.remove('hidden'); }
+        function hideChapterModal() { document.getElementById('chapterModal').classList.add('hidden'); }
+        
+        function showContentModal(chapterId) { 
+            document.getElementById('contentChapterId').value = chapterId;
+            document.getElementById('contentModal').classList.remove('hidden'); 
+        }
+        function hideContentModal() { document.getElementById('contentModal').classList.add('hidden'); }
+
+        // Actions
+        async function saveChapter() {
+            const courseId = document.getElementById('courseSelect').value;
+            const title = document.getElementById('chapterTitle').value;
+            const orderIndex = parseInt(document.getElementById('chapterOrder').value);
+            
+            if(!title) return alert("Title required");
+
+            const res = await fetch('/api/CourseContents/chapters', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                body: JSON.stringify({ courseId, title, orderIndex })
+            });
+
+            if(res.ok) {
+                hideChapterModal();
+                document.getElementById('chapterTitle').value = '';
+                loadCourseDetails();
+            } else alert("Failed to add chapter");
+        }
+
+        async function saveContent() {
+            const chapterId = document.getElementById('contentChapterId').value;
+            const title = document.getElementById('contentTitle').value;
+            const type = document.getElementById('contentType').value;
+            const url = document.getElementById('contentUrl').value;
+            const orderIndex = parseInt(document.getElementById('contentOrder').value);
+
+            if(!title || !url) return alert("Title and URL required");
+
+            const res = await fetch('/api/CourseContents/contents', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                body: JSON.stringify({ chapterId, title, type, url, orderIndex })
+            });
+
+            if(res.ok) {
+                hideContentModal();
+                document.getElementById('contentTitle').value = '';
+                document.getElementById('contentUrl').value = '';
+                loadCourseDetails();
+            } else alert("Failed to add content");
+        }
+
+        async function deleteChapter(id) {
+            if(!confirm("Are you sure? This will delete all contents inside this chapter!")) return;
+            const res = await fetch('/api/CourseContents/chapters/' + id, {
+                method: 'DELETE',
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
+            if(res.ok) loadCourseDetails();
+        }
+
+        async function deleteContent(id) {
+            if(!confirm("Delete this content?")) return;
+            const res = await fetch('/api/CourseContents/contents/' + id, {
+                method: 'DELETE',
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
+            if(res.ok) loadCourseDetails();
+        }
+
+        window.onload = loadCourses;
+    </script>
+</body>
+</html>
