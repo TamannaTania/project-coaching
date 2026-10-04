@@ -111,9 +111,11 @@
                             </li>
                         </ul>
 
-                        <button id="enrollBtn" onclick="openEnrollModal()" class="w-full bg-emerald-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-emerald-700 transition shadow-lg shadow-emerald-200">
+                        <div id="enrollAction">
+                            <button id="enrollBtn" onclick="openEnrollModal()" class="w-full bg-emerald-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-emerald-700 transition shadow-lg shadow-emerald-200">
                             Course টি কিনুন
                         </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -298,11 +300,16 @@
                 let isEnrolled = course.isEnrolled === true;
 
                 if(isEnrolled) {
+                    const vp = document.getElementById('videoPlaceholder');
+                    if(vp) vp.style.display = 'none';
+
                     const actionDiv = document.getElementById('enrollAction');
-                    actionDiv.innerHTML = `<div class="bg-emerald-50 text-emerald-700 p-4 rounded-xl flex items-center gap-3 border border-emerald-100">
-                        <i class="fa-solid fa-circle-check text-2xl"></i>
-                        <div class="font-bold">${t.statusEnrolled}</div>
-                    </div>`;
+                    if(actionDiv) {
+                        actionDiv.innerHTML = `<div class="bg-emerald-50 text-emerald-700 p-4 rounded-xl flex items-center gap-3 border border-emerald-100">
+                            <i class="fa-solid fa-circle-check text-2xl"></i>
+                            <div class="font-bold">${t.statusEnrolled}</div>
+                        </div>`;
+                    }
 
                     // Render Chapters
                     let chaptersHtml = '<div class="mt-8"><h3 class="text-2xl font-bold text-slate-800 mb-6 border-b pb-2">Course Contents</h3><div class="space-y-4">';
@@ -348,10 +355,12 @@
                         const pending = myCourses.find(c => c.courseId == courseId);
                         if(pending) {
                             const actionDiv = document.getElementById('enrollAction');
-                            actionDiv.innerHTML = `<div class="bg-amber-50 text-amber-700 p-4 rounded-xl flex items-center gap-3 border border-amber-100">
-                                <i class="fa-solid fa-clock text-2xl"></i>
-                                <div class="font-bold">${t.statusPending}</div>
-                            </div>`;
+                            if(actionDiv) {
+                                actionDiv.innerHTML = `<div class="bg-amber-50 text-amber-700 p-4 rounded-xl flex items-center gap-3 border border-amber-100">
+                                    <i class="fa-solid fa-clock text-2xl"></i>
+                                    <div class="font-bold">${t.statusPending}</div>
+                                </div>`;
+                            }
                         }
                     }
                 }
