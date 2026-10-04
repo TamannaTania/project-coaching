@@ -8,10 +8,13 @@ namespace ProjectCoachingAPI.Models
         public string Badge { get; set; } = string.Empty;
         public decimal Price { get; set; }
         public string ImageUrl { get; set; } = string.Empty;
-        public string VideoUrl { get; set; } = string.Empty;
+        public string VideoUrl { get; set; } = string.Empty; // Keep for backward compatibility/preview
         
         // Relationship to features
         public List<CourseFeature> Features { get; set; } = new List<CourseFeature>();
+        
+        // Relationship to Chapters
+        public List<CourseChapter> Chapters { get; set; } = new List<CourseChapter>();
     }
 
     public class CourseFeature
