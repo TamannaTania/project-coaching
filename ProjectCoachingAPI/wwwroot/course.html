@@ -315,7 +315,7 @@
 
                 let isEnrolled = course.isEnrolled === true;
 
-                if(isEnrolled) {
+                if(isEnrolled) { handleEnrolledView(); 
                     const vp = document.getElementById('videoPlaceholder');
                     if(vp) vp.style.display = 'none';
 
