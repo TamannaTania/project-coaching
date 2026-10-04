@@ -123,6 +123,14 @@
             to { opacity: 1; transform: translateY(0); }
         }
     </style>
+
+    <style>
+        .stat-card { transition: transform 0.3s ease, box-shadow 0.3s ease; cursor: default; }
+        .stat-card:hover { transform: translateY(-5px); }
+        .stat-card.c1:hover { box-shadow: 0 20px 25px -5px rgba(5,150,105,0.4); }
+        .stat-card.c2:hover { box-shadow: 0 20px 25px -5px rgba(79,70,229,0.4); }
+        .stat-card.c3:hover { box-shadow: 0 20px 25px -5px rgba(234,88,12,0.4); }
+    </style>
 </head>
 <body>
     <header class="main-header" style="background: #1f2937; color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center;">
@@ -148,7 +156,7 @@
         <div id="viewDashboard">
             <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 30px;">
                 <!-- Total Sales (Primary Green Card) -->
-                <div style="background: #14532d; color: white; padding: 25px; border-radius: 16px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); position: relative;">
+                <div class="stat-card c1" style="background: linear-gradient(135deg, #064e3b 0%, #059669 100%); color: white; padding: 25px; border-radius: 16px; box-shadow: 0 10px 15px -3px rgba(5,150,105,0.3); position: relative; cursor: pointer; transition: transform 0.3s ease, box-shadow 0.3s ease;">
                     <h3 style="margin: 0; font-size: 1.1rem; font-weight: 500;">মোট এনরোলমেন্ট (Sale)</h3>
                     <div style="position: absolute; top: 20px; right: 20px; background: white; color: #14532d; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">↗</div>
                     <p id="statSales" style="font-size: 3rem; font-weight: 700; margin: 15px 0 10px;">0</p>
@@ -158,22 +166,22 @@
                 </div>
 
                 <!-- Total Students (White Card) -->
-                <div style="background: white; color: #1f2937; padding: 25px; border-radius: 16px; border: 1px solid #e5e7eb; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); position: relative;">
+                <div class="stat-card c2" style="background: linear-gradient(135deg, #1e3a8a 0%, #4f46e5 100%); color: white; padding: 25px; border-radius: 16px; border: none; box-shadow: 0 10px 15px -3px rgba(79,70,229,0.3); position: relative;">
                     <h3 style="margin: 0; font-size: 1.1rem; font-weight: 500;">মোট স্টুডেন্ট</h3>
-                    <div style="position: absolute; top: 20px; right: 20px; border: 1px solid #d1d5db; color: #6b7280; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">↗</div>
+                    <div style="position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.2); color: white; border: none; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">↗</div>
                     <p id="statStudents" style="font-size: 3rem; font-weight: 700; margin: 15px 0 10px;">0</p>
-                    <div style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: #6b7280;">
-                        <span style="border: 1px solid #d1d5db; padding: 2px 6px; border-radius: 4px; color: #10b981;">↑</span> Increased from last month
+                    <div style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: #a5b4fc;">
+                        <span style="background: rgba(255,255,255,0.2); padding: 2px 6px; border-radius: 4px; color: white;">↑</span> Increased from last month
                     </div>
                 </div>
 
                 <!-- Pending Requests (White Card) -->
-                <div style="background: white; color: #1f2937; padding: 25px; border-radius: 16px; border: 1px solid #e5e7eb; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); position: relative;">
+                <div class="stat-card c3" style="background: linear-gradient(135deg, #9a3412 0%, #ea580c 100%); color: white; padding: 25px; border-radius: 16px; border: none; box-shadow: 0 10px 15px -3px rgba(234,88,12,0.3); position: relative;">
                     <h3 style="margin: 0; font-size: 1.1rem; font-weight: 500;">পেমেন্ট রিকোয়েস্ট (Pending)</h3>
-                    <div style="position: absolute; top: 20px; right: 20px; border: 1px solid #d1d5db; color: #6b7280; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">↗</div>
+                    <div style="position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.2); color: white; border: none; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">↗</div>
                     <p id="statPending" style="font-size: 3rem; font-weight: 700; margin: 15px 0 10px;">0</p>
-                    <div style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: #6b7280;">
-                        On Discuss
+                    <div style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: #a5b4fc;">
+                        <span style="color: #fdba74;">On Discuss</span>
                     </div>
                 </div>
             </div>
