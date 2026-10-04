@@ -6,92 +6,119 @@
     <title>Manage Course Contents</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+    </style>
 </head>
-<body class="bg-slate-50 text-slate-900 font-sans p-8">
+<body class="text-slate-900 p-8">
 
-    <div class="max-w-4xl mx-auto">
-        <div class="flex justify-between items-center mb-8">
-            <h1 class="text-3xl font-bold text-slate-800">Manage Course Contents</h1>
-            <a href="admin.html" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-4 py-2 rounded-lg font-medium transition">Back to Dashboard</a>
+    <div class="max-w-5xl mx-auto">
+        <div class="flex justify-between items-center mb-10 bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+            <div>
+                <h1 class="text-3xl font-extrabold text-slate-800">Manage Contents</h1>
+                <p class="text-slate-500 mt-1">Organize chapters and upload videos/PDFs for your courses.</p>
+            </div>
+            <a href="admin.html" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-5 py-2.5 rounded-xl font-semibold transition flex items-center gap-2">
+                <i class="fa-solid fa-arrow-left"></i> Dashboard
+            </a>
         </div>
 
         <!-- Course Selector -->
-        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 mb-8">
-            <label class="block text-sm font-bold text-slate-700 mb-2">Select a Course</label>
-            <select id="courseSelect" onchange="loadCourseDetails()" class="w-full border border-slate-300 rounded-lg px-4 py-2 focus:ring focus:ring-emerald-200 outline-none">
-                <option value="">-- Choose a Course --</option>
-            </select>
+        <div class="bg-white p-8 rounded-2xl shadow-md border border-slate-100 mb-10">
+            <label class="block text-sm font-bold text-slate-700 mb-3 uppercase tracking-wider">Select a Course to Edit</label>
+            <div class="relative">
+                <select id="courseSelect" onchange="loadCourseDetails()" class="w-full appearance-none bg-slate-50 border-2 border-slate-200 rounded-xl px-5 py-4 text-lg font-medium text-slate-800 focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-50 transition cursor-pointer">
+                    <option value="">-- Choose a Course --</option>
+                </select>
+                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-6 text-slate-500">
+                    <i class="fa-solid fa-chevron-down"></i>
+                </div>
+            </div>
         </div>
 
-        <div id="contentArea" class="hidden space-y-6">
-            <div class="flex justify-between items-center">
-                <h2 class="text-2xl font-bold text-slate-800" id="courseTitleDisplay">Chapters</h2>
-                <button onclick="showChapterModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg font-medium transition shadow-sm">
-                    <i class="fa-solid fa-plus mr-1"></i> Add Chapter
+        <div id="contentArea" class="hidden space-y-8 animate-fade-in">
+            <div class="flex justify-between items-center border-b-2 border-slate-200 pb-4">
+                <h2 class="text-2xl font-extrabold text-slate-800 flex items-center gap-3">
+                    <i class="fa-solid fa-layer-group text-emerald-500"></i>
+                    <span id="courseTitleDisplay">Chapters</span>
+                </h2>
+                <button onclick="showChapterModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl font-bold transition shadow-lg shadow-emerald-200 flex items-center gap-2 transform hover:-translate-y-0.5">
+                    <i class="fa-solid fa-folder-plus"></i> Add New Chapter
                 </button>
             </div>
 
-            <div id="chaptersContainer" class="space-y-4">
+            <div id="chaptersContainer" class="space-y-6">
                 <!-- Chapters will be rendered here -->
             </div>
         </div>
     </div>
 
     <!-- Add Chapter Modal -->
-    <div id="chapterModal" class="hidden fixed inset-0 bg-slate-900/50 flex items-center justify-center p-4">
-        <div class="bg-white p-6 rounded-xl shadow-xl w-full max-w-md">
-            <h3 class="text-xl font-bold mb-4">Add New Chapter</h3>
-            <div class="mb-4">
-                <label class="block text-sm font-bold mb-1">Chapter Title</label>
-                <input type="text" id="chapterTitle" class="w-full border rounded px-3 py-2">
+    <div id="chapterModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+        <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md transform transition-all">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-slate-800">Add Chapter</h3>
+                <button onclick="hideChapterModal()" class="text-slate-400 hover:text-slate-600 text-xl"><i class="fa-solid fa-times"></i></button>
             </div>
-            <div class="mb-6">
-                <label class="block text-sm font-bold mb-1">Order Index (e.g. 1, 2, 3)</label>
-                <input type="number" id="chapterOrder" value="1" class="w-full border rounded px-3 py-2">
-            </div>
-            <div class="flex justify-end gap-2">
-                <button onclick="hideChapterModal()" class="px-4 py-2 bg-slate-200 rounded hover:bg-slate-300">Cancel</button>
-                <button onclick="saveChapter()" class="px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700">Save</button>
+            <div class="space-y-5">
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">Chapter Title</label>
+                    <input type="text" id="chapterTitle" placeholder="e.g. Chapter 1: Introduction" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500 font-medium">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">Order Index (Sort Order)</label>
+                    <input type="number" id="chapterOrder" value="1" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500 font-medium">
+                </div>
+                <div class="pt-2">
+                    <button onclick="saveChapter()" class="w-full bg-emerald-600 text-white py-3.5 rounded-xl font-bold hover:bg-emerald-700 transition shadow-lg shadow-emerald-200">Save Chapter</button>
+                </div>
             </div>
         </div>
     </div>
 
     <!-- Add Content Modal -->
-    <div id="contentModal" class="hidden fixed inset-0 bg-slate-900/50 flex items-center justify-center p-4">
-        <div class="bg-white p-6 rounded-xl shadow-xl w-full max-w-md">
-            <h3 class="text-xl font-bold mb-4">Add New Content (Video/PDF)</h3>
+    <div id="contentModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+        <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md transform transition-all">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-slate-800">Add Content</h3>
+                <button onclick="hideContentModal()" class="text-slate-400 hover:text-slate-600 text-xl"><i class="fa-solid fa-times"></i></button>
+            </div>
             <input type="hidden" id="contentChapterId">
-            <div class="mb-4">
-                <label class="block text-sm font-bold mb-1">Content Title</label>
-                <input type="text" id="contentTitle" placeholder="e.g. Lecture 1: Basics" class="w-full border rounded px-3 py-2">
-            </div>
-            <div class="mb-4">
-                <label class="block text-sm font-bold mb-1">Type</label>
-                <select id="contentType" class="w-full border rounded px-3 py-2">
-                    <option value="Video">Video</option>
-                    <option value="PDF">PDF</option>
-                </select>
-            </div>
-            <div class="mb-4">
-                <label class="block text-sm font-bold mb-1">URL / Link</label>
-                <input type="text" id="contentUrl" placeholder="https://..." class="w-full border rounded px-3 py-2">
-            </div>
-            <div class="mb-6">
-                <label class="block text-sm font-bold mb-1">Order Index</label>
-                <input type="number" id="contentOrder" value="1" class="w-full border rounded px-3 py-2">
-            </div>
-            <div class="flex justify-end gap-2">
-                <button onclick="hideContentModal()" class="px-4 py-2 bg-slate-200 rounded hover:bg-slate-300">Cancel</button>
-                <button onclick="saveContent()" class="px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700">Save</button>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">Type</label>
+                    <div class="relative">
+                        <select id="contentType" class="w-full appearance-none bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-medium focus:outline-none focus:border-emerald-500">
+                            <option value="Video">📺 Video Link (YouTube/Vimeo)</option>
+                            <option value="PDF">📄 PDF Document Link</option>
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-500"><i class="fa-solid fa-chevron-down"></i></div>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">Content Title</label>
+                    <input type="text" id="contentTitle" placeholder="e.g. Lecture 1: Motion" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500 font-medium">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">URL / Link</label>
+                    <input type="text" id="contentUrl" placeholder="https://..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500 font-medium">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">Order Index</label>
+                    <input type="number" id="contentOrder" value="1" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500 font-medium">
+                </div>
+                <div class="pt-4">
+                    <button onclick="saveContent()" class="w-full bg-emerald-600 text-white py-3.5 rounded-xl font-bold hover:bg-emerald-700 transition shadow-lg shadow-emerald-200">Save Content</button>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
         const token = localStorage.getItem('token');
-        if(!token) {
-            window.location.href = 'login.html?returnUrl=admin-contents.html';
-        }
+        if(!token) window.location.href = 'login.html?returnUrl=admin-contents.html';
 
         async function loadCourses() {
             try {
@@ -131,47 +158,91 @@
                 if(course.chapters && course.chapters.length > 0) {
                     course.chapters.forEach(ch => {
                         let html = `
-                        <div class="bg-white border rounded-xl shadow-sm overflow-hidden mb-4">
-                            <div class="bg-slate-100 p-4 flex justify-between items-center border-b">
-                                <div class="font-bold text-lg"><i class="fa-solid fa-folder-open text-emerald-600 mr-2"></i>${ch.title} <span class="text-xs text-slate-400 font-normal ml-2">Order: ${ch.orderIndex}</span></div>
-                                <div class="flex gap-2">
-                                    <button onclick="showContentModal(${ch.id})" class="text-sm bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded transition">Add Content</button>
-                                    <button onclick="deleteChapter(${ch.id})" class="text-sm bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded transition"><i class="fa-solid fa-trash"></i></button>
+                        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden transform transition duration-200 hover:shadow-md">
+                            <!-- Chapter Header -->
+                            <div class="bg-slate-800 p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                                <div class="flex items-center gap-3 text-white">
+                                    <div class="w-10 h-10 bg-slate-700 rounded-lg flex items-center justify-center">
+                                        <i class="fa-solid fa-folder-open text-emerald-400 text-lg"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-bold text-lg">${ch.title}</h3>
+                                        <div class="text-xs text-slate-400 font-medium uppercase tracking-wider mt-0.5">Order: ${ch.orderIndex || 0}</div>
+                                    </div>
+                                </div>
+                                <div class="flex gap-2 w-full sm:w-auto">
+                                    <button onclick="showContentModal(${ch.id})" class="flex-1 sm:flex-none bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-xl font-bold text-sm transition shadow-sm flex items-center justify-center gap-2">
+                                        <i class="fa-solid fa-plus"></i> Add Content
+                                    </button>
+                                    <button onclick="deleteChapter(${ch.id})" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl transition shadow-sm" title="Delete Chapter">
+                                        <i class="fa-solid fa-trash-can"></i>
+                                    </button>
                                 </div>
                             </div>
-                            <div class="p-0 divide-y">
+                            
+                            <!-- Chapter Contents -->
+                            <div class="p-6 bg-slate-50/50">
                         `;
                         
                         if(ch.contents && ch.contents.length > 0) {
+                            html += `<div class="grid grid-cols-1 md:grid-cols-2 gap-4">`;
                             ch.contents.forEach(co => {
-                                let icon = co.type === 'Video' ? 'fa-video text-blue-500' : 'fa-file-pdf text-red-500';
+                                let isVid = co.type === 'Video';
+                                let icon = isVid ? 'fa-circle-play text-blue-500 bg-blue-50' : 'fa-file-pdf text-red-500 bg-red-50';
+                                let badgeColor = isVid ? 'bg-blue-100 text-blue-700' : 'bg-red-100 text-red-700';
+                                
                                 html += `
-                                <div class="p-3 flex justify-between items-center hover:bg-slate-50">
-                                    <div class="flex items-center gap-3">
-                                        <i class="fa-solid ${icon}"></i>
-                                        <span class="font-medium">${co.title}</span>
-                                        <a href="${co.url}" target="_blank" class="text-xs text-blue-500 hover:underline">Link</a>
+                                <div class="bg-white border border-slate-200 p-4 rounded-xl shadow-sm flex justify-between items-center group hover:border-emerald-300 transition">
+                                    <div class="flex items-center gap-4">
+                                        <div class="w-12 h-12 rounded-full flex items-center justify-center ${icon} text-xl">
+                                            <i class="fa-solid ${isVid ? 'fa-play' : 'fa-file-pdf'}"></i>
+                                        </div>
+                                        <div>
+                                            <h4 class="font-bold text-slate-800 text-sm mb-1">${co.title}</h4>
+                                            <div class="flex items-center gap-2">
+                                                <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md ${badgeColor}">${co.type}</span>
+                                                <a href="${co.url}" target="_blank" class="text-xs font-medium text-slate-400 hover:text-blue-500 transition"><i class="fa-solid fa-link"></i> Link</a>
+                                                <span class="text-[10px] text-slate-300">| Order: ${co.orderIndex || 0}</span>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <button onclick="deleteContent(${co.id})" class="text-red-400 hover:text-red-600"><i class="fa-solid fa-times"></i></button>
+                                    <button onclick="deleteContent(${co.id})" class="w-8 h-8 rounded-full flex items-center justify-center text-slate-300 hover:text-red-500 hover:bg-red-50 transition" title="Delete Content">
+                                        <i class="fa-solid fa-times"></i>
+                                    </button>
                                 </div>
                                 `;
                             });
+                            html += `</div>`;
                         } else {
-                            html += `<div class="p-4 text-sm text-slate-500 text-center">No contents yet.</div>`;
+                            html += `
+                                <div class="text-center py-8">
+                                    <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                                        <i class="fa-solid fa-photo-film text-slate-300 text-2xl"></i>
+                                    </div>
+                                    <p class="text-slate-500 font-medium">No videos or PDFs uploaded yet.</p>
+                                </div>
+                            `;
                         }
 
                         html += `</div></div>`;
                         container.innerHTML += html;
                     });
                 } else {
-                    container.innerHTML = `<div class="text-center p-8 bg-white border border-dashed rounded-xl text-slate-500">No chapters found for this course.</div>`;
+                    container.innerHTML = `
+                        <div class="text-center p-12 bg-white border-2 border-dashed border-slate-200 rounded-2xl">
+                            <div class="w-20 h-20 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <i class="fa-solid fa-book-open text-emerald-500 text-3xl"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-slate-800 mb-2">No Chapters Yet</h3>
+                            <p class="text-slate-500">Start building your course curriculum by adding the first chapter.</p>
+                        </div>
+                    `;
                 }
             } catch (err) {
                 console.error(err);
             }
         }
 
-        // Modals
         function showChapterModal() { document.getElementById('chapterModal').classList.remove('hidden'); }
         function hideChapterModal() { document.getElementById('chapterModal').classList.add('hidden'); }
         
@@ -181,7 +252,6 @@
         }
         function hideContentModal() { document.getElementById('contentModal').classList.add('hidden'); }
 
-        // Actions
         async function saveChapter() {
             const courseId = document.getElementById('courseSelect').value;
             const title = document.getElementById('chapterTitle').value;
@@ -226,7 +296,7 @@
         }
 
         async function deleteChapter(id) {
-            if(!confirm("Are you sure? This will delete all contents inside this chapter!")) return;
+            if(!confirm("Are you sure? This will delete all videos/PDFs inside this chapter!")) return;
             const res = await fetch('/api/CourseContents/chapters/' + id, {
                 method: 'DELETE',
                 headers: { 'Authorization': 'Bearer ' + token }

@@ -65,10 +65,12 @@ namespace ProjectCoachingAPI.Controllers
             var chapters = course.Chapters.OrderBy(c => c.OrderIndex).Select(ch => new {
                 ch.Id,
                 ch.Title,
+                ch.OrderIndex,
                 Contents = ch.Contents.OrderBy(co => co.OrderIndex).Select(co => new {
                     co.Id,
                     co.Title,
                     co.Type,
+                    co.OrderIndex,
                     // Send URL only if enrolled!
                     Url = isEnrolled ? co.Url : "" 
                 }).ToList()
