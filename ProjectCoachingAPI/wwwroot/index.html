@@ -106,28 +106,31 @@
         
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div class="text-center mb-16">
-                <h2 id="whyTitle" class="text-3xl font-bold text-slate-900">Why Choose Us?</h2>
-                <div class="w-24 h-1 bg-[#6bc117] mx-auto mt-4 rounded-full"></div>
+                <div class="inline-block bg-gradient-to-r from-blue-700 to-indigo-700 p-4 px-8 rounded-2xl shadow-xl shadow-indigo-200/50 mb-4 transform transition hover:-translate-y-1">
+                <h2 id="whyHeading" class="text-3xl font-extrabold text-white flex items-center justify-center gap-3">
+                    <i class="fa-solid fa-ranking-star text-yellow-300"></i> <span id="whyTitle">Why Choose Us?</span>
+                </h2>
+            </div>
             </div>
             
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                <div class="bg-white p-8 rounded-2xl text-center border border-emerald-100 shadow-xl shadow-emerald-50 animate-float">
-                    <div class="w-16 h-16 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center mx-auto mb-6 text-2xl shadow-inner"><i class="fa-solid fa-brain"></i></div>
+                <div class="group bg-white p-8 rounded-2xl text-center border border-emerald-100 shadow-xl shadow-emerald-50 animate-float hover:-translate-y-3 hover:shadow-2xl hover:border-emerald-300 transition-all duration-300">
+                    <div class="w-16 h-16 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center mx-auto mb-6 text-2xl shadow-inner group-hover:scale-125 group-hover:rotate-12 group-hover:bg-blue-500 group-hover:text-white transition-all duration-300"><i class="fa-solid fa-brain"></i></div>
                     <h3 id="f1Title" class="text-xl font-bold text-slate-800 mb-3">Strong Concepts</h3>
                     <p id="f1Desc" class="text-slate-600">Deep understanding of core physics principles from the basics.</p>
                 </div>
-                <div class="bg-white p-8 rounded-2xl text-center border border-emerald-100 shadow-xl shadow-emerald-50 animate-float-delayed-1">
-                    <div class="w-16 h-16 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6 text-2xl shadow-inner"><i class="fa-solid fa-person-chalkboard"></i></div>
+                <div class="group bg-white p-8 rounded-2xl text-center border border-emerald-100 shadow-xl shadow-emerald-50 animate-float-delayed-1 hover:-translate-y-3 hover:shadow-2xl hover:border-emerald-300 transition-all duration-300">
+                    <div class="w-16 h-16 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6 text-2xl shadow-inner group-hover:scale-125 group-hover:-rotate-12 group-hover:bg-emerald-500 group-hover:text-white transition-all duration-300"><i class="fa-solid fa-person-chalkboard"></i></div>
                     <h3 id="f2Title" class="text-xl font-bold text-slate-800 mb-3">Easy Explanation</h3>
                     <p id="f2Desc" class="text-slate-600">Complex topics broken down into simple, digestible lessons.</p>
                 </div>
-                <div class="bg-white p-8 rounded-2xl text-center border border-emerald-100 shadow-xl shadow-emerald-50 animate-float-delayed-2">
-                    <div class="w-16 h-16 bg-purple-50 text-purple-500 rounded-full flex items-center justify-center mx-auto mb-6 text-2xl shadow-inner"><i class="fa-solid fa-calculator"></i></div>
+                <div class="group bg-white p-8 rounded-2xl text-center border border-emerald-100 shadow-xl shadow-emerald-50 animate-float-delayed-2 hover:-translate-y-3 hover:shadow-2xl hover:border-emerald-300 transition-all duration-300">
+                    <div class="w-16 h-16 bg-purple-50 text-purple-500 rounded-full flex items-center justify-center mx-auto mb-6 text-2xl shadow-inner group-hover:scale-125 group-hover:rotate-12 group-hover:bg-purple-500 group-hover:text-white transition-all duration-300"><i class="fa-solid fa-calculator"></i></div>
                     <h3 id="f3Title" class="text-xl font-bold text-slate-800 mb-3">Numerical Solving</h3>
                     <p id="f3Desc" class="text-slate-600">Extensive practice on mathematical problems and theories.</p>
                 </div>
-                <div class="bg-white p-8 rounded-2xl text-center border border-emerald-100 shadow-xl shadow-emerald-50 animate-float-delayed-3">
-                    <div class="w-16 h-16 bg-orange-50 text-orange-500 rounded-full flex items-center justify-center mx-auto mb-6 text-2xl shadow-inner"><i class="fa-solid fa-file-signature"></i></div>
+                <div class="group bg-white p-8 rounded-2xl text-center border border-emerald-100 shadow-xl shadow-emerald-50 animate-float-delayed-3 hover:-translate-y-3 hover:shadow-2xl hover:border-emerald-300 transition-all duration-300">
+                    <div class="w-16 h-16 bg-orange-50 text-orange-500 rounded-full flex items-center justify-center mx-auto mb-6 text-2xl shadow-inner group-hover:scale-125 group-hover:-rotate-12 group-hover:bg-orange-500 group-hover:text-white transition-all duration-300"><i class="fa-solid fa-file-signature"></i></div>
                     <h3 id="f4Title" class="text-xl font-bold text-slate-800 mb-3">Regular Exams</h3>
                     <p id="f4Desc" class="text-slate-600">Weekly tests and evaluations to track student progress.</p>
                 </div>
@@ -139,8 +142,11 @@
     <section id="courses" class="py-20 bg-gradient-to-br from-blue-50 via-white to-emerald-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-16">
-                <h2 id="coursesTitle" class="text-3xl font-bold text-slate-900">Featured Courses</h2>
-                <div class="w-24 h-1 bg-emerald-500 mx-auto mt-4 rounded-full"></div>
+                <div class="inline-block bg-gradient-to-r from-emerald-600 to-teal-600 p-4 px-8 rounded-2xl shadow-xl shadow-emerald-200/50 mb-4 transform transition hover:-translate-y-1">
+                <h2 id="coursesHeading" class="text-3xl font-extrabold text-white flex items-center justify-center gap-3">
+                    <i class="fa-solid fa-graduation-cap text-emerald-100"></i> <span id="coursesTitle">Featured Courses</span>
+                </h2>
+            </div>
             </div>
 
             <!-- Dynamic Courses Grid -->
@@ -154,7 +160,11 @@
     <section class="py-16 bg-emerald-50 border-t border-emerald-100">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-8">
             <div class="text-center md:text-left">
-                <h2 id="appTitle" class="text-3xl font-bold text-slate-900 mb-4">Learn Anywhere, Anytime.</h2>
+                <div class="inline-block bg-gradient-to-r from-slate-800 to-slate-700 p-4 px-8 rounded-2xl shadow-lg mb-6 transform transition hover:-translate-y-1 text-center md:text-left">
+                    <h2 id="appTitle" class="text-3xl font-extrabold text-white flex justify-center md:justify-start items-center gap-3">
+                        <i class="fa-solid fa-mobile-screen text-blue-300"></i> Learn Anywhere, Anytime.
+                    </h2>
+                </div>
                 <p id="appDesc" class="text-slate-600 text-lg max-w-lg mb-6">Download the <span class="font-bold text-emerald-600 font-sans">PhysicsAcademy</span> mobile app to watch premium video lectures, give exams, and access study materials on the go.</p>
                 <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
                     <button class="bg-slate-900 text-white px-6 py-3 rounded-xl flex items-center justify-center gap-3 hover:bg-slate-800 transition shadow-lg">
@@ -177,8 +187,11 @@
     <section class="py-20 bg-slate-50 overflow-hidden border-t border-slate-100">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
             <div class="text-center">
-                <h2 id="successTitle" class="text-3xl font-bold text-slate-900">Our Pride: Successful Students</h2>
-                <div class="w-24 h-1 bg-emerald-500 mx-auto mt-4 rounded-full"></div>
+                <div class="inline-block bg-gradient-to-r from-purple-600 to-fuchsia-600 p-4 px-8 rounded-2xl shadow-xl shadow-purple-200/50 mb-4 transform transition hover:-translate-y-1">
+                <h2 id="successHeading" class="text-3xl font-extrabold text-white flex items-center justify-center gap-3">
+                    <i class="fa-solid fa-trophy text-yellow-300"></i> <span id="successTitle">Our Pride: Successful Students</span>
+                </h2>
+            </div>
                 <p id="successDesc" class="text-slate-600 mt-4 text-lg">Hundreds of our students are studying in top universities.</p>
             </div>
         </div>
