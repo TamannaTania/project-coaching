@@ -534,6 +534,22 @@
             }
         });
     </script>
+
+<script>
+    function toggleAccordion(id, iconId) {
+        const el = document.getElementById(id);
+        const icon = document.getElementById(iconId);
+        if(el && icon) {
+            if(el.classList.contains('hidden')) {
+                el.classList.remove('hidden');
+                icon.style.transform = 'rotate(180deg)';
+            } else {
+                el.classList.add('hidden');
+                icon.style.transform = 'rotate(0deg)';
+            }
+        }
+    }
+</script>
 </body>
 </html>
 
