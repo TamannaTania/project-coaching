@@ -4,7 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Course Details - PhysicsAcademy</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com">
+        function toggleAccordion(id, iconId) {
+            const el = document.getElementById(id);
+            const icon = document.getElementById(iconId);
+            if(el.classList.contains('hidden')) {
+                el.classList.remove('hidden');
+                icon.style.transform = 'rotate(180deg)';
+            } else {
+                el.classList.add('hidden');
+                icon.style.transform = 'rotate(0deg)';
+            }
+        }
+    </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         .glass-nav {
@@ -332,17 +344,15 @@
                     
                     if (course.chapters && course.chapters.length > 0) {
                         course.chapters.forEach((ch, index) => {
-                            // Alternate background gradients for chapters
-                            const gradients = [
-                                'bg-gradient-to-r from-emerald-500 to-teal-600',
-                                'bg-gradient-to-r from-blue-500 to-indigo-600',
-                                'bg-gradient-to-r from-purple-500 to-pink-600'
-                            ];
-                            const headerBg = gradients[index % gradients.length];
-                            
-                            ﻿chaptersHtml += `<div class="bg-white rounded-2xl shadow-md border border-slate-100 overflow-hidden transform transition duration-200 hover:shadow-lg">`;
+                              const gradients = [
+                                  'bg-gradient-to-r from-emerald-500 to-teal-600',
+                                  'bg-gradient-to-r from-blue-500 to-indigo-600',
+                                  'bg-gradient-to-r from-purple-500 to-pink-600'
+                              ];
+                              const headerBg = gradients[index % gradients.length];
                               
-                              // Chapter Header
+                              chaptersHtml += `<div class="bg-white rounded-2xl shadow-md border border-slate-100 overflow-hidden transform transition duration-200 hover:shadow-lg mb-4">`;
+                              
                               chaptersHtml += `
                                   <div class="${headerBg} p-5 flex justify-between items-center cursor-pointer select-none" onclick="toggleAccordion('content-${ch.id}', 'icon-${ch.id}')">
                                       <div class="flex items-center gap-4 text-white">
@@ -365,7 +375,6 @@
                                   </div>
                               `;
                               
-                              // Chapter Contents Container (Hidden by default)
                               chaptersHtml += `<div id="content-${ch.id}" class="hidden">`;
 
                               if (ch.contents && ch.contents.length > 0) {
@@ -374,7 +383,7 @@
 
                                   chaptersHtml += `<div class="p-6 bg-slate-50/50 grid grid-cols-1 md:grid-cols-2 gap-8 border-t border-slate-100">`;
                                   
-                                  // Left Side: PDFs (ba pashe)
+                                  // PDFs
                                   chaptersHtml += `<div>
                                       <h4 class="font-bold text-slate-700 mb-4 flex items-center gap-2 border-b border-slate-200 pb-2">
                                           <i class="fa-solid fa-file-pdf text-red-500"></i> Study Materials
@@ -400,7 +409,7 @@
                                   });
                                   chaptersHtml += `</div></div>`;
 
-                                  // Right Side: Videos (dan pashe)
+                                  // Videos
                                   chaptersHtml += `<div>
                                       <h4 class="font-bold text-slate-700 mb-4 flex items-center gap-2 border-b border-slate-200 pb-2">
                                           <i class="fa-solid fa-circle-play text-blue-500"></i> Video Lectures
@@ -425,6 +434,7 @@
                                       `;
                                   });
                                   chaptersHtml += `</div></div>`;
+                                  
                                   chaptersHtml += `</div>`;
                               } else {
                                   chaptersHtml += `
@@ -436,21 +446,8 @@
                                       </div>
                                   `;
                               }
-                              chaptersHtml += `</div>
-                        });
-                                chaptersHtml += `</div>`;
-                            } else {
-                                chaptersHtml += `
-                                    <div class="p-8 text-center bg-slate-50">
-                                        <div class="w-12 h-12 bg-slate-200 rounded-full flex items-center justify-center mx-auto mb-3">
-                                            <i class="fa-solid fa-hourglass-half text-slate-400"></i>
-                                        </div>
-                                        <p class="text-slate-500 text-sm font-medium">Contents for this chapter will be uploaded soon.</p>
-                                    </div>
-                                `;
-                            }
-                            chaptersHtml += `</div>`;
-                        });
+                              chaptersHtml += `</div></div>`;
+                          });
                     } else {
                         chaptersHtml += `<div class="p-10 text-center bg-white rounded-2xl border-2 border-dashed border-slate-200 shadow-sm"><div class="w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-4"><i class="fa-solid fa-person-digging text-3xl text-emerald-500"></i></div><h3 class="text-lg font-bold text-slate-800 mb-1">Curriculum Under Construction</h3><p class="text-slate-500">Chapters and videos will be published here very soon.</p></div>`;
                     }
