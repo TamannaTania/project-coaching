@@ -4,49 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Course Details - PhysicsAcademy</title>
-    <script src="https://cdn.tailwindcss.com">
-        function toggleAccordion(id, iconId) {
-            const el = document.getElementById(id);
-            const icon = document.getElementById(iconId);
-            if(el.classList.contains('hidden')) {
-                el.classList.remove('hidden');
-                icon.style.transform = 'rotate(180deg)';
-            } else {
-                el.classList.add('hidden');
-                icon.style.transform = 'rotate(0deg)';
-            }
-        }
-    
-        function filterChapters(query) {
-            query = query.toLowerCase().trim();
-            const chapters = document.querySelectorAll('.chapter-item');
-            chapters.forEach(chapter => {
-                const text = chapter.textContent.toLowerCase();
-                if(text.includes(query)) {
-                    chapter.style.display = 'block';
-                    // Auto-expand if they type something
-                    if(query.length > 0) {
-                        const contentDiv = chapter.querySelector('div[id^="content-"]');
-                        const icon = chapter.querySelector('div[id^="icon-"]');
-                        if(contentDiv && contentDiv.classList.contains('hidden')) {
-                            contentDiv.classList.remove('hidden');
-                            if(icon) icon.style.transform = 'rotate(180deg)';
-                        }
-                    } else {
-                        // Auto-collapse if search is empty
-                        const contentDiv = chapter.querySelector('div[id^="content-"]');
-                        const icon = chapter.querySelector('div[id^="icon-"]');
-                        if(contentDiv && !contentDiv.classList.contains('hidden')) {
-                            contentDiv.classList.add('hidden');
-                            if(icon) icon.style.transform = 'rotate(0deg)';
-                        }
-                    }
-                } else {
-                    chapter.style.display = 'none';
-                }
-            });
-        }
-    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -610,6 +568,36 @@
                 icon.style.transform = 'rotate(0deg)';
             }
         }
+    }
+
+    function filterChapters(query) {
+        query = query.toLowerCase().trim();
+        const chapters = document.querySelectorAll('.chapter-item');
+        chapters.forEach(chapter => {
+            const text = chapter.textContent.toLowerCase();
+            if(text.includes(query)) {
+                chapter.style.display = 'block';
+                // Auto-expand if they type something
+                if(query.length > 0) {
+                    const contentDiv = chapter.querySelector('div[id^="content-"]');
+                    const icon = chapter.querySelector('div[id^="icon-"]');
+                    if(contentDiv && contentDiv.classList.contains('hidden')) {
+                        contentDiv.classList.remove('hidden');
+                        if(icon) icon.style.transform = 'rotate(180deg)';
+                    }
+                } else {
+                    // Auto-collapse if search is empty
+                    const contentDiv = chapter.querySelector('div[id^="content-"]');
+                    const icon = chapter.querySelector('div[id^="icon-"]');
+                    if(contentDiv && !contentDiv.classList.contains('hidden')) {
+                        contentDiv.classList.add('hidden');
+                        if(icon) icon.style.transform = 'rotate(0deg)';
+                    }
+                }
+            } else {
+                chapter.style.display = 'none';
+            }
+        });
     }
 </script>
 </body>
