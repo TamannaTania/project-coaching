@@ -4,7 +4,41 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Course Contents</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com">
+        function toggleChapter(id) {
+            const content = document.getElementById('chapter-content-' + id);
+            if(content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+            } else {
+                content.classList.add('hidden');
+            }
+        }
+
+        function filterAdminChapters() {
+            const query = document.getElementById('adminSearch').value.toLowerCase();
+            const container = document.getElementById('chaptersContainer');
+            const chapters = container.querySelectorAll('.admin-chapter-card');
+
+            chapters.forEach(card => {
+                const text = card.innerText.toLowerCase();
+                if(text.includes(query)) {
+                    card.classList.remove('hidden');
+                    // If searching and found, expand it automatically
+                    if(query.length > 0) {
+                        const content = card.querySelector('div[id^="chapter-content-"]');
+                        if(content) content.classList.remove('hidden');
+                    } else {
+                        // Collapse if search is cleared
+                        const content = card.querySelector('div[id^="chapter-content-"]');
+                        if(content) content.classList.add('hidden');
+                    }
+                } else {
+                    card.classList.add('hidden');
+                }
+            });
+        }
+
+    </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -56,7 +90,13 @@
                 </button>
             </div>
 
-            <div id="chaptersContainer" class="space-y-6">
+            
+                    <div class="mb-6 relative">
+                        <input type="text" id="adminSearch" onkeyup="filterAdminChapters()" placeholder="Search chapters, videos, or PDFs..." class="w-full bg-white border border-slate-200 rounded-xl pl-12 pr-4 py-3 font-medium focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 shadow-sm transition">
+                        <i class="fa-solid fa-search absolute left-4 top-3.5 text-slate-400"></i>
+                    </div>
+
+                    <div id="chaptersContainer" class="space-y-6">
                 <!-- Chapters will be rendered here -->
             </div>
         </div>
@@ -251,10 +291,10 @@
                                     </div>
                                 </div>
                                 <div class="flex gap-2 w-full sm:w-auto">
-                                    <button onclick="showContentModal(${ch.id})" class="flex-1 sm:flex-none bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-xl font-bold text-sm transition shadow-sm flex items-center justify-center gap-2">
+                                    <button onclick="event.stopPropagation(); showContentModal(${ch.id})" class="flex-1 sm:flex-none bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-xl font-bold text-sm transition shadow-sm flex items-center justify-center gap-2">
                                         <i class="fa-solid fa-plus"></i> Add Content
                                     </button>
-                                    <button onclick="deleteChapter(${ch.id})" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl transition shadow-sm" title="Delete Chapter">
+                                    <button onclick="event.stopPropagation(); deleteChapter(${ch.id})" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl transition shadow-sm" title="Delete Chapter">
                                         <i class="fa-solid fa-trash-can"></i>
                                     </button>
                                 </div>
