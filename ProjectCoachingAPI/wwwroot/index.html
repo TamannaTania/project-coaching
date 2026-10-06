@@ -539,7 +539,7 @@
                     teachers.forEach(t => {
                         const imgUrl = t.imageUrl || 'https://via.placeholder.com/300';
                         grid.innerHTML += `
-                            <div class="bg-white rounded-2xl overflow-hidden shadow-md border border-slate-100 hover:shadow-xl transition-shadow group">
+                            <div class="bg-white rounded-2xl overflow-hidden shadow-md border border-slate-100 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 group">
                                 <div class="h-48 overflow-hidden relative">
                                     <img src="${imgUrl}" alt="${t.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                                     <div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4 justify-center gap-3">
