@@ -232,11 +232,11 @@
     <section id="teachers" class="py-20 bg-white">
         <div class="max-w-7xl mx-auto px-6">
             <div class="text-center mb-16">
-                <h2 class="text-3xl md:text-4xl font-extrabold text-slate-800 mb-2 relative inline-block">
-                    <span class="sparkle-text">
-                        <i class="fa-solid fa-chalkboard-user text-purple-500 mr-2"></i><span id="teachersTitle">Meet Our Teachers</span>
-                    </span>
-                </h2>
+                <div class="heading-container mb-4">
+                      <h2 class="text-3xl md:text-4xl font-extrabold text-slate-800 sparkle-text">
+                          <i class="fa-solid fa-chalkboard-user text-purple-500 mr-2"></i><span id="teachersTitle">Meet Our Teachers</span>
+                      </h2>
+                  </div>
                 <p id="teachersDesc" class="text-slate-500 mt-4 text-lg">Learn from the best educators in the field.</p>
             </div>
             
@@ -503,7 +503,7 @@
                                 <h3 class="text-xl font-extrabold text-slate-900 mb-2 group-hover:text-emerald-600 transition-colors">${course.title}</h3>
                                 <p class="text-slate-500 mb-6 line-clamp-2 text-sm flex-grow">${course.description}</p>
                                 <div class="flex justify-between items-center pt-4 border-t border-slate-100 mt-auto">
-                                    <span class="text-2xl font-black text-emerald-600 group-hover:scale-105 transition-transform origin-left">৳${course.price}</span>
+                                    <span class="text-2xl font-black text-emerald-600 group-hover:scale-110 ease-out transition-transform origin-left">৳${course.price}</span>
                                     <button class="bg-blue-900 text-white px-5 py-2.5 rounded-xl font-bold group-hover:bg-emerald-600 transition-colors flex items-center gap-2 shadow-sm">
                                         View Details <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
                                     </button>
@@ -539,7 +539,7 @@
                     teachers.forEach(t => {
                         const imgUrl = t.imageUrl || 'https://via.placeholder.com/300';
                         grid.innerHTML += `
-                            <div class="bg-white rounded-2xl overflow-hidden shadow-md border border-slate-100 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 group">
+                            <div class="group bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 border border-slate-100 flex flex-col h-full cursor-pointer">
                                 <div class="h-48 overflow-hidden relative">
                                     <img src="${imgUrl}" alt="${t.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                                     <div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4 justify-center gap-3">
