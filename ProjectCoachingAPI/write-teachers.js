@@ -1,4 +1,6 @@
-<!DOCTYPE html>
+﻿const fs = require('fs');
+
+const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -137,20 +139,20 @@
 
                 teachers.forEach(t => {
                     const imgUrl = t.imageUrl || 'https://via.placeholder.com/150';
-                    list.innerHTML += `
+                    list.innerHTML += \`
                         <div class="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-200 hover:border-purple-300 transition">
                             <div class="flex items-center gap-4">
-                                <img src="${imgUrl}" class="w-16 h-16 rounded-full object-cover border-2 border-white shadow-sm">
+                                <img src="\${imgUrl}" class="w-16 h-16 rounded-full object-cover border-2 border-white shadow-sm">
                                 <div>
-                                    <h3 class="font-bold text-slate-800 text-lg">${t.name}</h3>
-                                    <p class="text-sm text-slate-500">${t.designation || ''} ${t.subject ? ' - ' + t.subject : ''}</p>
+                                    <h3 class="font-bold text-slate-800 text-lg">\${t.name}</h3>
+                                    <p class="text-sm text-slate-500">\${t.designation || ''} \${t.subject ? ' - ' + t.subject : ''}</p>
                                 </div>
                             </div>
-                            <button onclick="deleteTeacher(${t.id})" class="text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 w-10 h-10 rounded-full flex items-center justify-center transition">
+                            <button onclick="deleteTeacher(\${t.id})" class="text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 w-10 h-10 rounded-full flex items-center justify-center transition">
                                 <i class="fa-solid fa-trash"></i>
                             </button>
                         </div>
-                    `;
+                    \`;
                 });
             } catch(e) {
                 document.getElementById('teachersList').innerHTML = '<div class="text-red-500 p-4">Error loading teachers</div>';
@@ -218,4 +220,7 @@
         loadTeachers();
     </script>
 </body>
-</html>
+</html>`;
+
+fs.writeFileSync('wwwroot/admin-teachers.html', html, 'utf8');
+console.log("Successfully rebuilt admin-teachers.html");
