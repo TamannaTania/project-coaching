@@ -363,7 +363,7 @@
                 f2Title: "Easy Explanation", f2Desc: "Complex topics broken down into simple, digestible lessons.",
                 f3Title: "Numerical Solving", f3Desc: "Extensive practice on mathematical problems and theories.",
                 f4Title: "Regular Exams", f4Desc: "Weekly tests and evaluations to track student progress.",
-                coursesTitle: "Featured Courses",
+                coursesTitle: "Featured Courses", teachersTitle: "Meet Our Teachers", teachersDesc: "Learn from the best educators in the field.",
                 appTitle: "Learn Anywhere, Anytime.", appDesc: "Download the <span class='font-bold text-emerald-600 font-sans'>PhysicsAcademy</span> mobile app to watch premium video lectures, give exams, and access study materials on the go.",
                 successTitle: "Our Pride: Successful Students", successDesc: "Hundreds of our students are studying in top universities.",
                 ctaTitle: "Ready to Make Physics Easier?", ctaDesc: "Join our upcoming batches and start your journey towards excellence.", ctaBtn: "Join Our Course Today"
@@ -497,6 +497,48 @@
             const savedLang = localStorage.getItem('lang') || 'en';
             setLanguage(savedLang);
             loadCourses();
+
+        async function loadTeachers() {
+            try {
+                const response = await fetch('/api/Teachers');
+                if(response.ok) {
+                    const teachers = await response.json();
+                    const grid = document.getElementById('teachersGrid');
+                    grid.innerHTML = '';
+                    
+                    if(teachers.length === 0) {
+                        grid.innerHTML = '<div class="col-span-full text-center text-slate-500 bg-slate-50 py-10 rounded-2xl border border-slate-100">No teachers found.</div>';
+                        return;
+                    }
+
+                    teachers.forEach(t => {
+                        const imgUrl = t.imageUrl || 'https://via.placeholder.com/300';
+                        grid.innerHTML += `
+                            <div class="bg-white rounded-2xl overflow-hidden shadow-md border border-slate-100 hover:shadow-xl transition-shadow group">
+                                <div class="h-48 overflow-hidden relative">
+                                    <img src="${imgUrl}" alt="${t.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                    <div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4 justify-center gap-3">
+                                        ${t.facebookUrl ? `<a href="${t.facebookUrl}" target="_blank" class="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md text-white flex items-center justify-center hover:bg-blue-500 transition"><i class="fa-brands fa-facebook-f"></i></a>` : ''}
+                                        ${t.linkedInUrl ? `<a href="${t.linkedInUrl}" target="_blank" class="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md text-white flex items-center justify-center hover:bg-blue-700 transition"><i class="fa-brands fa-linkedin-in"></i></a>` : ''}
+                                    </div>
+                                </div>
+                                <div class="p-6 text-center">
+                                    <h3 class="font-bold text-xl text-slate-800 mb-1">${t.name}</h3>
+                                    ${t.designation ? `<p class="text-purple-600 font-medium text-sm mb-1">${t.designation}</p>` : ''}
+                                    ${t.subject ? `<p class="text-slate-500 text-sm font-semibold">${t.subject}</p>` : ''}
+                                    ${t.bio ? `<p class="text-slate-600 text-sm mt-3 line-clamp-3">${t.bio}</p>` : ''}
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+            } catch (error) {
+                console.error("Error loading teachers", error);
+            }
+        }
+        
+        loadTeachers();
+
         };
     </script>
 </body>

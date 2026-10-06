@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using ProjectCoachingAPI.Models;
 
 namespace ProjectCoachingAPI.Data
@@ -15,5 +15,7 @@ namespace ProjectCoachingAPI.Data
         public DbSet<CourseContent> CourseContents { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Enrollment> Enrollments { get; set; }
+        public DbSet<Teacher> Teachers { get; set; }
     }
 }
+
