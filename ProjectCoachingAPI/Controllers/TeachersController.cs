@@ -3,8 +3,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProjectCoachingAPI.Data;
 using ProjectCoachingAPI.Models;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace ProjectCoachingAPI.Controllers
 {
@@ -23,7 +25,7 @@ namespace ProjectCoachingAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Teacher>>> GetTeachers()
         {
-            return await _context.Teachers.ToListAsync();
+            return await _context.Teachers.OrderByDescending(t => t.Id).ToListAsync();
         }
 
         // GET: api/Teachers/5
@@ -45,8 +47,27 @@ namespace ProjectCoachingAPI.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Teacher>> PostTeacher(Teacher teacher)
         {
+            // Force values to be at least empty string to satisfy NOT NULL constraints
+            // if the database schema was generated before they were made nullable
+            teacher.Designation = teacher.Designation ?? string.Empty;
+            teacher.Subject = teacher.Subject ?? string.Empty;
+            teacher.ImageUrl = teacher.ImageUrl ?? string.Empty;
+            teacher.Bio = teacher.Bio ?? string.Empty;
+            teacher.FacebookUrl = teacher.FacebookUrl ?? string.Empty;
+            teacher.LinkedInUrl = teacher.LinkedInUrl ?? string.Empty;
+            
+            teacher.CreatedAt = DateTime.UtcNow;
+
             _context.Teachers.Add(teacher);
-            await _context.SaveChangesAsync();
+            
+            try 
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch(Exception ex) 
+            {
+                return BadRequest(new { message = ex.InnerException?.Message ?? ex.Message });
+            }
 
             return CreatedAtAction("GetTeacher", new { id = teacher.Id }, teacher);
         }
@@ -60,6 +81,13 @@ namespace ProjectCoachingAPI.Controllers
             {
                 return BadRequest();
             }
+
+            teacher.Designation = teacher.Designation ?? string.Empty;
+            teacher.Subject = teacher.Subject ?? string.Empty;
+            teacher.ImageUrl = teacher.ImageUrl ?? string.Empty;
+            teacher.Bio = teacher.Bio ?? string.Empty;
+            teacher.FacebookUrl = teacher.FacebookUrl ?? string.Empty;
+            teacher.LinkedInUrl = teacher.LinkedInUrl ?? string.Empty;
 
             _context.Entry(teacher).State = EntityState.Modified;
 
