@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         .glass-nav {
-            background: rgba(255, 255, 255, 0.95);
+            /* background replaced */
             backdrop-filter: blur(10px);
         }
         .locked-video-bg {
@@ -20,7 +20,7 @@
 </head>
 <body class="bg-slate-50 font-sans text-slate-800 pt-20">
 
-    <nav class="glass-nav fixed top-0 w-full z-50 border-b border-slate-200 shadow-sm">
+    <nav class="glass-nav bg-gradient-to-r from-white to-emerald-100/90 fixed top-0 w-full z-50 border-b border-slate-200 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-20 items-center">
                 <a href="/" class="flex items-center gap-2">
@@ -60,7 +60,7 @@
                 
                 <div id="videoContainer" class="locked-video-bg rounded-2xl aspect-video flex flex-col items-center justify-center text-center p-6 shadow-xl relative overflow-hidden group">
                     <img id="courseImage" src="https://via.placeholder.com/800x400" alt="Course Thumbnail" class="absolute inset-0 w-full h-full object-cover opacity-30">
-                    <div id="videoPlaceholder" class="absolute inset-0 bg-slate-900/60 flex flex-col items-center justify-center">
+                    <div id="videoPlaceholder" class="absolute inset-0 bg-gradient-to-b from-slate-800 to-slate-950/60 flex flex-col items-center justify-center">
                         <div class="w-20 h-20 bg-slate-800/80 rounded-full flex items-center justify-center mb-4 border border-slate-600 backdrop-blur-sm">
                             <i class="fa-solid fa-lock text-3xl text-slate-300"></i>
                         </div>
