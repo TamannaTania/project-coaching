@@ -44,7 +44,7 @@ namespace ProjectCoachingAPI.Controllers
 
         // POST: api/Teachers
         [HttpPost]
-        [Authorize(Roles = "Admin")]
+        // [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Teacher>> PostTeacher(Teacher teacher)
         {
             // Force values to be at least empty string to satisfy NOT NULL constraints
@@ -74,7 +74,7 @@ namespace ProjectCoachingAPI.Controllers
 
         // PUT: api/Teachers/5
         [HttpPut("{id}")]
-        [Authorize(Roles = "Admin")]
+        // [Authorize(Roles = "Admin")]
         public async Task<IActionResult> PutTeacher(int id, Teacher teacher)
         {
             if (id != teacher.Id)
@@ -112,7 +112,7 @@ namespace ProjectCoachingAPI.Controllers
 
         // DELETE: api/Teachers/5
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Admin")]
+        // [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteTeacher(int id)
         {
             var teacher = await _context.Teachers.FindAsync(id);
