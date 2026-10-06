@@ -4,41 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Course Contents</title>
-    <script src="https://cdn.tailwindcss.com">
-        function toggleChapter(id) {
-            const content = document.getElementById('chapter-content-' + id);
-            if(content.classList.contains('hidden')) {
-                content.classList.remove('hidden');
-            } else {
-                content.classList.add('hidden');
-            }
-        }
-
-        function filterAdminChapters() {
-            const query = document.getElementById('adminSearch').value.toLowerCase();
-            const container = document.getElementById('chaptersContainer');
-            const chapters = container.querySelectorAll('.admin-chapter-card');
-
-            chapters.forEach(card => {
-                const text = card.innerText.toLowerCase();
-                if(text.includes(query)) {
-                    card.classList.remove('hidden');
-                    // If searching and found, expand it automatically
-                    if(query.length > 0) {
-                        const content = card.querySelector('div[id^="chapter-content-"]');
-                        if(content) content.classList.remove('hidden');
-                    } else {
-                        // Collapse if search is cleared
-                        const content = card.querySelector('div[id^="chapter-content-"]');
-                        if(content) content.classList.add('hidden');
-                    }
-                } else {
-                    card.classList.add('hidden');
-                }
-            });
-        }
-
-    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -278,9 +244,9 @@
                 if(course.chapters && course.chapters.length > 0) {
                     course.chapters.forEach(ch => {
                         let html = `
-                        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden transform transition duration-200 hover:shadow-md">
+                        <div class="admin-chapter-card bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden transform transition duration-200 hover:shadow-md">
                             <!-- Chapter Header -->
-                            <div class="bg-slate-800 p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                            <div class="bg-slate-800 p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 cursor-pointer hover:bg-slate-700 transition" onclick="toggleChapter(${ch.id})">
                                 <div class="flex items-center gap-3 text-white">
                                     <div class="w-10 h-10 bg-slate-700 rounded-lg flex items-center justify-center">
                                         <i class="fa-solid fa-folder-open text-emerald-400 text-lg"></i>
@@ -301,7 +267,7 @@
                             </div>
                             
                             <!-- Chapter Contents -->
-                            <div class="p-6 bg-slate-50/50">
+                              <div id="chapter-content-${ch.id}" class="p-6 bg-slate-50/50 hidden">
                         `;
                         
                         if(ch.contents && ch.contents.length > 0) {
@@ -504,6 +470,43 @@
         }
 
         window.onload = loadCourses;
+    </script>
+
+    <script>
+
+        function toggleChapter(id) {
+            const content = document.getElementById('chapter-content-' + id);
+            if(content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+            } else {
+                content.classList.add('hidden');
+            }
+        }
+
+        function filterAdminChapters() {
+            const query = document.getElementById('adminSearch').value.toLowerCase();
+            const container = document.getElementById('chaptersContainer');
+            const chapters = container.querySelectorAll('.admin-chapter-card');
+
+            chapters.forEach(card => {
+                const text = card.innerText.toLowerCase();
+                if(text.includes(query)) {
+                    card.classList.remove('hidden');
+                    // If searching and found, expand it automatically
+                    if(query.length > 0) {
+                        const content = card.querySelector('div[id^="chapter-content-"]');
+                        if(content) content.classList.remove('hidden');
+                    } else {
+                        // Collapse if search is cleared
+                        const content = card.querySelector('div[id^="chapter-content-"]');
+                        if(content) content.classList.add('hidden');
+                    }
+                } else {
+                    card.classList.add('hidden');
+                }
+            });
+        }
+
     </script>
 </body>
 </html>
