@@ -15,6 +15,7 @@ namespace ProjectCoachingAPI.Data
         public DbSet<CourseContent> CourseContents { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Enrollment> Enrollments { get; set; }
+        public DbSet<FreeClass> FreeClasses { get; set; }
         public DbSet<Teacher> Teachers { get; set; }
     }
 }
