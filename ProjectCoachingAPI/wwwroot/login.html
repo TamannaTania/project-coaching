@@ -44,6 +44,11 @@
     </div>
 
     <script>
+        const existingToken = localStorage.getItem('token');
+        if (existingToken) {
+            window.location.href = 'profile.html';
+        }
+
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('submitBtn');
