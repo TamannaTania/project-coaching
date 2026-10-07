@@ -125,7 +125,7 @@
                 </div>
                 <div class="hidden md:flex space-x-8 items-center">
                     <a href="#" id="navHome" class="text-emerald-600 font-semibold">Home</a>
-                    <a href="#" id="navAbout" class="text-slate-600 hover:text-emerald-600 font-medium transition">About</a>
+                    <a href="#about" id="navAbout" class="text-slate-600 hover:text-emerald-600 font-medium transition">About</a>
                     <a href="#courses" id="navCourses" class="text-slate-600 hover:text-emerald-600 font-medium transition">Courses</a>
                     <a href="#teachers" id="navTeachers" class="text-slate-600 hover:text-emerald-600 font-medium transition">Teachers</a>
                     <a href="#free-classes" id="navFreeClasses" class="text-slate-600 hover:text-emerald-600 font-medium transition">Free Classes</a>
@@ -593,6 +593,20 @@
         }
         
         loadTeachers();
+
+        async function loadAbout() {
+            try {
+                const res = await fetch('/api/About');
+                if(res.ok) {
+                    const data = await res.json();
+                    if(document.getElementById('aboutTitle')) document.getElementById('aboutTitle').innerText = data.title;
+                    if(document.getElementById('aboutDesc')) document.getElementById('aboutDesc').innerText = data.description;
+                    if(document.getElementById('aboutImg')) document.getElementById('aboutImg').src = data.imageUrl;
+                }
+            } catch(e) {}
+        }
+        loadAbout();
+
 
         async function loadFreeClasses() {
             try {
