@@ -130,6 +130,13 @@
                     <a href="#teachers" id="navTeachers" class="text-slate-600 hover:text-emerald-600 font-medium transition">Teachers</a>
                     <a href="#free-classes" id="navFreeClasses" class="text-slate-600 hover:text-emerald-600 font-medium transition">Free Classes</a>
                     
+                    
+                    <!-- Global Search -->
+                    <div class="relative hidden lg:block">
+                        <input type="text" id="globalSearch" placeholder="Search..." class="bg-white/80 border border-emerald-200 rounded-full pl-4 pr-10 py-1.5 text-sm focus:outline-none focus:border-emerald-500 w-48 transition-all focus:w-64 focus:bg-white shadow-sm placeholder-slate-400">
+                        <i class="fa-solid fa-magnifying-glass absolute right-3 top-2.5 text-slate-400 text-sm"></i>
+                    </div>
+
                     <!-- Language Toggle -->
                     <div class="flex items-center border border-emerald-200 rounded-full overflow-hidden bg-emerald-50">
                         <button id="btnBn" onclick="setLanguage('bn')" class="px-3 py-1 text-sm font-bold text-emerald-700 hover:bg-emerald-100 transition">BN</button>
@@ -584,6 +591,29 @@
             const savedLang = localStorage.getItem('lang') || 'en';
             setLanguage(savedLang);
             loadCourses();
+
+        document.getElementById('globalSearch').addEventListener('input', function(e) {
+            const term = e.target.value.toLowerCase();
+            const courses = document.querySelectorAll('#coursesGrid > div');
+            let found = false;
+            
+            courses.forEach(card => {
+                const title = card.querySelector('h3').innerText.toLowerCase();
+                const desc = card.querySelector('p').innerText.toLowerCase();
+                if(title.includes(term) || desc.includes(term)) {
+                    card.style.display = 'flex';
+                    found = true;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            // If user typed something, scroll to courses so they see it
+            if(term.length > 0 && e.inputType !== 'deleteContentBackward') {
+                document.getElementById('courses').scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+
 
         async function loadTeachers() {
             try {
