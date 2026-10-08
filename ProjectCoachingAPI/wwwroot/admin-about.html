@@ -38,8 +38,12 @@
                         <input type="text" id="abTitle" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500" required>
                     </div>
                     <div>
-                        <label class="block text-sm font-bold text-slate-700 mb-2">Image URL</label>
-                        <input type="url" id="abImg" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500" required>
+                        <label class="block text-sm font-bold text-slate-700 mb-2">About Image (Upload or URL)</label>
+                        <div class="flex gap-2">
+                            <input type="file" id="abImgFile" accept="image/*" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 focus:outline-none focus:border-emerald-500 text-sm">
+                            <input type="text" id="abImg" placeholder="Or paste image URL..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 focus:outline-none focus:border-emerald-500 text-sm">
+                        </div>
+                        <p class="text-xs text-slate-500 mt-1">Optional. Upload a picture from your computer, or paste a link.</p>
                     </div>
                     <div>
                         <label class="block text-sm font-bold text-slate-700 mb-2">Description</label>
@@ -97,9 +101,36 @@
 
         document.getElementById('aboutForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+            
+            const fileInput = document.getElementById('abImgFile');
+            let imageUrl = document.getElementById('abImg').value;
+
+            if (fileInput.files.length > 0) {
+                const formData = new FormData();
+                formData.append('file', fileInput.files[0]);
+                
+                try {
+                    const uploadRes = await fetch('/api/Uploads', {
+                        method: 'POST',
+                        headers: { 'Authorization': 'Bearer ' + token },
+                        body: formData
+                    });
+                    if (uploadRes.ok) {
+                        const uploadData = await uploadRes.json();
+                        imageUrl = uploadData.url;
+                    }
+                } catch (e) {
+                    console.error("Upload failed", e);
+                }
+            }
+
+            if (!imageUrl || imageUrl.trim() === '') {
+                imageUrl = 'https://images.unsplash.com/photo-1524169358666-79f22534bc6e?auto=format&fit=crop&q=80&w=800'; // fallback
+            }
+
             const payload = {
                 title: document.getElementById('abTitle').value,
-                imageUrl: document.getElementById('abImg').value,
+                imageUrl: imageUrl,
                 description: document.getElementById('abDesc').value
             };
 

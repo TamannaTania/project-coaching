@@ -108,11 +108,38 @@
 
         document.getElementById('freeClassForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+            
+            const fileInput = document.getElementById('fcThumbFile');
+            let thumbnailUrl = document.getElementById('fcThumb').value;
+
+            if (fileInput && fileInput.files.length > 0) {
+                const formData = new FormData();
+                formData.append('file', fileInput.files[0]);
+                
+                try {
+                    const uploadRes = await fetch('/api/Uploads', {
+                        method: 'POST',
+                        headers: { 'Authorization': 'Bearer ' + token },
+                        body: formData
+                    });
+                    if (uploadRes.ok) {
+                        const uploadData = await uploadRes.json();
+                        thumbnailUrl = uploadData.url;
+                    }
+                } catch (e) {
+                    console.error("Upload failed", e);
+                }
+            }
+
+            if (!thumbnailUrl || thumbnailUrl.trim() === '') {
+                thumbnailUrl = 'https://images.unsplash.com/photo-1524169358666-79f22534bc6e?auto=format&fit=crop&q=80&w=800'; // fallback
+            }
+
             const payload = {
                 title: document.getElementById('fcTitle').value,
                 category: document.getElementById('fcCategory').value,
                 videoUrl: document.getElementById('fcVideo').value,
-                thumbnailUrl: document.getElementById('fcThumb').value,
+                thumbnailUrl: thumbnailUrl,
                 description: document.getElementById('fcDesc').value,
                 orderIndex: 0
             };
