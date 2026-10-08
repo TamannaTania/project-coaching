@@ -119,26 +119,26 @@
     <nav class="glass-nav bg-gradient-to-r from-white to-emerald-100/90 fixed w-full z-50 border-b border-slate-200 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-20 items-center">
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-2 mr-4 flex-shrink-0">
                     <i class="fa-solid fa-atom text-3xl text-emerald-600"></i>
                     <span class="font-bold text-2xl text-slate-900 tracking-tight">PhysicsAcademy</span>
                 </div>
-                <div class="hidden md:flex space-x-8 items-center">
-                    <a href="#" id="navHome" class="text-emerald-600 font-semibold">Home</a>
-                    <a href="#about" id="navAbout" class="text-slate-600 hover:text-emerald-600 font-medium transition">About</a>
-                    <a href="#courses" id="navCourses" class="text-slate-600 hover:text-emerald-600 font-medium transition">Courses</a>
-                    <a href="#teachers" id="navTeachers" class="text-slate-600 hover:text-emerald-600 font-medium transition">Teachers</a>
-                    <a href="#free-classes" id="navFreeClasses" class="text-slate-600 hover:text-emerald-600 font-medium transition">Free Classes</a>
+                <div class="hidden lg:flex gap-4 xl:gap-6 items-center">
+                    <a href="#" id="navHome" class="whitespace-nowrap text-emerald-600 font-semibold">Home</a>
+                    <a href="#about" id="navAbout" class="whitespace-nowrap text-slate-600 hover:text-emerald-600 font-medium transition">About</a>
+                    <a href="#courses" id="navCourses" class="whitespace-nowrap text-slate-600 hover:text-emerald-600 font-medium transition">Courses</a>
+                    <a href="#teachers" id="navTeachers" class="whitespace-nowrap text-slate-600 hover:text-emerald-600 font-medium transition">Teachers</a>
+                    <a href="#free-classes" id="navFreeClasses" class="whitespace-nowrap text-slate-600 hover:text-emerald-600 font-medium transition">Free Classes</a>
                     
                     
                     <!-- Global Search -->
                     <div class="relative hidden lg:block">
-                        <input type="text" id="globalSearch" placeholder="Search..." class="bg-white/80 border border-emerald-200 rounded-full pl-4 pr-10 py-1.5 text-sm focus:outline-none focus:border-emerald-500 w-48 transition-all focus:w-64 focus:bg-white shadow-sm placeholder-slate-400">
+                        <input type="text" id="globalSearch" placeholder="Search..." class="bg-white/80 border border-emerald-200 rounded-full pl-4 pr-10 py-1.5 text-sm focus:outline-none focus:border-emerald-500 w-32 xl:w-48 transition-all focus:w-48 xl:focus:w-64 focus:bg-white shadow-sm placeholder-slate-400">
                         <i class="fa-solid fa-magnifying-glass absolute right-3 top-2.5 text-slate-400 text-sm"></i>
                     </div>
 
                     <!-- Language Toggle -->
-                    <div class="flex items-center border border-emerald-200 rounded-full overflow-hidden bg-emerald-50">
+                    <div class="flex items-center border border-emerald-200 rounded-full overflow-hidden bg-emerald-50 flex-shrink-0">
                         <button id="btnBn" onclick="setLanguage('bn')" class="px-3 py-1 text-sm font-bold text-emerald-700 hover:bg-emerald-100 transition">BN</button>
                         <button id="btnEn" onclick="setLanguage('en')" class="px-3 py-1 text-sm font-bold bg-emerald-600 text-white">EN</button>
                     </div>
