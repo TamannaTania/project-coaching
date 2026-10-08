@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Success Students</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+    </style>
+</head>
+<body class="text-slate-900 p-8">
+
+    <div class="max-w-5xl mx-auto">
+        <div class="flex justify-between items-center mb-10 bg-gradient-to-br from-purple-900 to-indigo-700 p-8 rounded-3xl shadow-xl border border-purple-800/50">
+            <div>
+                <h1 class="text-4xl font-extrabold text-white tracking-tight mb-2">Manage Success Students</h1>
+                <p class="text-purple-200 font-medium text-lg">Add and organize successful students for the homepage.</p>
+            </div>
+            <a href="admin.html" class="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-sm px-6 py-3 rounded-xl font-bold transition flex items-center gap-2 shadow-lg">
+                <i class="fa-solid fa-arrow-left"></i> Dashboard
+            </a>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- Add Form -->
+            <div class="md:col-span-1 bg-white p-6 rounded-2xl shadow-md border border-slate-100 h-fit sticky top-8">
+                <h2 id="formTitle" class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
+                    <i class="fa-solid fa-trophy text-yellow-500"></i> Add New Student
+                </h2>
+                
+                
+                <form id="successForm" class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">Student Name</label>
+                            <input type="text" id="ssName" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">University / Institution</label>
+                            <input type="text" id="ssUni" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">Batch (e.g. HSC 2024)</label>
+                            <input type="text" id="ssBatch" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">Image URL</label>
+                            <input type="url" id="ssImg" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500" required>
+                        </div>
+                    </div>
+                    <div class="flex gap-4">
+                        <button type="submit" id="saveBtn" class="bg-emerald-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-emerald-700 transition">Add Student</button>
+                    </div>
+                </form>
+
+
+            </div>
+
+            <!-- List -->
+            <div class="md:col-span-2">
+                <div class="bg-white p-6 rounded-2xl shadow-md border border-slate-100">
+                    <h2 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
+                        <i class="fa-solid fa-users text-indigo-500"></i> Existing Students
+                    </h2>
+                    <div id="teachersList" class="space-y-4">
+                        <div class="p-8 text-center text-slate-400"><i class="fa-solid fa-spinner fa-spin text-3xl mb-3"></i><p>Loading...</p></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+        const token = localStorage.getItem('token');
+        if (!token) window.location.href = 'login.html';
+
+        async function loadStudents() {
+            try {
+                const res = await fetch('/api/SuccessStudents');
+                const data = await res.json();
+                const container = document.getElementById('teachersList');
+                container.innerHTML = '';
+                
+                if(data.length === 0) {
+                    container.innerHTML = '<div class="col-span-full text-center text-slate-400 py-10">No students added yet.</div>';
+                    return;
+                }
+
+                data.forEach(s => {
+                    container.innerHTML += `
+                    <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex items-center gap-6">
+                        <img src="${s.imageUrl}" class="w-20 h-20 object-cover rounded-full bg-slate-100">
+                        <div class="flex-1">
+                            <h3 class="text-xl font-bold text-slate-800">${s.name}</h3>
+                            <p class="text-emerald-600 font-bold">${s.institution}</p>
+                            <p class="text-slate-500 text-sm mt-1">${s.batch}</p>
+                        </div>
+                        <button onclick="deleteStudent(${s.id})" class="bg-red-50 text-red-500 hover:bg-red-500 hover:text-white px-4 py-2 rounded-xl font-bold transition">Delete</button>
+                    </div>`;
+                });
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        document.getElementById('successForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const payload = {
+                name: document.getElementById('ssName').value,
+                institution: document.getElementById('ssUni').value,
+                batch: document.getElementById('ssBatch').value,
+                imageUrl: document.getElementById('ssImg').value,
+                orderIndex: 0
+            };
+
+            await fetch('/api/SuccessStudents', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                body: JSON.stringify(payload)
+            });
+            document.getElementById('successForm').reset();
+            loadStudents();
+        });
+
+        async function deleteStudent(id) {
+            if(!confirm("Are you sure?")) return;
+            await fetch('/api/SuccessStudents/' + id, {
+                method: 'DELETE',
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
+            loadStudents();
+        }
+
+        loadStudents();
+
+</script>
+</body>
+</html>
