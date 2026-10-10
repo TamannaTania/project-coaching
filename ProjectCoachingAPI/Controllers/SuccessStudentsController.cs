@@ -30,6 +30,26 @@ namespace ProjectCoachingAPI.Controllers
             return CreatedAtAction("GetSuccessStudents", new { id = student.Id }, student);
         }
 
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutSuccessStudent(int id, SuccessStudent student)
+        {
+            if (id != student.Id) return BadRequest();
+
+            _context.Entry(student).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!SuccessStudentExists(id)) return NotFound();
+                else throw;
+            }
+
+            return NoContent();
+        }
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteSuccessStudent(int id)
         {
@@ -39,6 +59,11 @@ namespace ProjectCoachingAPI.Controllers
             _context.SuccessStudents.Remove(student);
             await _context.SaveChangesAsync();
             return NoContent();
+        }
+
+        private bool SuccessStudentExists(int id)
+        {
+            return _context.SuccessStudents.Any(e => e.Id == id);
         }
     }
 }

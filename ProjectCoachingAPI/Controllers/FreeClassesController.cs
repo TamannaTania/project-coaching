@@ -19,15 +19,39 @@ namespace ProjectCoachingAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<FreeClass>>> GetFreeClasses()
         {
-            return await _context.FreeClasses.OrderBy(f => f.OrderIndex).ToListAsync();
+            return await _context.FreeClasses.OrderByDescending(f => f.DateAdded).ToListAsync();
         }
 
         [HttpPost]
         public async Task<ActionResult<FreeClass>> PostFreeClass(FreeClass freeClass)
         {
+            freeClass.DateAdded = DateTime.UtcNow;
             _context.FreeClasses.Add(freeClass);
             await _context.SaveChangesAsync();
             return CreatedAtAction("GetFreeClasses", new { id = freeClass.Id }, freeClass);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutFreeClass(int id, FreeClass freeClass)
+        {
+            if (id != freeClass.Id) return BadRequest();
+
+            _context.Entry(freeClass).State = EntityState.Modified;
+            
+            // Keep original date added
+            _context.Entry(freeClass).Property(x => x.DateAdded).IsModified = false;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!FreeClassExists(id)) return NotFound();
+                else throw;
+            }
+
+            return NoContent();
         }
 
         [HttpDelete("{id}")]
@@ -39,6 +63,11 @@ namespace ProjectCoachingAPI.Controllers
             _context.FreeClasses.Remove(freeClass);
             await _context.SaveChangesAsync();
             return NoContent();
+        }
+
+        private bool FreeClassExists(int id)
+        {
+            return _context.FreeClasses.Any(e => e.Id == id);
         }
     }
 }

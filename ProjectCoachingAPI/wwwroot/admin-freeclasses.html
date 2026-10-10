@@ -79,6 +79,7 @@
     <script>
 
         const token = localStorage.getItem('token');
+        let editId = null;
         if (!token) window.location.href = 'login.html';
 
         async function loadClasses() {
@@ -101,7 +102,12 @@
                         <h3 class="text-xl font-bold text-slate-800">${fc.title}</h3>
                         <p class="text-slate-500 text-sm mt-1">${fc.description}</p>
                     </div>
-                    <button onclick="deleteClass(${fc.id})" class="bg-red-50 text-red-500 hover:bg-red-500 hover:text-white px-4 py-2 rounded-xl font-bold transition">Delete</button>
+                    
+                        <div class="flex gap-2">
+                            <button onclick="editClass(${fc.id}, '${fc.title.replace(/'/g, "\'")}', '${fc.videoUrl.replace(/'/g, "\'")}', '${fc.thumbnailUrl.replace(/'/g, "\'")}')" class="bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white px-4 py-2 rounded-xl font-bold transition">Edit</button>
+                            <button onclick="deleteClass(${fc.id})" class="bg-red-50 text-red-500 hover:bg-red-500 hover:text-white px-4 py-2 rounded-xl font-bold transition">Delete</button>
+                        </div>
+
                 </div>`;
             });
         }
@@ -110,6 +116,7 @@
             e.preventDefault();
             
             const fileInput = document.getElementById('fcThumbFile');
+            let editId = null;
             let thumbnailUrl = document.getElementById('fcThumb').value;
 
             if (fileInput && fileInput.files.length > 0) {
@@ -152,6 +159,16 @@
             document.getElementById('freeClassForm').reset();
             loadClasses();
         });
+
+        
+        function editClass(id, title, videoUrl, thumb) {
+            editId = id;
+            document.getElementById('fcTitle').value = title;
+            document.getElementById('fcVideo').value = videoUrl;
+            document.getElementById('fcThumb').value = thumb;
+            document.getElementById('saveBtn').innerText = 'Update Class';
+            document.getElementById('saveBtn').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
 
         async function deleteClass(id) {
             if(!confirm("Are you sure?")) return;

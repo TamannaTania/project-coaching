@@ -80,6 +80,7 @@
     <script>
 
         const token = localStorage.getItem('token');
+        let editId = null;
         if (!token) window.location.href = 'login.html';
 
         async function loadStudents() {
@@ -103,7 +104,22 @@
                             <p class="text-emerald-600 font-bold">${s.institution}</p>
                             <p class="text-slate-500 text-sm mt-1">${s.batch}</p>
                         </div>
-                        <button onclick="deleteStudent(${s.id})" class="bg-red-50 text-red-500 hover:bg-red-500 hover:text-white px-4 py-2 rounded-xl font-bold transition">Delete</button>
+                        
+                        <div class="flex gap-2">
+                            <button onclick="editStudent(${s.id}, '${s.name.replace(/'/g, "\'")}', '${s.institution.replace(/'/g, "\'")}', '${s.batch.replace(/'/g, "\'")}', '${s.imageUrl.replace(/'/g, "\'")}')" class="bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white px-4 py-2 rounded-xl font-bold transition">Edit</button>
+                            
+                        <div class="flex gap-2">
+                            <button onclick="editStudent(${s.id}, '${s.name.replace(/'/g, "\'")}', '${s.institution.replace(/'/g, "\'")}', '${s.batch.replace(/'/g, "\'")}', '${s.imageUrl.replace(/'/g, "\'")}')" class="bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white px-4 py-2 rounded-xl font-bold transition">Edit</button>
+                            
+                        <div class="flex gap-2">
+                            <button onclick="editStudent(${s.id}, '${s.name.replace(/'/g, "\'")}', '${s.institution.replace(/'/g, "\'")}', '${s.batch.replace(/'/g, "\'")}', '${s.imageUrl.replace(/'/g, "\'")}')" class="bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white px-4 py-2 rounded-xl font-bold transition">Edit</button>
+                            <button onclick="deleteStudent(${s.id})" class="bg-red-50 text-red-500 hover:bg-red-500 hover:text-white px-4 py-2 rounded-xl font-bold transition">Delete</button>
+                        </div>
+
+                        </div>
+
+                        </div>
+
                     </div>`;
                 });
             } catch (err) {
@@ -115,6 +131,7 @@
             e.preventDefault();
             
             const fileInput = document.getElementById('ssImgFile');
+            let editId = null;
             let imageUrl = document.getElementById('ssImg').value;
 
             if (fileInput.files.length > 0) {
@@ -149,14 +166,38 @@
                 orderIndex: 0
             };
 
-            await fetch('/api/SuccessStudents', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-                body: JSON.stringify(payload)
-            });
+            if (editId) {
+                payload.id = editId;
+                await fetch('/api/SuccessStudents/' + editId, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                    body: JSON.stringify(payload)
+                });
+                editId = null;
+                document.getElementById('saveBtn').innerText = 'Add Student';
+            } else {
+                await fetch('/api/SuccessStudents', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                    body: JSON.stringify(payload)
+                });
+            }
+
             document.getElementById('successForm').reset();
+            document.getElementById('ssImgFile').value = '';
             loadStudents();
         });
+
+        
+        function editStudent(id, name, institution, batch, img) {
+            editId = id;
+            document.getElementById('ssName').value = name;
+            document.getElementById('ssUni').value = institution;
+            document.getElementById('ssBatch').value = batch;
+            document.getElementById('ssImg').value = img;
+            document.getElementById('saveBtn').innerText = 'Update Student';
+            document.getElementById('saveBtn').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
 
         async function deleteStudent(id) {
             if(!confirm("Are you sure?")) return;
