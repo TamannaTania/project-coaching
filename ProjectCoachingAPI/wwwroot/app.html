@@ -18,18 +18,19 @@
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         .active-tab {
-            color: #059669;
+            color: #38bdf8 !important;
         }
         .active-tab i {
             transform: translateY(-2px);
-            color: #059669;
+            color: #38bdf8 !important;
         }
         .tab-indicator {
             position: absolute;
             top: 0;
             width: 24px;
             height: 3px;
-            background: #059669;
+            background: #38bdf8;
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.8);
             border-radius: 99px;
             display: none;
         }
@@ -208,7 +209,7 @@
         </main>
 
         <!-- ================= FIXED BOTTOM NAVIGATION ================= -->
-        <nav class="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-t border-slate-200 shadow-xl max-w-md mx-auto">
+        <nav class="fixed bottom-0 left-0 right-0 z-50 bg-gradient-to-r from-slate-950 via-slate-900 to-blue-950 border-t border-slate-800 shadow-2xl max-w-md mx-auto">
             <div class="grid grid-cols-4 h-16">
                 
                 <!-- Tab: Home -->
