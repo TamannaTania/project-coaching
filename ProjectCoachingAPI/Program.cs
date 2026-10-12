@@ -54,7 +54,10 @@ app.UseDefaultFiles();
 app.UseStaticFiles();
 
 app.UseCors("AllowAll");
-app.UseHttpsRedirection();
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 
 // Use Authentication before Authorization
 app.UseAuthentication();
