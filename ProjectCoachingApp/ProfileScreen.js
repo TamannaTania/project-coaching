@@ -27,7 +27,7 @@ export default function ProfileScreen({ navigation }) {
     return (
         <View style={styles.container}>
             <View style={styles.avatar}>
-                <Ionicons name="person" size={60} color="#1a9c5c" />
+                <Ionicons name="person" size={60} color="#0284c7" />
             </View>
             <Text style={styles.text}>Welcome, {username || 'Student'}!</Text>
             

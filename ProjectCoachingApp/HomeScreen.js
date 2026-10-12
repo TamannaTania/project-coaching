@@ -18,7 +18,7 @@ export default function HomeScreen({ navigation }) {
         try {
             const token = await AsyncStorage.getItem('token');
             const response = await fetch(API_URL, {
-                headers: { 'Authorization': "Bearer $token" }
+                headers: token ? { 'Authorization': `Bearer ${token}` } : {}
             });
             if (response.ok) {
                 const data = await response.json();
@@ -94,19 +94,19 @@ export default function HomeScreen({ navigation }) {
                         <Text style={styles.sectionTitle}>Why Choose Us?</Text>
                         <View style={styles.featuresGrid}>
                             <View style={styles.featureItem}>
-                                <Ionicons name="bulb-outline" size={40} color="#1a9c5c" />
+                                <Ionicons name="bulb-outline" size={40} color="#0284c7" />
                                 <Text style={styles.featureTitle}>Concept Building</Text>
                             </View>
                             <View style={styles.featureItem}>
-                                <Ionicons name="chatbubbles-outline" size={40} color="#1a9c5c" />
+                                <Ionicons name="chatbubbles-outline" size={40} color="#0284c7" />
                                 <Text style={styles.featureTitle}>Easy Explanation</Text>
                             </View>
                             <View style={styles.featureItem}>
-                                <Ionicons name="calculator-outline" size={40} color="#1a9c5c" />
+                                <Ionicons name="calculator-outline" size={40} color="#0284c7" />
                                 <Text style={styles.featureTitle}>Numerical Practice</Text>
                             </View>
                             <View style={styles.featureItem}>
-                                <Ionicons name="checkmark-done-circle-outline" size={40} color="#1a9c5c" />
+                                <Ionicons name="checkmark-done-circle-outline" size={40} color="#0284c7" />
                                 <Text style={styles.featureTitle}>Regular Assessment</Text>
                             </View>
                         </View>
@@ -180,7 +180,7 @@ const styles = StyleSheet.create({
         gap: 15,
     },
     primaryBtn: {
-        backgroundColor: '#1a9c5c',
+        backgroundColor: '#0284c7',
         flexDirection: 'row',
         paddingHorizontal: 25,
         paddingVertical: 12,
@@ -288,10 +288,10 @@ const styles = StyleSheet.create({
     coursePrice: {
         fontSize: 18,
         fontWeight: 'bold',
-        color: '#1a9c5c',
+        color: '#0284c7',
     },
     buyButton: {
-        backgroundColor: '#143d8d',
+        backgroundColor: '#0284c7',
         paddingHorizontal: 20,
         paddingVertical: 10,
         borderRadius: 8,
@@ -301,7 +301,9 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
     ctaSection: {
-        backgroundColor: '#1a9c5c',
+        backgroundColor: '#0f172a',
+        borderTopWidth: 1,
+        borderTopColor: '#1e3a8a',
         padding: 40,
         alignItems: 'center',
         marginTop: 20,
@@ -314,14 +316,14 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     ctaButton: {
-        backgroundColor: 'white',
+        backgroundColor: '#ffffff',
         paddingHorizontal: 30,
         paddingVertical: 15,
         borderRadius: 8,
     },
     ctaButtonText: {
-        color: '#1a9c5c',
+        color: '#1e3a8a',
         fontWeight: 'bold',
-        fontSize: 18,
+        fontSize: 16,
     }
 });
