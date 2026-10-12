@@ -44,9 +44,13 @@
     </div>
 
     <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const isAppMode = urlParams.get('app') === 'true' || sessionStorage.getItem('isApp') === 'true';
+        if (isAppMode) sessionStorage.setItem('isApp', 'true');
+
         const existingToken = localStorage.getItem('token');
         if (existingToken) {
-            window.location.href = 'profile.html';
+            window.location.href = isAppMode ? 'app.html' : 'profile.html';
         }
 
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
@@ -74,9 +78,13 @@
                     const data = await response.json();
                     localStorage.setItem('token', data.token);
                     localStorage.setItem('username', data.username || email);
-                    const urlParams = new URLSearchParams(window.location.search);
-                    const returnUrl = urlParams.get('returnUrl') || '/';
-                    window.location.href = returnUrl;
+                    const isApp = sessionStorage.getItem('isApp') === 'true' || new URLSearchParams(window.location.search).get('app') === 'true';
+                    if (isApp) {
+                        window.location.href = 'app.html';
+                    } else {
+                        const returnUrl = new URLSearchParams(window.location.search).get('returnUrl') || '/';
+                        window.location.href = returnUrl;
+                    }
                 } else {
                     const text = await response.text();
                     errorMsg.innerText = text || "Invalid credentials.";

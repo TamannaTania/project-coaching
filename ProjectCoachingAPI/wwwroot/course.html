@@ -178,6 +178,20 @@
 
     <script>
         // @ts-nocheck
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        const isAppMode = urlParams.get('app') === 'true' || sessionStorage.getItem('isApp') === 'true';
+        if (isAppMode) {
+            sessionStorage.setItem('isApp', 'true');
+            const webNav = document.querySelector('nav');
+            if (webNav) webNav.style.display = 'none';
+            document.body.classList.remove('pt-20');
+            const topBar = document.createElement('div');
+            topBar.className = 'sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200 px-4 py-3 flex items-center justify-between shadow-sm';
+            topBar.innerHTML = `<button onclick="window.location.href='app.html'" class="flex items-center gap-2 text-slate-700 font-bold hover:text-emerald-600 transition text-sm"><i class="fa-solid fa-arrow-left"></i> <span>অ্যাপে ফিরুন</span></button><span class="font-extrabold text-slate-800 text-sm">PhysicsAcademy</span><div class="w-8"></div>`;
+            document.body.prepend(topBar);
+        }
+
         const translations = {
             en: {
                 navHome: "Home", navCourses: "Courses", navAdmin: "Admin",
