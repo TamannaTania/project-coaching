@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         .hero-bg {
-            background: linear-gradient(135deg, #0f172a 0%, #14532d 100%);
+            background: linear-gradient(135deg, #020617 0%, #0f172a 35%, #172554 75%, #1e3a8a 100%);
         }
         .glass-nav {
             background: rgba(255, 255, 255, 0.95);
@@ -116,34 +116,34 @@
 <body class="bg-slate-50 font-sans text-slate-800">
 
     <!-- Top Navbar -->
-    <nav class="glass-nav bg-gradient-to-r from-white to-emerald-100/90 fixed w-full z-50 border-b border-slate-200 shadow-sm">
+    <nav class="glass-nav bg-gradient-to-r from-white via-slate-50 to-blue-50/90 fixed w-full z-50 border-b border-slate-200 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-20 items-center">
                 <div class="flex items-center gap-2 mr-4 flex-shrink-0">
-                    <i class="fa-solid fa-atom text-3xl text-emerald-600"></i>
+                    <i class="fa-solid fa-atom text-3xl text-blue-600"></i>
                     <span class="font-bold text-2xl text-slate-900 tracking-tight">PhysicsAcademy</span>
                 </div>
                 <div class="hidden lg:flex gap-4 xl:gap-6 items-center">
-                    <a href="#" id="navHome" class="whitespace-nowrap text-emerald-600 font-semibold">Home</a>
-                    <a href="#about" id="navAbout" class="whitespace-nowrap text-slate-600 hover:text-emerald-600 font-medium transition">About</a>
-                    <a href="#courses" id="navCourses" class="whitespace-nowrap text-slate-600 hover:text-emerald-600 font-medium transition">Courses</a>
-                    <a href="#teachers" id="navTeachers" class="whitespace-nowrap text-slate-600 hover:text-emerald-600 font-medium transition">Teachers</a>
-                    <a href="#free-classes" id="navFreeClasses" class="whitespace-nowrap text-slate-600 hover:text-emerald-600 font-medium transition">Free Classes</a>
+                    <a href="#" id="navHome" class="whitespace-nowrap text-blue-600 font-semibold">Home</a>
+                    <a href="#about" id="navAbout" class="whitespace-nowrap text-slate-600 hover:text-blue-600 font-medium transition">About</a>
+                    <a href="#courses" id="navCourses" class="whitespace-nowrap text-slate-600 hover:text-blue-600 font-medium transition">Courses</a>
+                    <a href="#teachers" id="navTeachers" class="whitespace-nowrap text-slate-600 hover:text-blue-600 font-medium transition">Teachers</a>
+                    <a href="#free-classes" id="navFreeClasses" class="whitespace-nowrap text-slate-600 hover:text-blue-600 font-medium transition">Free Classes</a>
                     
                     
                     <!-- Global Search -->
                     <div class="relative hidden lg:block">
-                        <input type="text" id="globalSearch" placeholder="Search..." class="bg-white/80 border border-emerald-200 rounded-full pl-4 pr-10 py-1.5 text-sm focus:outline-none focus:border-emerald-500 w-32 xl:w-48 transition-all focus:w-48 xl:focus:w-64 focus:bg-white shadow-sm placeholder-slate-400">
+                        <input type="text" id="globalSearch" placeholder="Search..." class="bg-white/80 border border-blue-200 rounded-full pl-4 pr-10 py-1.5 text-sm focus:outline-none focus:border-blue-500 w-32 xl:w-48 transition-all focus:w-48 xl:focus:w-64 focus:bg-white shadow-sm placeholder-slate-400">
                         <i class="fa-solid fa-magnifying-glass absolute right-3 top-2.5 text-slate-400 text-sm"></i>
                     </div>
 
                     <!-- Language Toggle -->
-                    <div class="flex items-center border border-emerald-200 rounded-full overflow-hidden bg-emerald-50 flex-shrink-0">
-                        <button id="btnBn" onclick="setLanguage('bn')" class="px-3 py-1 text-sm font-bold text-emerald-700 hover:bg-emerald-100 transition">BN</button>
-                        <button id="btnEn" onclick="setLanguage('en')" class="px-3 py-1 text-sm font-bold bg-emerald-600 text-white">EN</button>
+                    <div class="flex items-center border border-blue-200 rounded-full overflow-hidden bg-blue-50 flex-shrink-0">
+                        <button id="btnBn" onclick="setLanguage('bn')" class="px-3 py-1 text-sm font-bold text-blue-700 hover:bg-blue-100 transition">BN</button>
+                        <button id="btnEn" onclick="setLanguage('en')" class="px-3 py-1 text-sm font-bold bg-blue-600 text-white">EN</button>
                     </div>
 
-                    <a href="/admin.html" class="text-slate-600 hover:text-emerald-600 font-medium transition">Admin</a>
+                    <a href="/admin.html" class="text-slate-600 hover:text-blue-600 font-medium transition">Admin</a>
                     
                     <!-- Auth Container -->
                     <div id="authNavContainer" class="flex items-center gap-4 border-l border-slate-200 pl-4 ml-2">
@@ -155,16 +155,16 @@
     </nav>
 
     <!-- Hero Section -->
-    <section class="hero-bg pt-24 pb-10 px-4 sm:px-6 lg:px-8">
+    <section class="hero-bg pt-24 pb-12 px-4 sm:px-6 lg:px-8">
         <div class="max-w-4xl mx-auto text-center mt-6">
             <h1 id="heroTitle" class="text-3xl md:text-4xl font-extrabold text-white leading-tight mb-4">
-                Master Physics. <br>Build Strong Concepts. <br><span class="text-emerald-300">Achieve Better Results.</span>
+                Master Physics. <br>Build Strong Concepts. <br><span class="text-blue-300">Achieve Better Results.</span>
             </h1>
             <p id="heroSub" class="text-base text-blue-100 mb-8 max-w-xl mx-auto leading-relaxed">
                 Concept-based Physics learning with expert guidance, regular practice, and exam-focused preparation for SSC, HSC & Admission.
             </p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                <a href="#courses" id="btnExplore" class="bg-emerald-500 text-white px-6 py-3 rounded-full font-bold text-base hover:bg-emerald-400 transition shadow-lg flex items-center justify-center gap-2">
+                <a href="#courses" id="btnExplore" class="bg-blue-600 text-white px-6 py-3 rounded-full font-bold text-base hover:bg-blue-500 transition shadow-lg shadow-blue-900/50 flex items-center justify-center gap-2">
                     <i class="fa-solid fa-graduation-cap"></i> Explore Courses
                 </a>
                 <a href="#contact" id="btnContact" class="bg-white text-blue-900 px-6 py-3 rounded-full font-bold text-base hover:bg-slate-100 transition shadow-lg flex items-center justify-center gap-2">
@@ -463,7 +463,7 @@
                 `;
             } else {
                 const loginText = lang === 'bn' ? 'লগইন' : 'Login';
-                container.innerHTML = `<a href="login.html" class="bg-emerald-600 text-white px-5 py-2 rounded-full font-bold hover:bg-emerald-700 transition shadow-lg shadow-emerald-200 flex items-center gap-2"><i class="fa-solid fa-user text-sm"></i> ` + loginText + `</a>`;
+                container.innerHTML = `<a href="login.html" class="bg-blue-600 text-white px-5 py-2 rounded-full font-bold hover:bg-blue-700 transition shadow-lg shadow-blue-200 flex items-center gap-2"><i class="fa-solid fa-user text-sm"></i> ` + loginText + `</a>`;
             }
         }
 
@@ -502,11 +502,11 @@
             document.getElementById('ctaTitle').innerText = t.ctaTitle; document.getElementById('ctaDesc').innerText = t.ctaDesc; document.getElementById('ctaBtn').innerHTML = t.ctaBtn;
 
             if (lang === 'bn') {
-                document.getElementById('btnBn').className = 'px-3 py-1 text-sm font-bold bg-emerald-600 text-white';
-                document.getElementById('btnEn').className = 'px-3 py-1 text-sm font-bold text-emerald-700 hover:bg-emerald-100 transition';
+                document.getElementById('btnBn').className = 'px-3 py-1 text-sm font-bold bg-blue-600 text-white';
+                document.getElementById('btnEn').className = 'px-3 py-1 text-sm font-bold text-blue-700 hover:bg-blue-100 transition';
             } else {
-                document.getElementById('btnEn').className = 'px-3 py-1 text-sm font-bold bg-emerald-600 text-white';
-                document.getElementById('btnBn').className = 'px-3 py-1 text-sm font-bold text-emerald-700 hover:bg-emerald-100 transition';
+                document.getElementById('btnEn').className = 'px-3 py-1 text-sm font-bold bg-blue-600 text-white';
+                document.getElementById('btnBn').className = 'px-3 py-1 text-sm font-bold text-blue-700 hover:bg-blue-100 transition';
             }
         }
 

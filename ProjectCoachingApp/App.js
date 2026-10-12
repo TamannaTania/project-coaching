@@ -24,10 +24,10 @@ function MobileMainTabs() {
       screenOptions={({ route }) => ({
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: '#0f172a',
-          borderTopColor: '#1e293b',
+          backgroundColor: '#020617',
+          borderTopColor: '#172554',
           borderTopWidth: 1,
-          height: 62,
+          height: 64,
           paddingBottom: 8,
           paddingTop: 8,
         },
