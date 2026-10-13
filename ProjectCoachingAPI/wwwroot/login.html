@@ -55,12 +55,17 @@
 
     <script>
         const urlParams = new URLSearchParams(window.location.search);
-        const isAppMode = urlParams.get('app') === 'true' || sessionStorage.getItem('isApp') === 'true';
-        if (isAppMode) sessionStorage.setItem('isApp', 'true');
+        // Only enter App Mode if explicitly requested via ?app=true in the URL
+        const isAppMode = urlParams.get('app') === 'true';
+        if (isAppMode) {
+            sessionStorage.setItem('isApp', 'true');
+        } else {
+            sessionStorage.removeItem('isApp');
+        }
 
         const existingToken = localStorage.getItem('token');
         if (existingToken) {
-            window.location.href = isAppMode ? 'app.html' : 'profile.html';
+            window.location.href = isAppMode ? 'app.html' : (urlParams.get('returnUrl') || '/');
         }
 
         async function doLogin(forceLogin = false) {
@@ -90,11 +95,11 @@
                     localStorage.setItem('token', data.token);
                     localStorage.setItem('username', data.username || email);
                     localStorage.setItem('email', email);
-                    const isApp = sessionStorage.getItem('isApp') === 'true' || new URLSearchParams(window.location.search).get('app') === 'true';
-                    if (isApp) {
+                    
+                    if (isAppMode) {
                         window.location.href = 'app.html';
                     } else {
-                        const returnUrl = new URLSearchParams(window.location.search).get('returnUrl') || '/';
+                        const returnUrl = urlParams.get('returnUrl') || '/';
                         window.location.href = returnUrl;
                     }
                 } else {
