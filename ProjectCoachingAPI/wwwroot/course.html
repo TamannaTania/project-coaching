@@ -311,9 +311,18 @@
 
         
         function handleEnrolledView() {
-            // Hide lock screen
+            // Update lock screen to show unlocked state
             const vp = document.getElementById('videoPlaceholder');
-            if(vp) vp.style.display = 'none';
+            if(vp) {
+                vp.className = 'absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/60 to-transparent flex flex-col items-center justify-center text-center p-6';
+                vp.innerHTML = `
+                    <div class="w-16 h-16 bg-blue-600/90 text-white rounded-full flex items-center justify-center mb-3 shadow-lg shadow-blue-500/50">
+                        <i class="fa-solid fa-circle-check text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-1">কোর্সটি সফলভাবে আনলক হয়েছে!</h3>
+                    <p class="text-blue-200 text-sm max-w-md">নিচের যেকোনো চ্যাপ্টারের ভিডিও বা নোটে ক্লিক করে শুরু করুন।</p>
+                `;
+            }
             
             // Hide Sidebar and expand main column
             const sidebar = document.getElementById('sidebarColumn');
@@ -323,6 +332,24 @@
                 mainCol.classList.remove('lg:col-span-2');
                 mainCol.classList.add('lg:col-span-3');
             }
+        }
+
+        function playVideoLecture(url, title) {
+            const vc = document.getElementById('videoContainer');
+            if(!vc) return;
+            vc.innerHTML = `
+                <div class="w-full h-full relative bg-black rounded-2xl overflow-hidden flex flex-col justify-center shadow-2xl">
+                    <video controls autoplay class="w-full h-full max-h-[500px] object-contain">
+                        <source src="${url}" type="video/mp4">
+                        আপনার ব্রাউজারে ভিডিও চলতে সমস্যা হচ্ছে।
+                    </video>
+                    <div class="absolute top-3 left-3 bg-slate-900/80 backdrop-blur-md text-white text-xs px-3 py-1.5 rounded-lg border border-slate-700 flex items-center gap-2">
+                        <i class="fa-solid fa-circle-play text-blue-400"></i>
+                        <span class="font-semibold">${title}</span>
+                    </div>
+                </div>
+            `;
+            vc.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
 
         async function loadCourseDetails() {
@@ -357,6 +384,19 @@
                 const t = translations[lang];
 
                 let isEnrolled = course.isEnrolled === true;
+                if (!isEnrolled && token) {
+                    try {
+                        const checkRes = await fetch('/api/Enrollments/check/' + courseId, {
+                            headers: { 'Authorization': 'Bearer ' + token }
+                        });
+                        if (checkRes.ok) {
+                            const checkData = await checkRes.json();
+                            if (checkData.isEnrolled === true) {
+                                isEnrolled = true;
+                            }
+                        }
+                    } catch(e) {}
+                }
 
                 if(isEnrolled) { handleEnrolledView(); 
                     const vp = document.getElementById('videoPlaceholder');
@@ -434,8 +474,12 @@
                                   `;
                                   if(pdfs.length === 0) chaptersHtml += `<div class="text-sm text-slate-400 italic p-2 bg-slate-100/50 rounded-lg text-center border border-slate-100">No study materials available yet.</div>`;
                                   pdfs.forEach(co => {
+                                      let pdfUrl = co.url || '';
+                                      if(pdfUrl && !pdfUrl.startsWith('http')) {
+                                          pdfUrl = '/' + pdfUrl.replace(/^\//, '');
+                                      }
                                       chaptersHtml += `
-                                          <a href="${co.url}" target="_blank" class="flex items-center justify-between py-3 px-2 border-b border-slate-200/60 last:border-0 group hover:bg-red-50/50 rounded-lg transition-colors cursor-pointer">
+                                          <a href="${pdfUrl}" target="_blank" download class="flex items-center justify-between py-3 px-2 border-b border-slate-200/60 last:border-0 group hover:bg-red-50/50 rounded-lg transition-colors cursor-pointer">
                                               <div class="flex items-center gap-3 overflow-hidden">
                                                   <div class="w-10 h-10 flex-shrink-0 rounded-full flex items-center justify-center text-red-500 bg-red-50 text-lg group-hover:scale-110 transition-transform">
                                                       <i class="fa-solid fa-file-pdf"></i>

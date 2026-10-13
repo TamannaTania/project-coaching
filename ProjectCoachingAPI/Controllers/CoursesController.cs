@@ -5,6 +5,8 @@ using ProjectCoachingAPI.Models;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 
+using System.IdentityModel.Tokens.Jwt;
+
 namespace ProjectCoachingAPI.Controllers
 {
     [Route("api/[controller]")]
@@ -44,19 +46,40 @@ namespace ProjectCoachingAPI.Controllers
 
             // Check if user is logged in and enrolled
             bool isEnrolled = false;
+            string? userEmail = null;
+
             if (User.Identity != null && User.Identity.IsAuthenticated)
             {
-                var userEmail = User.FindFirstValue(ClaimTypes.Email);
-                if (!string.IsNullOrEmpty(userEmail))
+                userEmail = User.FindFirstValue(ClaimTypes.Email) 
+                            ?? User.FindFirstValue("email")
+                            ?? User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email || c.Type == "email")?.Value;
+            }
+
+            // Fallback: manually parse JWT from Authorization header
+            if (string.IsNullOrEmpty(userEmail))
+            {
+                var authHeader = Request.Headers["Authorization"].FirstOrDefault();
+                if (!string.IsNullOrEmpty(authHeader) && authHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
                 {
-                    var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == userEmail);
-                    if (user != null)
+                    try
                     {
-                        var enrollment = await _context.Enrollments.FirstOrDefaultAsync(e => e.UserId == user.Id && e.CourseId == id && e.Status == "Approved");
-                        if (enrollment != null || user.Role == "Admin")
-                        {
-                            isEnrolled = true;
-                        }
+                        var handler = new JwtSecurityTokenHandler();
+                        var token = handler.ReadJwtToken(authHeader.Substring("Bearer ".Length).Trim());
+                        userEmail = token.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email || c.Type == "email")?.Value;
+                    }
+                    catch { }
+                }
+            }
+
+            if (!string.IsNullOrEmpty(userEmail))
+            {
+                var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == userEmail);
+                if (user != null)
+                {
+                    var enrollment = await _context.Enrollments.FirstOrDefaultAsync(e => e.UserId == user.Id && e.CourseId == id && e.Status == "Approved");
+                    if (enrollment != null || user.Role == "Admin")
+                    {
+                        isEnrolled = true;
                     }
                 }
             }
