@@ -563,7 +563,11 @@
             try {
                 await fetch('/api/Auth/logout', {
                     method: 'POST',
-                    headers: { 'Authorization': 'Bearer ' + token }
+                    headers: { 
+                        'Authorization': token ? 'Bearer ' + token : '',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email: localStorage.getItem('email') })
                 });
             } catch (e) {}
             localStorage.removeItem('token');

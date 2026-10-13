@@ -436,15 +436,20 @@
 
         async function logout() {
             const token = localStorage.getItem('token');
-            if(token) {
-                try {
-                    await fetch('/api/Auth/logout', { 
-                        method: 'POST',
-                        headers: { 'Authorization': 'Bearer ' + token }
-                    });
-                } catch(e) {}
-            }
+            const email = localStorage.getItem('email');
+            try {
+                await fetch('/api/Auth/logout', { 
+                    method: 'POST',
+                    headers: { 
+                        'Authorization': token ? 'Bearer ' + token : '',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email: email })
+                });
+            } catch(e) {}
             localStorage.removeItem('token');
+            localStorage.removeItem('username');
+            localStorage.removeItem('email');
             window.location.reload();
         }
 

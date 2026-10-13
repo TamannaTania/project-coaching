@@ -79,8 +79,17 @@ namespace ProjectCoachingAPI.Controllers
                 }
                 else if (user.DeviceId != request.DeviceId)
                 {
-                    // Logging in from a different device!
-                    return BadRequest("oops! You are already logged in on another device.");
+                    if (request.ForceLogin)
+                    {
+                        // User chose to switch session to this device
+                        user.DeviceId = request.DeviceId;
+                        await _context.SaveChangesAsync();
+                    }
+                    else
+                    {
+                        // Logging in from a different device!
+                        return BadRequest("oops! You are already logged in on another device.");
+                    }
                 }
             }
 
@@ -117,19 +126,40 @@ namespace ProjectCoachingAPI.Controllers
             return jwt;
         }
 
-        [Authorize]
         [HttpPost("logout")]
-        public async Task<IActionResult> Logout()
+        public async Task<IActionResult> Logout([FromBody] LogoutDto? request = null)
         {
-            var email = User.FindFirstValue(ClaimTypes.Email);
-            if (string.IsNullOrEmpty(email)) return Unauthorized();
+            string? email = User.FindFirstValue(ClaimTypes.Email);
 
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
-            if (user != null)
+            if (string.IsNullOrEmpty(email) && request != null && !string.IsNullOrEmpty(request.Email))
             {
-                // Clear the allowed device so they can log in from anywhere else
-                user.DeviceId = null;
-                await _context.SaveChangesAsync();
+                email = request.Email;
+            }
+
+            if (string.IsNullOrEmpty(email))
+            {
+                var authHeader = Request.Headers["Authorization"].FirstOrDefault();
+                if (!string.IsNullOrEmpty(authHeader) && authHeader.StartsWith("Bearer "))
+                {
+                    try
+                    {
+                        var handler = new JwtSecurityTokenHandler();
+                        var token = handler.ReadJwtToken(authHeader.Substring("Bearer ".Length).Trim());
+                        email = token.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email || c.Type == "email")?.Value;
+                    }
+                    catch { }
+                }
+            }
+
+            if (!string.IsNullOrEmpty(email))
+            {
+                var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+                if (user != null)
+                {
+                    // Clear the allowed device so they can log in from anywhere else
+                    user.DeviceId = null;
+                    await _context.SaveChangesAsync();
+                }
             }
 
             return Ok(new { message = "Logged out successfully" });

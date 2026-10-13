@@ -11,7 +11,7 @@ export default function LoginScreen({ navigation }) {
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
 
-    const handleLogin = async () => {
+    const handleLogin = async (forceLogin = false) => {
         if (!email || !password) {
             Alert.alert('Error', 'Please enter both email and password');
             return;
@@ -29,20 +29,35 @@ export default function LoginScreen({ navigation }) {
             const response = await fetch(API_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password, deviceId })
+                body: JSON.stringify({ email, password, deviceId, forceLogin })
             });
 
             if (response.ok) {
                 const data = await response.json();
                 await AsyncStorage.setItem('token', data.token || data.Token);
                 await AsyncStorage.setItem('username', data.username || data.Username);
+                await AsyncStorage.setItem('email', email);
                 
                 // Navigate to Home screen
                 navigation.replace('Main');
             } else {
                 const errorText = await response.text();
                 console.log("SERVER ERROR:", errorText);
-                alert('Login Failed: ' + errorText);
+                if (errorText.toLowerCase().includes('already logged in')) {
+                    Alert.alert(
+                        'অন্য ডিভাইসে লগইন আছেন',
+                        'আপনার অ্যাকাউন্টটি ইতিমধ্যে অন্য ডিভাইসে চালু আছে। আপনি কি পূর্বের ডিভাইস থেকে লগআউট করে এই ফোনে লগইন করতে চান?',
+                        [
+                            { text: 'বাতিল', style: 'cancel' },
+                            { 
+                                text: 'হ্যাঁ, লগইন করুন', 
+                                onPress: () => handleLogin(true) 
+                            }
+                        ]
+                    );
+                } else {
+                    Alert.alert('Login Failed', errorText || 'Invalid credentials');
+                }
             }
         } catch (error) {
             console.error('Login error:', error);

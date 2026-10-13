@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
+import { API_BASE } from './config';
 
 export default function ProfileScreen({ navigation }) {
     const [username, setUsername] = useState('');
+    const [loggingOut, setLoggingOut] = useState(false);
 
     useEffect(() => {
         const loadUser = async () => {
@@ -15,13 +17,33 @@ export default function ProfileScreen({ navigation }) {
     }, []);
 
     const handleLogout = async () => {
-        await AsyncStorage.removeItem('token');
-        await AsyncStorage.removeItem('username');
-        
-        navigation.reset({
-            index: 0,
-            routes: [{ name: 'Login' }],
-        });
+        setLoggingOut(true);
+        try {
+            const token = await AsyncStorage.getItem('token');
+            const email = await AsyncStorage.getItem('email');
+            
+            // Call server logout to clear DeviceId in database
+            await fetch(`${API_BASE}/auth/logout`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': token ? `Bearer ${token}` : '',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email: email })
+            });
+        } catch (error) {
+            console.error('Logout error:', error);
+        } finally {
+            await AsyncStorage.removeItem('token');
+            await AsyncStorage.removeItem('username');
+            await AsyncStorage.removeItem('email');
+            setLoggingOut(false);
+            
+            navigation.reset({
+                index: 0,
+                routes: [{ name: 'Login' }],
+            });
+        }
     };
 
     return (
@@ -31,8 +53,12 @@ export default function ProfileScreen({ navigation }) {
             </View>
             <Text style={styles.text}>Welcome, {username || 'Student'}!</Text>
             
-            <TouchableOpacity onPress={handleLogout} style={styles.logoutBtn}>
-                <Text style={styles.logoutBtnText}>Logout</Text>
+            <TouchableOpacity onPress={handleLogout} style={styles.logoutBtn} disabled={loggingOut}>
+                {loggingOut ? (
+                    <ActivityIndicator color="white" />
+                ) : (
+                    <Text style={styles.logoutBtnText}>Logout</Text>
+                )}
             </TouchableOpacity>
         </View>
     );
