@@ -248,13 +248,21 @@
             if(token) {
                 const logoutText = lang === 'bn' ? 'লগআউট' : 'Logout';
                 const profileText = username ? username : (lang === 'bn' ? 'প্রোফাইল' : 'Profile');
+                const myCoursesText = lang === 'bn' ? 'আমার কোর্সসমূহ' : 'My Courses';
                 container.innerHTML = `
-                    <a href="#" class="text-slate-600 hover:text-emerald-600 font-medium transition flex items-center gap-2"><i class="fa-solid fa-user-circle text-xl"></i> <span class="hidden md:inline">` + profileText + `</span></a>
-                    <button onclick="logout()" class="text-red-500 hover:text-red-700 font-bold transition flex items-center gap-2"><i class="fa-solid fa-arrow-right-from-bracket"></i> <span class="hidden md:inline">` + logoutText + `</span></button>
+                    <a href="profile.html" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-2 rounded-full text-xs md:text-sm flex items-center gap-1.5 shadow-md shadow-blue-600/30 transition transform hover:-translate-y-0.5">
+                        <i class="fa-solid fa-graduation-cap"></i> <span>` + myCoursesText + `</span>
+                    </a>
+                    <a href="profile.html" class="text-slate-700 hover:text-blue-600 font-semibold transition flex items-center gap-2">
+                        <i class="fa-solid fa-user-circle text-2xl text-blue-600"></i> <span class="hidden md:inline">` + profileText + `</span>
+                    </a>
+                    <button onclick="logout()" class="text-red-500 hover:text-red-700 font-bold transition flex items-center gap-1.5 text-sm ml-1">
+                        <i class="fa-solid fa-arrow-right-from-bracket"></i> <span class="hidden md:inline">` + logoutText + `</span>
+                    </button>
                 `;
             } else {
                 const loginText = lang === 'bn' ? 'লগইন' : 'Login';
-                container.innerHTML = `<a href="login.html" class="bg-emerald-600 text-white px-5 py-2 rounded-full font-bold hover:bg-emerald-700 transition shadow-lg shadow-emerald-200 flex items-center gap-2"><i class="fa-solid fa-user text-sm"></i> ` + loginText + `</a>`;
+                container.innerHTML = `<a href="login.html?returnUrl=course.html?id=` + (courseId || '') + `" class="bg-blue-600 text-white px-5 py-2 rounded-full font-bold hover:bg-blue-700 transition shadow-lg shadow-blue-200 flex items-center gap-2"><i class="fa-solid fa-user text-sm"></i> ` + loginText + `</a>`;
             }
         }
 
@@ -334,13 +342,17 @@
             }
         }
 
-        function playVideoLecture(url, title) {
+        function playVideoLecture(url, title, autoPlay = true) {
+            let videoUrl = url;
+            if(!videoUrl.startsWith('http') && !videoUrl.startsWith('/')) {
+                videoUrl = '/' + videoUrl;
+            }
             const vc = document.getElementById('videoContainer');
             if(!vc) return;
             vc.innerHTML = `
                 <div class="w-full h-full relative bg-black rounded-2xl overflow-hidden flex flex-col justify-center shadow-2xl">
-                    <video controls autoplay class="w-full h-full max-h-[500px] object-contain">
-                        <source src="${url}" type="video/mp4">
+                    <video controls ${autoPlay ? 'autoplay' : ''} class="w-full h-full max-h-[500px] object-contain">
+                        <source src="${videoUrl}" type="video/mp4">
                         আপনার ব্রাউজারে ভিডিও চলতে সমস্যা হচ্ছে।
                     </video>
                     <div class="absolute top-3 left-3 bg-slate-900/80 backdrop-blur-md text-white text-xs px-3 py-1.5 rounded-lg border border-slate-700 flex items-center gap-2">
@@ -349,7 +361,9 @@
                     </div>
                 </div>
             `;
-            vc.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            if (autoPlay) {
+                vc.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
         }
 
         async function loadCourseDetails() {
@@ -398,14 +412,48 @@
                     } catch(e) {}
                 }
 
-                if(isEnrolled) { handleEnrolledView(); 
-                    const vp = document.getElementById('videoPlaceholder');
-                    if(vp) vp.style.display = 'none';
+                if(isEnrolled) { 
+                    handleEnrolledView(); 
+
+                    // Find first video to offer immediate playback
+                    let firstVideo = null;
+                    if (course.chapters) {
+                        for (const ch of course.chapters) {
+                            if (ch.contents) {
+                                const v = ch.contents.find(c => c.type === 'Video' && c.url);
+                                if (v) { firstVideo = v; break; }
+                            }
+                        }
+                    }
+
+                    if (firstVideo) {
+                        let firstUrl = firstVideo.url;
+                        if (!firstUrl.startsWith('http') && !firstUrl.startsWith('/')) firstUrl = '/' + firstUrl;
+                        const vc = document.getElementById('videoContainer');
+                        if (vc) {
+                            vc.innerHTML = `
+                                <div class="w-full h-full relative bg-slate-950 rounded-2xl overflow-hidden flex flex-col justify-center items-center shadow-2xl group min-h-[360px]">
+                                    <img src="${imgUrl}" class="absolute inset-0 w-full h-full object-cover opacity-20 filter blur-sm">
+                                    <div class="relative z-10 text-center p-6 flex flex-col items-center">
+                                        <div onclick="playVideoLecture('${firstUrl}', '${firstVideo.title.replace(/'/g, "\\'")}', true)" class="w-20 h-20 bg-blue-600 hover:bg-blue-500 text-white rounded-full flex items-center justify-center mb-4 shadow-xl shadow-blue-500/50 cursor-pointer transform hover:scale-110 transition duration-300">
+                                            <i class="fa-solid fa-play text-3xl ml-1"></i>
+                                        </div>
+                                        <span class="bg-blue-500/20 text-blue-400 border border-blue-400/30 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-2">✅ কোর্স আনলক করা হয়েছে</span>
+                                        <h2 class="text-xl md:text-2xl font-black text-white mb-2 max-w-lg">${firstVideo.title}</h2>
+                                        <p class="text-slate-300 text-sm mb-4">ক্লাস শুরু করতে উপরের প্লে বাটনে ক্লিক করুন অথবা নিচের যেকোনো ভিডিও বেছে নিন।</p>
+                                        <button onclick="playVideoLecture('${firstUrl}', '${firstVideo.title.replace(/'/g, "\\'")}', true)" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-6 py-2.5 rounded-full text-sm shadow-lg shadow-blue-600/30 transition">
+                                            ▶ ক্লাস প্লে করুন
+                                        </button>
+                                    </div>
+                                </div>
+                            `;
+                        }
+                    }
 
                     const actionDiv = document.getElementById('enrollAction');
                     if(actionDiv) {
-                        actionDiv.innerHTML = `<div class="bg-emerald-50 text-emerald-700 p-4 rounded-xl flex items-center gap-3 border border-emerald-100">
-                            <i class="fa-solid fa-circle-check text-2xl"></i>
+                        actionDiv.innerHTML = `<div class="bg-blue-50 text-blue-700 p-4 rounded-xl flex items-center gap-3 border border-blue-100">
+                            <i class="fa-solid fa-circle-check text-2xl text-blue-600"></i>
                             <div class="font-bold">${t.statusEnrolled}</div>
                         </div>`;
                     }
@@ -414,10 +462,10 @@
                     let chaptersHtml = `
 <div class="mt-12 mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
     <h3 class="text-2xl font-extrabold text-slate-800 flex items-center gap-3">
-        <i class="fa-solid fa-layer-group text-emerald-500"></i> Course Contents
+        <i class="fa-solid fa-layer-group text-blue-600"></i> Course Contents
     </h3>
     <div class="relative w-full sm:w-72">
-        <input type="text" id="chapterSearch" onkeyup="filterChapters(this.value)" placeholder="Search chapters & topics..." class="w-full bg-white border border-slate-200 rounded-full px-4 py-2.5 pl-10 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all shadow-sm">
+        <input type="text" id="chapterSearch" onkeyup="filterChapters(this.value)" placeholder="Search chapters & topics..." class="w-full bg-white border border-slate-200 rounded-full px-4 py-2.5 pl-10 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all shadow-sm">
         <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400"></i>
     </div>
 </div>
@@ -427,9 +475,9 @@
                     if (course.chapters && course.chapters.length > 0) {
                         course.chapters.forEach((ch, index) => {
                               const gradients = [
-                                  'bg-gradient-to-r from-emerald-500 to-teal-600',
-                                  'bg-gradient-to-r from-blue-500 to-indigo-600',
-                                  'bg-gradient-to-r from-purple-500 to-pink-600'
+                                  'bg-gradient-to-r from-blue-600 to-indigo-700',
+                                  'bg-gradient-to-r from-slate-800 to-blue-900',
+                                  'bg-gradient-to-r from-indigo-600 to-purple-700'
                               ];
                               const headerBg = gradients[index % gradients.length];
                               
@@ -465,57 +513,66 @@
 
                                   chaptersHtml += `<div class="p-6 bg-slate-50/50 grid grid-cols-1 md:grid-cols-2 gap-8 border-t border-slate-100">`;
                                   
+                                  // Videos First!
+                                  chaptersHtml += `<div>
+                                      <h4 class="font-bold text-slate-700 mb-4 flex items-center gap-2 border-b border-slate-200 pb-2">
+                                          <i class="fa-solid fa-circle-play text-blue-500"></i> Video Lectures
+                                      </h4>
+                                      <div class="flex flex-col space-y-2">
+                                  `;
+                                  if(videos.length === 0) chaptersHtml += `<div class="text-sm text-slate-400 italic p-2 bg-slate-100/50 rounded-lg text-center border border-slate-100">No video lectures available yet.</div>`;
+                                  videos.forEach(co => {
+                                      let videoUrl = co.url || '';
+                                      if(videoUrl && !videoUrl.startsWith('http') && !videoUrl.startsWith('/')) {
+                                          videoUrl = '/' + videoUrl;
+                                      }
+                                      const safeTitle = co.title.replace(/'/g, "\\'");
+                                      chaptersHtml += `
+                                          <div onclick="playVideoLecture('${videoUrl}', '${safeTitle}', true)" class="flex items-center justify-between py-2.5 px-3 border border-slate-200/70 bg-white hover:border-blue-300 hover:bg-blue-50/60 rounded-xl transition-all cursor-pointer shadow-sm">
+                                              <div class="flex items-center gap-3 overflow-hidden">
+                                                  <div class="w-9 h-9 flex-shrink-0 rounded-full flex items-center justify-center text-blue-600 bg-blue-100 group-hover:bg-blue-600 group-hover:text-white transition-all">
+                                                      <i class="fa-solid fa-play text-sm"></i>
+                                                  </div>
+                                                  <div class="truncate">
+                                                      <h4 class="font-bold text-slate-800 text-sm truncate hover:text-blue-600 transition-colors">${co.title}</h4>
+                                                      <span class="text-xs text-blue-500 font-medium">ভিডিও লেকচার</span>
+                                                  </div>
+                                              </div>
+                                              <button class="text-xs bg-blue-600 hover:bg-blue-700 text-white font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 shadow-sm transition">
+                                                  <i class="fa-solid fa-play text-[10px]"></i> প্লে
+                                              </button>
+                                          </div>
+                                      `;
+                                  });
+                                  chaptersHtml += `</div></div>`;
+
                                   // PDFs
                                   chaptersHtml += `<div>
                                       <h4 class="font-bold text-slate-700 mb-4 flex items-center gap-2 border-b border-slate-200 pb-2">
                                           <i class="fa-solid fa-file-pdf text-red-500"></i> Study Materials
                                       </h4>
-                                      <div class="flex flex-col">
+                                      <div class="flex flex-col space-y-2">
                                   `;
                                   if(pdfs.length === 0) chaptersHtml += `<div class="text-sm text-slate-400 italic p-2 bg-slate-100/50 rounded-lg text-center border border-slate-100">No study materials available yet.</div>`;
                                   pdfs.forEach(co => {
                                       let pdfUrl = co.url || '';
-                                      if(pdfUrl && !pdfUrl.startsWith('http')) {
+                                      if(pdfUrl && !pdfUrl.startsWith('http') && !pdfUrl.startsWith('/')) {
                                           pdfUrl = '/' + pdfUrl.replace(/^\//, '');
                                       }
                                       chaptersHtml += `
-                                          <a href="${pdfUrl}" target="_blank" download class="flex items-center justify-between py-3 px-2 border-b border-slate-200/60 last:border-0 group hover:bg-red-50/50 rounded-lg transition-colors cursor-pointer">
+                                          <a href="${pdfUrl}" target="_blank" download class="flex items-center justify-between py-2.5 px-3 border border-slate-200/70 bg-white hover:border-red-300 hover:bg-red-50/60 rounded-xl transition-all cursor-pointer shadow-sm">
                                               <div class="flex items-center gap-3 overflow-hidden">
-                                                  <div class="w-10 h-10 flex-shrink-0 rounded-full flex items-center justify-center text-red-500 bg-red-50 text-lg group-hover:scale-110 transition-transform">
+                                                  <div class="w-9 h-9 flex-shrink-0 rounded-full flex items-center justify-center text-red-500 bg-red-100 text-base">
                                                       <i class="fa-solid fa-file-pdf"></i>
                                                   </div>
                                                   <div class="truncate">
-                                                      <h4 class="font-bold text-slate-800 text-sm truncate group-hover:text-red-600 transition-colors">${co.title}</h4>
-                                                      
+                                                      <h4 class="font-bold text-slate-800 text-sm truncate hover:text-red-600 transition-colors">${co.title}</h4>
+                                                      <span class="text-xs text-red-500 font-medium">পিডিএফ নোট</span>
                                                   </div>
                                               </div>
-                                              <i class="fa-solid fa-download text-slate-300 group-hover:text-red-400 transition-colors"></i>
-                                          </a>
-                                      `;
-                                  });
-                                  chaptersHtml += `</div></div>`;
-
-                                  // Videos
-                                  chaptersHtml += `<div>
-                                      <h4 class="font-bold text-slate-700 mb-4 flex items-center gap-2 border-b border-slate-200 pb-2">
-                                          <i class="fa-solid fa-circle-play text-blue-500"></i> Video Lectures
-                                      </h4>
-                                      <div class="flex flex-col">
-                                  `;
-                                  if(videos.length === 0) chaptersHtml += `<div class="text-sm text-slate-400 italic p-2 bg-slate-100/50 rounded-lg text-center border border-slate-100">No video lectures available yet.</div>`;
-                                  videos.forEach(co => {
-                                      chaptersHtml += `
-                                          <a href="${co.url}" target="_blank" class="flex items-center justify-between py-3 px-2 border-b border-slate-200/60 last:border-0 group hover:bg-blue-50/50 rounded-lg transition-colors cursor-pointer">
-                                              <div class="flex items-center gap-3 overflow-hidden">
-                                                  <div class="w-10 h-10 flex-shrink-0 rounded-full flex items-center justify-center text-blue-500 bg-blue-50 text-lg group-hover:scale-110 transition-transform">
-                                                      <i class="fa-solid fa-play"></i>
-                                                  </div>
-                                                  <div class="truncate">
-                                                      <h4 class="font-bold text-slate-800 text-sm truncate group-hover:text-blue-600 transition-colors">${co.title}</h4>
-                                                      
-                                                  </div>
-                                              </div>
-                                              <i class="fa-solid fa-play text-slate-300 group-hover:text-blue-400 transition-colors"></i>
+                                              <span class="text-xs bg-red-50 text-red-600 border border-red-200 font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 hover:bg-red-600 hover:text-white transition">
+                                                  <i class="fa-solid fa-download text-[10px]"></i> ডাউনলোড
+                                              </span>
                                           </a>
                                       `;
                                   });
@@ -535,13 +592,18 @@
                               chaptersHtml += `</div></div>`;
                           });
                     } else {
-                        chaptersHtml += `<div class="p-10 text-center bg-white rounded-2xl border-2 border-dashed border-slate-200 shadow-sm"><div class="w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-4"><i class="fa-solid fa-person-digging text-3xl text-emerald-500"></i></div><h3 class="text-lg font-bold text-slate-800 mb-1">Curriculum Under Construction</h3><p class="text-slate-500">Chapters and videos will be published here very soon.</p></div>`;
+                        chaptersHtml += `<div class="p-10 text-center bg-white rounded-2xl border-2 border-dashed border-slate-200 shadow-sm"><div class="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4"><i class="fa-solid fa-person-digging text-3xl text-blue-500"></i></div><h3 class="text-lg font-bold text-slate-800 mb-1">Curriculum Under Construction</h3><p class="text-slate-500">Chapters and videos will be published here very soon.</p></div>`;
                     }
                     chaptersHtml += '</div></div>';
                     
                     document.getElementById('overviewContent').innerHTML += chaptersHtml;
-                } else if(token) {
-                    // Check if pending
+                } else if(!token) {
+                    const descEl = document.getElementById('lockedDesc');
+                    if (descEl) {
+                        descEl.innerHTML += `<div class="mt-4"><a href="login.html?returnUrl=course.html?id=${courseId}" class="inline-block bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm px-6 py-2.5 rounded-full shadow-lg transition"><i class="fa-solid fa-arrow-right-to-bracket mr-1.5"></i> কোর্সটি কিনে থাকলে লগইন করুন</a></div>`;
+                    }
+                } else {
+                    // Logged in but not approved yet - check if pending
                     const enrollRes = await fetch('/api/Enrollments/mycourses', {
                         headers: { 'Authorization': 'Bearer ' + token }
                     });

@@ -73,7 +73,7 @@ namespace ProjectCoachingAPI.Controllers
 
             if (!string.IsNullOrEmpty(userEmail))
             {
-                var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == userEmail);
+                var user = await _context.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == userEmail.ToLower());
                 if (user != null)
                 {
                     var enrollment = await _context.Enrollments.FirstOrDefaultAsync(e => e.UserId == user.Id && e.CourseId == id && e.Status == "Approved");

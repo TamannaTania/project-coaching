@@ -24,12 +24,39 @@ namespace ProjectCoachingAPI.Controllers
             public string trxId { get; set; } = "";
         }
 
+        private string? GetUserEmail()
+        {
+            string? email = null;
+            if (User.Identity != null && User.Identity.IsAuthenticated)
+            {
+                email = User.FindFirstValue(ClaimTypes.Email) 
+                        ?? User.FindFirstValue("email")
+                        ?? User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email || c.Type == "email")?.Value;
+            }
+
+            if (string.IsNullOrEmpty(email))
+            {
+                var authHeader = Request.Headers["Authorization"].FirstOrDefault();
+                if (!string.IsNullOrEmpty(authHeader) && authHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+                {
+                    try
+                    {
+                        var handler = new System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler();
+                        var token = handler.ReadJwtToken(authHeader.Substring("Bearer ".Length).Trim());
+                        email = token.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email || c.Type == "email")?.Value;
+                    }
+                    catch { }
+                }
+            }
+            return email?.Trim();
+        }
+
         [HttpPost("{courseId}")]
         public async Task<IActionResult> Enroll(int courseId, [FromBody] PaymentDto dto)
         {
-            var email = User.FindFirstValue(ClaimTypes.Email);
+            var email = GetUserEmail();
             if(string.IsNullOrEmpty(email)) return Unauthorized();
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
             if (user == null) return Unauthorized();
             var userId = user.Id;
             
@@ -49,11 +76,12 @@ namespace ProjectCoachingAPI.Controllers
         }
 
         [HttpGet("check/{courseId}")]
+        [AllowAnonymous]
         public async Task<IActionResult> CheckEnrollment(int courseId)
         {
-            var email = User.FindFirstValue(ClaimTypes.Email);
+            var email = GetUserEmail();
             if(string.IsNullOrEmpty(email)) return Ok(new { isEnrolled = false, status = "None" });
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
             if (user == null) return Ok(new { isEnrolled = false, status = "None" });
             var userId = user.Id;
             var enrollment = await _context.Enrollments.FirstOrDefaultAsync(e => e.UserId == userId && e.CourseId == courseId);
@@ -66,10 +94,10 @@ namespace ProjectCoachingAPI.Controllers
         [HttpGet("mycourses")]
         public async Task<IActionResult> GetMyCourses()
         {
-            var email = User.FindFirstValue(ClaimTypes.Email);
+            var email = GetUserEmail();
             if(string.IsNullOrEmpty(email)) return Unauthorized();
             
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
             if (user == null) return Unauthorized();
 
             var enrollments = await _context.Enrollments
