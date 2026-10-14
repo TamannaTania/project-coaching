@@ -34,6 +34,48 @@ namespace ProjectCoachingAPI.Controllers
             return Ok(content);
         }
 
+        [HttpPut("chapters/{id}")]
+        public async Task<IActionResult> PutChapter(int id, CourseChapter chapter)
+        {
+            if (id != chapter.Id && chapter.Id != 0)
+            {
+                chapter.Id = id;
+            }
+
+            var existing = await _context.CourseChapters.FindAsync(id);
+            if (existing == null) return NotFound();
+
+            existing.Title = chapter.Title;
+            existing.OrderIndex = chapter.OrderIndex;
+
+            await _context.SaveChangesAsync();
+            return Ok(existing);
+        }
+
+        [HttpPut("contents/{id}")]
+        public async Task<IActionResult> PutContent(int id, CourseContent content)
+        {
+            if (id != content.Id && content.Id != 0)
+            {
+                content.Id = id;
+            }
+
+            var existing = await _context.CourseContents.FindAsync(id);
+            if (existing == null) return NotFound();
+
+            existing.Title = content.Title;
+            existing.Type = content.Type;
+            existing.Url = content.Url;
+            existing.OrderIndex = content.OrderIndex;
+            if (content.ChapterId > 0)
+            {
+                existing.ChapterId = content.ChapterId;
+            }
+
+            await _context.SaveChangesAsync();
+            return Ok(existing);
+        }
+
         [HttpDelete("chapters/{id}")]
         public async Task<IActionResult> DeleteChapter(int id)
         {

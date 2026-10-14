@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -68,13 +68,14 @@
         </div>
     </div>
 
-    <!-- Add Chapter Modal -->
+    <!-- Add / Edit Chapter Modal -->
     <div id="chapterModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
         <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md transform transition-all">
             <div class="flex justify-between items-center mb-6">
-                <h3 class="text-2xl font-bold text-slate-800">Add Chapter</h3>
+                <h3 class="text-2xl font-bold text-slate-800" id="chapterModalTitle">Add Chapter</h3>
                 <button onclick="hideChapterModal()" class="text-slate-400 hover:text-slate-600 text-xl"><i class="fa-solid fa-times"></i></button>
             </div>
+            <input type="hidden" id="chapterEditId">
             <div class="space-y-5">
                 <div>
                     <label class="block text-sm font-bold text-slate-700 mb-2">Chapter Title</label>
@@ -85,27 +86,28 @@
                     <input type="number" id="chapterOrder" value="1" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500 font-medium">
                 </div>
                 <div class="pt-2">
-                    <button onclick="saveChapter()" class="w-full bg-emerald-600 text-white py-3.5 rounded-xl font-bold hover:bg-emerald-700 transition shadow-lg shadow-emerald-200">Save Chapter</button>
+                    <button id="chapterModalSubmitBtn" onclick="saveChapter()" class="w-full bg-emerald-600 text-white py-3.5 rounded-xl font-bold hover:bg-emerald-700 transition shadow-lg shadow-emerald-200">Save Chapter</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Add Content Modal -->
+    <!-- Add / Edit Content Modal -->
     <div id="contentModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
         <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md transform transition-all">
             <div class="flex justify-between items-center mb-6">
-                <h3 class="text-2xl font-bold text-slate-800">Add Content</h3>
+                <h3 class="text-2xl font-bold text-slate-800" id="contentModalTitle">Add Content</h3>
                 <button onclick="hideContentModal()" class="text-slate-400 hover:text-slate-600 text-xl"><i class="fa-solid fa-times"></i></button>
             </div>
             <input type="hidden" id="contentChapterId">
+            <input type="hidden" id="contentEditId">
             
             <div class="space-y-4">
                 <div>
                     <label class="block text-sm font-bold text-slate-700 mb-2">Type</label>
                     <div class="relative">
                         <select id="contentType" class="w-full appearance-none bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-medium focus:outline-none focus:border-emerald-500">
-                            <option value="Video">📺 Video Link (YouTube/Vimeo)</option>
+                            <option value="Video">📺 Video Link (YouTube/Vimeo/MP4)</option>
                             <option value="PDF">📄 PDF Document Link</option>
                         </select>
                         <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-500"><i class="fa-solid fa-chevron-down"></i></div>
@@ -130,7 +132,7 @@
                     <input type="number" id="contentOrder" value="1" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500 font-medium">
                 </div>
                 <div class="pt-4">
-                    <button onclick="saveContent()" class="w-full bg-emerald-600 text-white py-3.5 rounded-xl font-bold hover:bg-emerald-700 transition shadow-lg shadow-emerald-200">Save Content</button>
+                    <button id="contentModalSubmitBtn" onclick="saveContent()" class="w-full bg-emerald-600 text-white py-3.5 rounded-xl font-bold hover:bg-emerald-700 transition shadow-lg shadow-emerald-200">Save Content</button>
                 </div>
             </div>
         </div>
@@ -238,11 +240,17 @@
                 document.getElementById('courseTitleDisplay').innerText = `Chapters for: ${course.title}`;
                 document.getElementById('contentArea').classList.remove('hidden');
 
+                // Remember currently open chapters so update doesn't collapse them
+                const openChapterIds = Array.from(document.querySelectorAll('[id^="chapter-content-"]'))
+                    .filter(el => !el.classList.contains('hidden'))
+                    .map(el => el.id.replace('chapter-content-', ''));
+
                 const container = document.getElementById('chaptersContainer');
                 container.innerHTML = '';
 
                 if(course.chapters && course.chapters.length > 0) {
                     course.chapters.forEach(ch => {
+                        const isPreviouslyOpen = openChapterIds.includes(String(ch.id));
                         let html = `
                         <div class="admin-chapter-card bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden transform transition duration-200 hover:shadow-md">
                             <!-- Chapter Header -->
@@ -260,14 +268,17 @@
                                     <button onclick="event.stopPropagation(); showContentModal(${ch.id})" class="flex-1 sm:flex-none bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-xl font-bold text-sm transition shadow-sm flex items-center justify-center gap-2">
                                         <i class="fa-solid fa-plus"></i> Add Content
                                     </button>
-                                    <button onclick="event.stopPropagation(); deleteChapter(${ch.id})" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl transition shadow-sm" title="Delete Chapter">
+                                    <button onclick="event.stopPropagation(); openEditChapterModal(${ch.id}, '${escapeForJs(ch.title)}', ${ch.orderIndex || 0})" class="bg-amber-500 hover:bg-amber-600 text-white px-3.5 py-2 rounded-xl font-bold text-sm transition shadow-sm flex items-center justify-center gap-1.5" title="Edit Chapter">
+                                        <i class="fa-solid fa-pen-to-square"></i>
+                                    </button>
+                                    <button onclick="event.stopPropagation(); deleteChapter(${ch.id})" class="bg-red-500 hover:bg-red-600 text-white px-3.5 py-2 rounded-xl transition shadow-sm flex items-center justify-center" title="Delete Chapter">
                                         <i class="fa-solid fa-trash-can"></i>
                                     </button>
                                 </div>
                             </div>
                             
                             <!-- Chapter Contents -->
-                              <div id="chapter-content-${ch.id}" class="p-6 bg-slate-50/50 hidden">
+                              <div id="chapter-content-${ch.id}" class="p-6 bg-slate-50/50 ${isPreviouslyOpen ? '' : 'hidden'}">
                         `;
                         
                         if(ch.contents && ch.contents.length > 0) {
@@ -281,22 +292,27 @@
                                 videos.forEach(co => {
                                     html += `
                                     <div class="bg-white border border-slate-200 p-4 rounded-xl shadow-sm flex justify-between items-center group hover:border-emerald-300 transition">
-                                        <div class="flex items-center gap-4">
-                                            <div class="w-12 h-12 rounded-full flex items-center justify-center fa-circle-play text-blue-500 bg-blue-50 text-xl">
+                                        <div class="flex items-center gap-4 overflow-hidden">
+                                            <div class="w-12 h-12 rounded-full flex items-center justify-center fa-circle-play text-blue-500 bg-blue-50 text-xl flex-shrink-0">
                                                 <i class="fa-solid fa-play"></i>
                                             </div>
-                                            <div>
-                                                <h4 class="font-bold text-slate-800 text-sm mb-1">${co.title}</h4>
-                                                <div class="flex items-center gap-2">
+                                            <div class="truncate">
+                                                <h4 class="font-bold text-slate-800 text-sm mb-1 truncate">${co.title}</h4>
+                                                <div class="flex items-center gap-2 flex-wrap">
                                                     <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-blue-100 text-blue-700">${co.type}</span>
-                                                    <a href="${co.url}" target="_blank" class="text-xs font-medium text-slate-400 hover:text-blue-500 transition"><i class="fa-solid fa-link"></i> Link</a>
+                                                    <a href="${co.url || '#'}" target="_blank" class="text-xs font-medium text-slate-400 hover:text-blue-500 transition"><i class="fa-solid fa-link"></i> Link</a>
                                                     <span class="text-[10px] text-slate-300">| Order: ${co.orderIndex || 0}</span>
                                                 </div>
                                             </div>
                                         </div>
-                                        <button onclick="deleteContent(${co.id})" class="w-8 h-8 rounded-full flex items-center justify-center text-slate-300 hover:text-red-500 hover:bg-red-50 transition" title="Delete Content">
-                                            <i class="fa-solid fa-times"></i>
-                                        </button>
+                                        <div class="flex items-center gap-1.5 flex-shrink-0 ml-3">
+                                            <button onclick="openEditContentModal(${co.id}, ${ch.id}, '${escapeForJs(co.title)}', '${co.type}', '${escapeForJs(co.url || '')}', ${co.orderIndex || 0})" class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition border border-transparent hover:border-blue-200" title="Edit Content">
+                                                <i class="fa-solid fa-pen-to-square text-sm"></i>
+                                            </button>
+                                            <button onclick="deleteContent(${co.id})" class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-50 transition border border-transparent hover:border-red-200" title="Delete Content">
+                                                <i class="fa-solid fa-trash-can text-sm"></i>
+                                            </button>
+                                        </div>
                                     </div>`;
                                 });
                             } else {
@@ -312,22 +328,27 @@
                                 pdfs.forEach(co => {
                                     html += `
                                     <div class="bg-white border border-slate-200 p-4 rounded-xl shadow-sm flex justify-between items-center group hover:border-emerald-300 transition">
-                                        <div class="flex items-center gap-4">
-                                            <div class="w-12 h-12 rounded-full flex items-center justify-center fa-file-pdf text-red-500 bg-red-50 text-xl">
+                                        <div class="flex items-center gap-4 overflow-hidden">
+                                            <div class="w-12 h-12 rounded-full flex items-center justify-center fa-file-pdf text-red-500 bg-red-50 text-xl flex-shrink-0">
                                                 <i class="fa-solid fa-file-pdf"></i>
                                             </div>
-                                            <div>
-                                                <h4 class="font-bold text-slate-800 text-sm mb-1">${co.title}</h4>
-                                                <div class="flex items-center gap-2">
+                                            <div class="truncate">
+                                                <h4 class="font-bold text-slate-800 text-sm mb-1 truncate">${co.title}</h4>
+                                                <div class="flex items-center gap-2 flex-wrap">
                                                     <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-red-100 text-red-700">${co.type}</span>
-                                                    <a href="${co.url}" target="_blank" class="text-xs font-medium text-slate-400 hover:text-blue-500 transition"><i class="fa-solid fa-link"></i> Link</a>
+                                                    <a href="${co.url || '#'}" target="_blank" class="text-xs font-medium text-slate-400 hover:text-blue-500 transition"><i class="fa-solid fa-link"></i> Link</a>
                                                     <span class="text-[10px] text-slate-300">| Order: ${co.orderIndex || 0}</span>
                                                 </div>
                                             </div>
                                         </div>
-                                        <button onclick="deleteContent(${co.id})" class="w-8 h-8 rounded-full flex items-center justify-center text-slate-300 hover:text-red-500 hover:bg-red-50 transition" title="Delete Content">
-                                            <i class="fa-solid fa-times"></i>
-                                        </button>
+                                        <div class="flex items-center gap-1.5 flex-shrink-0 ml-3">
+                                            <button onclick="openEditContentModal(${co.id}, ${ch.id}, '${escapeForJs(co.title)}', '${co.type}', '${escapeForJs(co.url || '')}', ${co.orderIndex || 0})" class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition border border-transparent hover:border-blue-200" title="Edit Content">
+                                                <i class="fa-solid fa-pen-to-square text-sm"></i>
+                                            </button>
+                                            <button onclick="deleteContent(${co.id})" class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-50 transition border border-transparent hover:border-red-200" title="Delete Content">
+                                                <i class="fa-solid fa-trash-can text-sm"></i>
+                                            </button>
+                                        </div>
                                     </div>`;
                                 });
                             } else {
@@ -366,33 +387,104 @@
             }
         }
 
-        function showChapterModal() { document.getElementById('chapterModal').classList.remove('hidden'); }
+        function escapeForJs(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/\\/g, '\\\\')
+                .replace(/'/g, "\\'")
+                .replace(/"/g, '&quot;')
+                .replace(/\n/g, ' ')
+                .replace(/\r/g, '');
+        }
+
+        function showChapterModal() { 
+            document.getElementById('chapterEditId').value = '';
+            document.getElementById('chapterTitle').value = '';
+            document.getElementById('chapterOrder').value = 1;
+            document.getElementById('chapterModalTitle').innerText = 'Add Chapter';
+            document.getElementById('chapterModalSubmitBtn').innerText = 'Save Chapter';
+            document.getElementById('chapterModal').classList.remove('hidden'); 
+        }
+
+        function openEditChapterModal(id, title, orderIndex) {
+            document.getElementById('chapterEditId').value = id;
+            document.getElementById('chapterTitle').value = title || '';
+            document.getElementById('chapterOrder').value = orderIndex || 1;
+            document.getElementById('chapterModalTitle').innerText = 'Update Chapter';
+            document.getElementById('chapterModalSubmitBtn').innerText = 'Update Chapter';
+            document.getElementById('chapterModal').classList.remove('hidden');
+        }
+
         function hideChapterModal() { document.getElementById('chapterModal').classList.add('hidden'); }
         
         function showContentModal(chapterId) { 
+            document.getElementById('contentEditId').value = '';
             document.getElementById('contentChapterId').value = chapterId;
+            document.getElementById('contentTitle').value = '';
+            document.getElementById('contentUrl').value = '';
+            document.getElementById('contentType').value = 'Video';
+            document.getElementById('contentOrder').value = 1;
+            document.getElementById('contentModalTitle').innerText = 'Add Content';
+            document.getElementById('contentModalSubmitBtn').innerText = 'Save Content';
             document.getElementById('contentModal').classList.remove('hidden'); 
         }
+
+        function openEditContentModal(id, chapterId, title, type, url, orderIndex) {
+            document.getElementById('contentEditId').value = id;
+            document.getElementById('contentChapterId').value = chapterId;
+            document.getElementById('contentType').value = type || 'Video';
+            document.getElementById('contentTitle').value = title || '';
+            document.getElementById('contentUrl').value = url || '';
+            document.getElementById('contentOrder').value = orderIndex || 1;
+            document.getElementById('contentModalTitle').innerText = 'Update Content';
+            document.getElementById('contentModalSubmitBtn').innerText = 'Update Content';
+            document.getElementById('contentModal').classList.remove('hidden');
+        }
+
         function hideContentModal() { document.getElementById('contentModal').classList.add('hidden'); }
 
         async function saveChapter() {
-            const courseId = document.getElementById('courseSelect').value;
-            const title = document.getElementById('chapterTitle').value;
-            const orderIndex = parseInt(document.getElementById('chapterOrder').value);
+            const editId = document.getElementById('chapterEditId').value;
+            const courseId = parseInt(document.getElementById('courseSelect').value);
+            const title = document.getElementById('chapterTitle').value.trim();
+            const orderIndex = parseInt(document.getElementById('chapterOrder').value) || 1;
             
             if(!title) return alert("Title required");
 
-            const res = await fetch('/api/CourseContents/chapters', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-                body: JSON.stringify({ courseId, title, orderIndex })
-            });
+            const submitBtn = document.getElementById('chapterModalSubmitBtn');
+            const originalText = submitBtn.innerText;
+            submitBtn.innerText = "Saving...";
+            submitBtn.disabled = true;
 
-            if(res.ok) {
-                hideChapterModal();
-                document.getElementById('chapterTitle').value = '';
-                loadCourseDetails();
-            } else alert("Failed to add chapter");
+            try {
+                let res;
+                if(editId) {
+                    res = await fetch('/api/CourseContents/chapters/' + editId, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                        body: JSON.stringify({ id: parseInt(editId), courseId, title, orderIndex })
+                    });
+                } else {
+                    res = await fetch('/api/CourseContents/chapters', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                        body: JSON.stringify({ courseId, title, orderIndex })
+                    });
+                }
+
+                if(res.ok) {
+                    hideChapterModal();
+                    loadCourseDetails();
+                } else {
+                    const err = await res.text();
+                    alert("Failed to save chapter: " + err);
+                }
+            } catch(e) {
+                alert("Network error while saving chapter");
+            } finally {
+                submitBtn.innerText = originalText;
+                submitBtn.disabled = false;
+            }
         }
 
         
@@ -429,26 +521,49 @@
         }
 
         async function saveContent() {
-            const chapterId = document.getElementById('contentChapterId').value;
-            const title = document.getElementById('contentTitle').value;
+            const editId = document.getElementById('contentEditId').value;
+            const chapterId = parseInt(document.getElementById('contentChapterId').value);
+            const title = document.getElementById('contentTitle').value.trim();
             const type = document.getElementById('contentType').value;
-            const url = document.getElementById('contentUrl').value;
-            const orderIndex = parseInt(document.getElementById('contentOrder').value);
+            const url = document.getElementById('contentUrl').value.trim();
+            const orderIndex = parseInt(document.getElementById('contentOrder').value) || 1;
 
-            if(!title || !url) return alert("Title and URL required");
+            if(!title) return alert("Content Title required");
 
-            const res = await fetch('/api/CourseContents/contents', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-                body: JSON.stringify({ chapterId, title, type, url, orderIndex })
-            });
+            const submitBtn = document.getElementById('contentModalSubmitBtn');
+            const originalText = submitBtn.innerText;
+            submitBtn.innerText = "Saving...";
+            submitBtn.disabled = true;
 
-            if(res.ok) {
-                hideContentModal();
-                document.getElementById('contentTitle').value = '';
-                document.getElementById('contentUrl').value = '';
-                loadCourseDetails();
-            } else alert("Failed to add content");
+            try {
+                let res;
+                if(editId) {
+                    res = await fetch('/api/CourseContents/contents/' + editId, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                        body: JSON.stringify({ id: parseInt(editId), chapterId, title, type, url, orderIndex })
+                    });
+                } else {
+                    res = await fetch('/api/CourseContents/contents', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                        body: JSON.stringify({ chapterId, title, type, url, orderIndex })
+                    });
+                }
+
+                if(res.ok) {
+                    hideContentModal();
+                    loadCourseDetails();
+                } else {
+                    const err = await res.text();
+                    alert("Failed to save content: " + err);
+                }
+            } catch(e) {
+                alert("Network error while saving content");
+            } finally {
+                submitBtn.innerText = originalText;
+                submitBtn.disabled = false;
+            }
         }
 
         async function deleteChapter(id) {
