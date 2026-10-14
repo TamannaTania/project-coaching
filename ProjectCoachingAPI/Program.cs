@@ -54,10 +54,8 @@ app.UseDefaultFiles();
 app.UseStaticFiles();
 
 app.UseCors("AllowAll");
-if (!app.Environment.IsDevelopment())
-{
-    app.UseHttpsRedirection();
-}
+// Do not redirect to HTTPS locally so API calls on http://localhost:3340 work seamlessly
+// and avoid stripping Authorization headers in browser fetches
 
 // Use Authentication before Authorization
 app.UseAuthentication();

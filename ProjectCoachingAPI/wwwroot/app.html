@@ -45,24 +45,24 @@
     <div class="max-w-md mx-auto min-h-screen bg-slate-50 flex flex-col shadow-2xl relative">
 
         <!-- ================= TOP APP BAR ================= -->
-        <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md px-4 pt-3 pb-3 border-b border-slate-100 flex items-center justify-between">
+        <header class="sticky top-0 z-40 bg-gradient-to-r from-slate-950 via-blue-950 to-slate-900 border-b border-blue-900/40 text-white px-4 pt-3 pb-3 flex items-center justify-between shadow-xl">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-emerald-600 to-teal-400 p-0.5 shadow-sm">
-                    <img id="appTopAvatar" src="https://ui-avatars.com/api/?name=User&background=059669&color=fff" class="w-full h-full rounded-full object-cover bg-white" alt="Avatar">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-400 p-0.5 shadow-sm">
+                    <img id="appTopAvatar" src="https://ui-avatars.com/api/?name=User&background=2563eb&color=fff" class="w-full h-full rounded-full object-cover bg-white" alt="Avatar">
                 </div>
                 <div>
-                    <span class="text-xs font-semibold text-slate-400 block uppercase tracking-wider">PhysicsAcademy</span>
-                    <h1 id="appTopGreeting" class="text-base font-extrabold text-slate-800 leading-tight">হ্যালো, শিক্ষার্থী! 👋</h1>
+                    <span class="text-[11px] font-bold text-blue-300 block uppercase tracking-wider">PhysicsAcademy</span>
+                    <h1 id="appTopGreeting" class="text-base font-extrabold text-white leading-tight">হ্যালো, শিক্ষার্থী! 👋</h1>
                 </div>
             </div>
             <div class="flex items-center gap-2">
-                <a href="/" onclick="sessionStorage.removeItem('isApp')" class="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 hover:text-blue-600 transition" title="ওয়েবসাইট ভিউয়ে ফিরে যান">
+                <a href="/" onclick="sessionStorage.removeItem('isApp')" class="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-blue-200 hover:text-white transition" title="ওয়েবসাইট ভিউয়ে ফিরে যান">
                     <i class="fa-solid fa-globe text-sm"></i>
                 </a>
-                <button onclick="switchTab('tab-free')" class="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 hover:text-red-500 transition">
+                <button onclick="switchTab('tab-free')" class="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-blue-200 hover:text-red-400 transition" title="ফ্রি ক্লাস">
                     <i class="fa-solid fa-play text-xs"></i>
                 </button>
-                <button onclick="switchTab('tab-profile')" class="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 hover:text-emerald-600 transition">
+                <button onclick="switchTab('tab-profile')" class="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-blue-200 hover:text-blue-300 transition" title="প্রোফাইল">
                     <i class="fa-solid fa-gear text-sm"></i>
                 </button>
             </div>
@@ -297,12 +297,15 @@
                     const email = data.email || '';
                     const role = data.role || 'Student';
 
+                    if (email) localStorage.setItem('email', email);
+                    if (name) localStorage.setItem('username', name);
+
                     document.getElementById('appTopGreeting').innerText = 'হ্যালো, ' + name.split(' ')[0] + '! 👋';
                     document.getElementById('profileCardName').innerText = name;
                     document.getElementById('profileCardEmail').innerText = email;
                     document.getElementById('profileUserRole').innerText = role;
 
-                    const avatarUrl = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(name) + '&background=059669&color=fff';
+                    const avatarUrl = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(name) + '&background=2563eb&color=fff';
                     document.getElementById('appTopAvatar').src = avatarUrl;
                     document.getElementById('profileCardImg').src = avatarUrl;
                 }
@@ -474,9 +477,14 @@
         async function loadMyCourses() {
             const container = document.getElementById('myCoursesList');
             try {
-                const res = await fetch('/api/Enrollments/my-enrollments', {
+                let res = await fetch('/api/Enrollments/mycourses', {
                     headers: { 'Authorization': 'Bearer ' + token }
                 });
+                if (!res.ok) {
+                    res = await fetch('/api/Enrollments/my-enrollments', {
+                        headers: { 'Authorization': 'Bearer ' + token }
+                    });
+                }
                 if (res.ok) {
                     myEnrollments = await res.json();
                     document.getElementById('profileEnrolledCount').innerText = myEnrollments.length;
@@ -484,12 +492,12 @@
                     if (myEnrollments.length === 0) {
                         container.innerHTML = `
                         <div class="bg-white rounded-3xl p-8 border border-slate-200 text-center space-y-3">
-                            <div class="w-16 h-16 mx-auto rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center text-2xl">
+                            <div class="w-16 h-16 mx-auto rounded-full bg-blue-50 text-blue-600 flex items-center justify-center text-2xl">
                                 <i class="fa-solid fa-graduation-cap"></i>
                             </div>
                             <h3 class="font-extrabold text-sm text-slate-800">কোনো কোর্সে এনরোল করা হয়নি</h3>
                             <p class="text-xs text-slate-400 max-w-xs mx-auto">এখনো কোনো কোর্সে জয়েন করেননি। এক্সপ্লোর করুন এবং আপনার পছন্দের কোর্সে এনরোল করুন।</p>
-                            <button onclick="switchTab('tab-home')" class="bg-emerald-600 text-white text-xs font-bold px-5 py-2.5 rounded-xl shadow-sm">
+                            <button onclick="switchTab('tab-home')" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-5 py-2.5 rounded-xl shadow-sm">
                                 কোর্সগুলো দেখুন
                             </button>
                         </div>
@@ -499,33 +507,37 @@
 
                     container.innerHTML = '';
                     myEnrollments.forEach(en => {
-                        const course = en.course || {};
+                        const courseTitle = en.title || en.course?.title || 'Physics Course';
+                        const courseImg = en.imageUrl || en.course?.imageUrl || 'https://via.placeholder.com/300x160?text=Physics';
+                        const cId = en.courseId || en.course?.id;
+                        const trx = en.transactionId || en.trxId || 'N/A';
                         const isApproved = en.status === 'Approved';
                         const statusBadge = isApproved 
-                            ? '<span class="bg-emerald-100 text-emerald-700 text-[10px] font-extrabold px-2 py-0.5 rounded-full">✓ Approved</span>'
-                            : '<span class="bg-amber-100 text-amber-700 text-[10px] font-extrabold px-2 py-0.5 rounded-full">⏳ Pending Approval</span>';
+                            ? '<span class="bg-blue-100 text-blue-700 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full flex items-center gap-1"><i class="fa-solid fa-circle-check"></i> Approved</span>'
+                            : '<span class="bg-amber-100 text-amber-700 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full flex items-center gap-1"><i class="fa-solid fa-clock"></i> Pending Approval</span>';
 
                         const actionBtn = isApproved 
-                            ? `<button onclick="window.location.href='course.html?id=${en.courseId}&app=true'" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2.5 rounded-xl shadow-sm transition flex items-center justify-center gap-1.5">
-                                 <i class="fa-solid fa-circle-play text-xs"></i> <span>ক্লাস শুরু করুন</span>
+                            ? `<button onclick="window.location.href='course.html?id=${cId}&app=true'" class="w-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2.5 rounded-xl shadow-md transition flex items-center justify-center gap-2">
+                                 <i class="fa-solid fa-circle-play text-sm"></i> <span>ভিডিও ক্লাস ও নোট দেখুন</span>
                                </button>`
                             : `<div class="text-[11px] text-slate-400 bg-slate-50 p-2.5 rounded-xl text-center border border-slate-100">
                                  পেমেন্ট ভেরিফাই করা হচ্ছে। কিছুক্ষণের মধ্যে এক্সেস পেয়ে যাবেন।
                                </div>`;
 
+                        let fullImg = courseImg;
+                        if (!fullImg.startsWith('http') && !fullImg.startsWith('/')) fullImg = '/' + fullImg;
+
                         container.innerHTML += `
-                        <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm space-y-3">
+                        <div class="bg-white rounded-2xl border-2 border-blue-100 p-4 shadow-sm hover:shadow-md transition space-y-3">
                             <div class="flex items-center justify-between">
                                 ${statusBadge}
-                                <span class="text-[10px] text-slate-400 font-semibold">Trx: ${en.transactionId || 'N/A'}</span>
+                                <span class="text-[10px] text-slate-400 font-semibold">Trx: ${trx}</span>
                             </div>
                             <div class="flex gap-3 items-center">
-                                <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center flex-shrink-0 text-xl font-bold">
-                                    <i class="fa-solid fa-atom"></i>
-                                </div>
-                                <div class="flex-1">
-                                    <h4 class="font-extrabold text-sm text-slate-800 leading-snug">${course.title || 'Physics Course'}</h4>
-                                    <p class="text-[11px] text-slate-500">অনলাইন লাইভ ও রেকর্ডেড ক্লাস</p>
+                                <img src="${fullImg}" class="w-16 h-16 rounded-xl object-cover bg-slate-100 border border-slate-200 flex-shrink-0" alt="${courseTitle}">
+                                <div class="flex-1 min-w-0">
+                                    <h4 class="font-extrabold text-sm text-slate-800 leading-snug truncate">${courseTitle}</h4>
+                                    <p class="text-[11px] text-slate-500 mt-0.5">অধ্যায়ভিত্তিক ভিডিও ও পিডিএফ নোট</p>
                                 </div>
                             </div>
                             ${actionBtn}
@@ -570,13 +582,18 @@
                         'Authorization': token ? 'Bearer ' + token : '',
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ email: localStorage.getItem('email') })
+                    body: JSON.stringify({ 
+                        email: localStorage.getItem('email'),
+                        deviceId: localStorage.getItem('deviceId')
+                    })
                 });
             } catch (e) {}
             localStorage.removeItem('token');
             localStorage.removeItem('role');
+            localStorage.removeItem('username');
+            localStorage.removeItem('email');
             sessionStorage.removeItem('isApp');
-            window.location.href = 'login.html?app=true';
+            window.location.href = 'login.html';
         }
 
         // Start App

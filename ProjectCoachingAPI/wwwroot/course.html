@@ -20,16 +20,16 @@
 </head>
 <body class="bg-slate-50 font-sans text-slate-800 pt-20">
 
-    <nav class="glass-nav bg-gradient-to-r from-white to-emerald-100/90 fixed top-0 w-full z-50 border-b border-slate-200 shadow-sm">
+    <nav class="glass-nav bg-gradient-to-r from-white via-slate-50 to-blue-50/90 fixed top-0 w-full z-50 border-b border-slate-200 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-20 items-center">
                 <a href="/" class="flex items-center gap-2">
-                    <i class="fa-solid fa-atom text-3xl text-emerald-600"></i>
+                    <i class="fa-solid fa-atom text-3xl text-blue-600"></i>
                     <span class="font-bold text-2xl text-slate-900 tracking-tight">PhysicsAcademy</span>
                 </a>
                 <div class="hidden md:flex space-x-8 items-center">
-                    <a href="/" id="navHome" class="text-slate-600 hover:text-emerald-600 font-medium transition">Home</a>
-                    <a href="/#courses" id="navCourses" class="text-emerald-600 font-semibold">Courses</a>
+                    <a href="/" id="navHome" class="text-slate-600 hover:text-blue-600 font-medium transition">Home</a>
+                    <a href="/#courses" id="navCourses" class="text-blue-600 font-semibold">Courses</a>
                     
                     <div class="flex items-center border border-emerald-200 rounded-full overflow-hidden bg-emerald-50">
                         <button id="btnBn" onclick="setLanguage('bn')" class="px-3 py-1 text-sm font-bold text-emerald-700 hover:bg-emerald-100 transition">BN</button>
@@ -49,6 +49,22 @@
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         
+        <!-- Guest Notice Banner -->
+        <div id="unauthenticatedNotice" class="hidden mb-6 bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 border border-blue-700/60 rounded-2xl p-4 sm:p-5 text-white flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xl">
+            <div class="flex items-center gap-3.5">
+                <div class="w-11 h-11 rounded-xl bg-blue-600/30 border border-blue-500/40 flex items-center justify-center text-blue-300 text-lg flex-shrink-0">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                </div>
+                <div>
+                    <h4 class="font-bold text-sm sm:text-base text-white">আপনি কি এই কোর্সটি কিনেছেন?</h4>
+                    <p class="text-xs text-blue-200/90 mt-0.5">আপনার কেনা পেইড কোর্সের ক্লাস ও হ্যান্ডনোট দেখতে অ্যাকাউন্টে লগইন করুন। লগইন করলেই কোর্সটি সাথে সাথে আনলক হয়ে যাবে।</p>
+                </div>
+            </div>
+            <a href="login.html" id="noticeLoginBtn" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-6 py-2.5 rounded-xl text-sm shadow-lg shadow-blue-600/40 transition flex items-center gap-2 flex-shrink-0">
+                <i class="fa-solid fa-right-to-bracket"></i> <span>লগইন করুন</span>
+            </a>
+        </div>
+
         <div class="mb-8" id="courseHeader">
             <h1 class="text-3xl md:text-4xl font-bold text-slate-900 mb-2">Loading Course...</h1>
             <p class="text-slate-500" id="waitText">Please wait</p>
@@ -180,6 +196,7 @@
         // @ts-nocheck
         
         const urlParams = new URLSearchParams(window.location.search);
+        const courseId = urlParams.get('id');
         const isAppMode = urlParams.get('app') === 'true';
         if (isAppMode) {
             sessionStorage.setItem('isApp', 'true');
@@ -187,8 +204,8 @@
             if (webNav) webNav.style.display = 'none';
             document.body.classList.remove('pt-20');
             const topBar = document.createElement('div');
-            topBar.className = 'sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200 px-4 py-3 flex items-center justify-between shadow-sm';
-            topBar.innerHTML = `<button onclick="window.location.href='app.html'" class="flex items-center gap-2 text-slate-700 font-bold hover:text-emerald-600 transition text-sm"><i class="fa-solid fa-arrow-left"></i> <span>অ্যাপে ফিরুন</span></button><span class="font-extrabold text-slate-800 text-sm">PhysicsAcademy</span><div class="w-8"></div>`;
+            topBar.className = 'sticky top-0 z-50 bg-gradient-to-r from-slate-950 via-blue-950 to-slate-900 border-b border-blue-900/40 text-white px-4 py-3 flex items-center justify-between shadow-xl';
+            topBar.innerHTML = `<button onclick="window.location.href='app.html'" class="flex items-center gap-2 text-blue-200 hover:text-white font-bold transition text-sm"><i class="fa-solid fa-arrow-left"></i> <span>অ্যাপে ফিরুন</span></button><span class="font-extrabold text-white text-sm">PhysicsAcademy</span><div class="w-8"></div>`;
             document.body.prepend(topBar);
         } else {
             sessionStorage.removeItem('isApp');
@@ -314,21 +331,19 @@
             }
         }
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const courseId = urlParams.get('id');
 
         
-        function handleEnrolledView() {
-            // Update lock screen to show unlocked state
-            const vp = document.getElementById('videoPlaceholder');
-            if(vp) {
-                vp.className = 'absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/60 to-transparent flex flex-col items-center justify-center text-center p-6';
-                vp.innerHTML = `
-                    <div class="w-16 h-16 bg-blue-600/90 text-white rounded-full flex items-center justify-center mb-3 shadow-lg shadow-blue-500/50">
-                        <i class="fa-solid fa-circle-check text-2xl"></i>
+        function handleEnrolledView(imgUrl) {
+            // Show only the course picture with blurred background (no text, no lock, no play button)
+            const vc = document.getElementById('videoContainer');
+            if(vc) {
+                vc.className = 'w-full rounded-2xl overflow-hidden shadow-2xl relative bg-slate-950 flex items-center justify-center min-h-[260px] md:min-h-[380px]';
+                vc.innerHTML = `
+                    <img src="${imgUrl}" class="absolute inset-0 w-full h-full object-cover filter blur-2xl scale-125 opacity-40 select-none pointer-events-none">
+                    <div class="absolute inset-0 bg-slate-950/20 backdrop-blur-[1px]"></div>
+                    <div class="relative z-10 p-3 sm:p-5 flex items-center justify-center w-full h-full">
+                        <img src="${imgUrl}" alt="Course Banner" class="max-h-[250px] md:max-h-[360px] w-auto max-w-full rounded-xl object-contain shadow-2xl border border-white/10 select-none">
                     </div>
-                    <h3 class="text-2xl font-bold text-white mb-1">কোর্সটি সফলভাবে আনলক হয়েছে!</h3>
-                    <p class="text-blue-200 text-sm max-w-md">নিচের যেকোনো চ্যাপ্টারের ভিডিও বা নোটে ক্লিক করে শুরু করুন।</p>
                 `;
             }
             
@@ -342,28 +357,13 @@
             }
         }
 
-        function playVideoLecture(url, title, autoPlay = true) {
+        function playVideoLecture(url, title) {
             let videoUrl = url;
             if(!videoUrl.startsWith('http') && !videoUrl.startsWith('/')) {
                 videoUrl = '/' + videoUrl;
             }
-            const vc = document.getElementById('videoContainer');
-            if(!vc) return;
-            vc.innerHTML = `
-                <div class="w-full h-full relative bg-black rounded-2xl overflow-hidden flex flex-col justify-center shadow-2xl">
-                    <video controls ${autoPlay ? 'autoplay' : ''} class="w-full h-full max-h-[500px] object-contain">
-                        <source src="${videoUrl}" type="video/mp4">
-                        আপনার ব্রাউজারে ভিডিও চলতে সমস্যা হচ্ছে।
-                    </video>
-                    <div class="absolute top-3 left-3 bg-slate-900/80 backdrop-blur-md text-white text-xs px-3 py-1.5 rounded-lg border border-slate-700 flex items-center gap-2">
-                        <i class="fa-solid fa-circle-play text-blue-400"></i>
-                        <span class="font-semibold">${title}</span>
-                    </div>
-                </div>
-            `;
-            if (autoPlay) {
-                vc.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
+            const appQuery = isAppMode ? '&app=true' : '';
+            window.location.href = `watch.html?courseId=${courseId}&url=${encodeURIComponent(videoUrl)}&title=${encodeURIComponent(title)}${appQuery}`;
         }
 
         async function loadCourseDetails() {
@@ -407,48 +407,22 @@
                             const checkData = await checkRes.json();
                             if (checkData.isEnrolled === true) {
                                 isEnrolled = true;
+                                const refetchRes = await fetch('/api/Courses/' + courseId, {
+                                    headers: { 'Authorization': 'Bearer ' + token }
+                                });
+                                if (refetchRes.ok) {
+                                    const refreshedCourse = await refetchRes.json();
+                                    if (refreshedCourse && refreshedCourse.chapters) {
+                                        course.chapters = refreshedCourse.chapters;
+                                    }
+                                }
                             }
                         }
                     } catch(e) {}
                 }
 
                 if(isEnrolled) { 
-                    handleEnrolledView(); 
-
-                    // Find first video to offer immediate playback
-                    let firstVideo = null;
-                    if (course.chapters) {
-                        for (const ch of course.chapters) {
-                            if (ch.contents) {
-                                const v = ch.contents.find(c => c.type === 'Video' && c.url);
-                                if (v) { firstVideo = v; break; }
-                            }
-                        }
-                    }
-
-                    if (firstVideo) {
-                        let firstUrl = firstVideo.url;
-                        if (!firstUrl.startsWith('http') && !firstUrl.startsWith('/')) firstUrl = '/' + firstUrl;
-                        const vc = document.getElementById('videoContainer');
-                        if (vc) {
-                            vc.innerHTML = `
-                                <div class="w-full h-full relative bg-slate-950 rounded-2xl overflow-hidden flex flex-col justify-center items-center shadow-2xl group min-h-[360px]">
-                                    <img src="${imgUrl}" class="absolute inset-0 w-full h-full object-cover opacity-20 filter blur-sm">
-                                    <div class="relative z-10 text-center p-6 flex flex-col items-center">
-                                        <div onclick="playVideoLecture('${firstUrl}', '${firstVideo.title.replace(/'/g, "\\'")}', true)" class="w-20 h-20 bg-blue-600 hover:bg-blue-500 text-white rounded-full flex items-center justify-center mb-4 shadow-xl shadow-blue-500/50 cursor-pointer transform hover:scale-110 transition duration-300">
-                                            <i class="fa-solid fa-play text-3xl ml-1"></i>
-                                        </div>
-                                        <span class="bg-blue-500/20 text-blue-400 border border-blue-400/30 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-2">✅ কোর্স আনলক করা হয়েছে</span>
-                                        <h2 class="text-xl md:text-2xl font-black text-white mb-2 max-w-lg">${firstVideo.title}</h2>
-                                        <p class="text-slate-300 text-sm mb-4">ক্লাস শুরু করতে উপরের প্লে বাটনে ক্লিক করুন অথবা নিচের যেকোনো ভিডিও বেছে নিন।</p>
-                                        <button onclick="playVideoLecture('${firstUrl}', '${firstVideo.title.replace(/'/g, "\\'")}', true)" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-6 py-2.5 rounded-full text-sm shadow-lg shadow-blue-600/30 transition">
-                                            ▶ ক্লাস প্লে করুন
-                                        </button>
-                                    </div>
-                                </div>
-                            `;
-                        }
-                    }
+                    handleEnrolledView(imgUrl); 
 
                     const actionDiv = document.getElementById('enrollAction');
                     if(actionDiv) {
@@ -598,9 +572,34 @@
                     
                     document.getElementById('overviewContent').innerHTML += chaptersHtml;
                 } else if(!token) {
+                    const notice = document.getElementById('unauthenticatedNotice');
+                    if (notice) notice.classList.remove('hidden');
+                    const noticeBtn = document.getElementById('noticeLoginBtn');
+                    if (noticeBtn) noticeBtn.href = `login.html?returnUrl=course.html?id=${courseId}`;
+
                     const descEl = document.getElementById('lockedDesc');
                     if (descEl) {
-                        descEl.innerHTML += `<div class="mt-4"><a href="login.html?returnUrl=course.html?id=${courseId}" class="inline-block bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm px-6 py-2.5 rounded-full shadow-lg transition"><i class="fa-solid fa-arrow-right-to-bracket mr-1.5"></i> কোর্সটি কিনে থাকলে লগইন করুন</a></div>`;
+                        descEl.innerHTML = `
+                            Enroll in this course to unlock the premium video lectures and study materials.
+                            <div class="mt-5 flex flex-col sm:flex-row items-center justify-center gap-3">
+                                <a href="login.html?returnUrl=course.html?id=${courseId}" class="bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm px-6 py-2.5 rounded-full shadow-lg shadow-blue-600/30 transition flex items-center gap-2">
+                                    <i class="fa-solid fa-right-to-bracket"></i> কোর্সটি কিনে থাকলে লগইন করুন
+                                </a>
+                                <button onclick="openEnrollModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm px-6 py-2.5 rounded-full shadow-lg shadow-emerald-600/30 transition flex items-center gap-2">
+                                    <i class="fa-solid fa-cart-shopping"></i> নতুন কিনতে চান? কোর্স টি কিনুন
+                                </button>
+                            </div>
+                        `;
+                    }
+                    const actionDiv = document.getElementById('enrollAction');
+                    if (actionDiv && !actionDiv.querySelector('.guest-login-helper')) {
+                        actionDiv.innerHTML += `
+                            <div class="guest-login-helper mt-3 text-center">
+                                <a href="login.html?returnUrl=course.html?id=${courseId}" class="text-xs text-blue-600 hover:underline font-bold flex items-center justify-center gap-1.5">
+                                    <i class="fa-solid fa-arrow-right-to-bracket"></i> আগে কেনা থাকলে লগইন করুন
+                                </a>
+                            </div>
+                        `;
                     }
                 } else {
                     // Logged in but not approved yet - check if pending

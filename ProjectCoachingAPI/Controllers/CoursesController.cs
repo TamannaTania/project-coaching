@@ -46,17 +46,19 @@ namespace ProjectCoachingAPI.Controllers
 
             // Check if user is logged in and enrolled
             bool isEnrolled = false;
-            string? userEmail = null;
+            string? userIdentifier = null;
 
             if (User.Identity != null && User.Identity.IsAuthenticated)
             {
-                userEmail = User.FindFirstValue(ClaimTypes.Email) 
+                userIdentifier = User.FindFirstValue(ClaimTypes.Email) 
                             ?? User.FindFirstValue("email")
-                            ?? User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email || c.Type == "email")?.Value;
+                            ?? User.FindFirstValue(ClaimTypes.Name)
+                            ?? User.FindFirstValue("name")
+                            ?? User.Claims.FirstOrDefault(c => c.Type.EndsWith("/emailaddress") || c.Type == "email" || c.Type.EndsWith("/name") || c.Type == "name")?.Value;
             }
 
             // Fallback: manually parse JWT from Authorization header
-            if (string.IsNullOrEmpty(userEmail))
+            if (string.IsNullOrEmpty(userIdentifier))
             {
                 var authHeader = Request.Headers["Authorization"].FirstOrDefault();
                 if (!string.IsNullOrEmpty(authHeader) && authHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
@@ -65,15 +67,16 @@ namespace ProjectCoachingAPI.Controllers
                     {
                         var handler = new JwtSecurityTokenHandler();
                         var token = handler.ReadJwtToken(authHeader.Substring("Bearer ".Length).Trim());
-                        userEmail = token.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email || c.Type == "email")?.Value;
+                        userIdentifier = token.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email || c.Type == "email" || c.Type.EndsWith("/emailaddress"))?.Value
+                                         ?? token.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name || c.Type == "name" || c.Type.EndsWith("/name"))?.Value;
                     }
                     catch { }
                 }
             }
 
-            if (!string.IsNullOrEmpty(userEmail))
+            if (!string.IsNullOrEmpty(userIdentifier))
             {
-                var user = await _context.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == userEmail.ToLower());
+                var user = await _context.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == userIdentifier.ToLower() || u.Name.ToLower() == userIdentifier.ToLower());
                 if (user != null)
                 {
                     var enrollment = await _context.Enrollments.FirstOrDefaultAsync(e => e.UserId == user.Id && e.CourseId == id && e.Status == "Approved");

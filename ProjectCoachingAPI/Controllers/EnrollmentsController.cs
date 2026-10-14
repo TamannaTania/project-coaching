@@ -31,7 +31,9 @@ namespace ProjectCoachingAPI.Controllers
             {
                 email = User.FindFirstValue(ClaimTypes.Email) 
                         ?? User.FindFirstValue("email")
-                        ?? User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email || c.Type == "email")?.Value;
+                        ?? User.FindFirstValue(ClaimTypes.Name)
+                        ?? User.FindFirstValue("name")
+                        ?? User.Claims.FirstOrDefault(c => c.Type.EndsWith("/emailaddress") || c.Type == "email" || c.Type.EndsWith("/name") || c.Type == "name")?.Value;
             }
 
             if (string.IsNullOrEmpty(email))
@@ -43,7 +45,8 @@ namespace ProjectCoachingAPI.Controllers
                     {
                         var handler = new System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler();
                         var token = handler.ReadJwtToken(authHeader.Substring("Bearer ".Length).Trim());
-                        email = token.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email || c.Type == "email")?.Value;
+                        email = token.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email || c.Type == "email" || c.Type.EndsWith("/emailaddress"))?.Value
+                                ?? token.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name || c.Type == "name" || c.Type.EndsWith("/name"))?.Value;
                     }
                     catch { }
                 }
@@ -56,7 +59,7 @@ namespace ProjectCoachingAPI.Controllers
         {
             var email = GetUserEmail();
             if(string.IsNullOrEmpty(email)) return Unauthorized();
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower() || u.Name.ToLower() == email.ToLower());
             if (user == null) return Unauthorized();
             var userId = user.Id;
             
@@ -81,7 +84,7 @@ namespace ProjectCoachingAPI.Controllers
         {
             var email = GetUserEmail();
             if(string.IsNullOrEmpty(email)) return Ok(new { isEnrolled = false, status = "None" });
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower() || u.Name.ToLower() == email.ToLower());
             if (user == null) return Ok(new { isEnrolled = false, status = "None" });
             var userId = user.Id;
             var enrollment = await _context.Enrollments.FirstOrDefaultAsync(e => e.UserId == userId && e.CourseId == courseId);
@@ -90,14 +93,15 @@ namespace ProjectCoachingAPI.Controllers
             return Ok(new { isEnrolled = enrollment.Status == "Approved", status = enrollment.Status });
         }
 
-        // --- Get My Courses for Profile Page ---
+        // --- Get My Courses for Profile & App Pages ---
+        [HttpGet("my-enrollments")]
         [HttpGet("mycourses")]
         public async Task<IActionResult> GetMyCourses()
         {
             var email = GetUserEmail();
             if(string.IsNullOrEmpty(email)) return Unauthorized();
             
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower() || u.Name.ToLower() == email.ToLower());
             if (user == null) return Unauthorized();
 
             var enrollments = await _context.Enrollments
@@ -110,7 +114,15 @@ namespace ProjectCoachingAPI.Controllers
                     imageUrl = e.Course.ImageUrl,
                     status = e.Status, // "Pending", "Approved", "Rejected"
                     trxId = e.TrxId,
-                    enrollmentDate = e.EnrollmentDate
+                    transactionId = e.TrxId,
+                    enrollmentDate = e.EnrollmentDate,
+                    course = new {
+                        id = e.Course.Id,
+                        title = e.Course.Title,
+                        imageUrl = e.Course.ImageUrl,
+                        price = e.Course.Price,
+                        description = e.Course.Description
+                    }
                 })
                 .ToListAsync();
 
