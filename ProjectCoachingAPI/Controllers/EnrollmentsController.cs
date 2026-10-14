@@ -86,6 +86,13 @@ namespace ProjectCoachingAPI.Controllers
             if(string.IsNullOrEmpty(email)) return Ok(new { isEnrolled = false, status = "None" });
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower() || u.Name.ToLower() == email.ToLower());
             if (user == null) return Ok(new { isEnrolled = false, status = "None" });
+
+            var clientDeviceId = Request.Headers["X-Device-Id"].FirstOrDefault();
+            if (user.Role != "Admin" && !string.IsNullOrEmpty(user.DeviceId) && !string.IsNullOrEmpty(clientDeviceId) && user.DeviceId != clientDeviceId)
+            {
+                return StatusCode(401, new { isEnrolled = false, status = "SessionTerminated", code = "SESSION_TERMINATED", sessionTerminated = true, message = "অন্য একটি ব্রাউজার বা ডিভাইসে লগইন করার কারণে এই সেশনটি বন্ধ করা হয়েছে।" });
+            }
+
             var userId = user.Id;
             var enrollment = await _context.Enrollments.FirstOrDefaultAsync(e => e.UserId == userId && e.CourseId == courseId);
             if (enrollment == null) return Ok(new { isEnrolled = false, status = "None" });
@@ -103,6 +110,12 @@ namespace ProjectCoachingAPI.Controllers
             
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower() || u.Name.ToLower() == email.ToLower());
             if (user == null) return Unauthorized();
+
+            var clientDeviceId = Request.Headers["X-Device-Id"].FirstOrDefault();
+            if (user.Role != "Admin" && !string.IsNullOrEmpty(user.DeviceId) && !string.IsNullOrEmpty(clientDeviceId) && user.DeviceId != clientDeviceId)
+            {
+                return StatusCode(401, new { code = "SESSION_TERMINATED", sessionTerminated = true, message = "অন্য একটি ব্রাউজার বা ডিভাইসে লগইন করার কারণে এই সেশনটি বন্ধ করা হয়েছে।" });
+            }
 
             var enrollments = await _context.Enrollments
                 .Include(e => e.Course)

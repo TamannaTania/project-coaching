@@ -79,10 +79,19 @@ namespace ProjectCoachingAPI.Controllers
                 var user = await _context.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == userIdentifier.ToLower() || u.Name.ToLower() == userIdentifier.ToLower());
                 if (user != null)
                 {
-                    var enrollment = await _context.Enrollments.FirstOrDefaultAsync(e => e.UserId == user.Id && e.CourseId == id && e.Status == "Approved");
-                    if (enrollment != null || user.Role == "Admin")
+                    var clientDeviceId = Request.Headers["X-Device-Id"].FirstOrDefault();
+                    bool isDeviceActive = (user.Role == "Admin")
+                        || string.IsNullOrEmpty(user.DeviceId)
+                        || string.IsNullOrEmpty(clientDeviceId)
+                        || (user.DeviceId == clientDeviceId);
+
+                    if (isDeviceActive)
                     {
-                        isEnrolled = true;
+                        var enrollment = await _context.Enrollments.FirstOrDefaultAsync(e => e.UserId == user.Id && e.CourseId == id && e.Status == "Approved");
+                        if (enrollment != null || user.Role == "Admin")
+                        {
+                            isEnrolled = true;
+                        }
                     }
                 }
             }

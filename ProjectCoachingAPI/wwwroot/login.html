@@ -65,8 +65,22 @@
 
         const existingToken = localStorage.getItem('token');
         if (existingToken) {
-            const dest = (isExplicitAppMode && window.innerWidth <= 640) ? 'app.html' : (urlParams.get('returnUrl') || '/');
-            window.location.href = dest;
+            fetch('/api/Auth/validate-session', {
+                headers: {
+                    'Authorization': 'Bearer ' + existingToken,
+                    'X-Device-Id': localStorage.getItem('deviceId') || ''
+                }
+            }).then(r => {
+                if (r.ok) {
+                    const dest = (isExplicitAppMode && window.innerWidth <= 640) ? 'app.html' : (urlParams.get('returnUrl') || '/');
+                    window.location.href = dest;
+                } else {
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('username');
+                    localStorage.removeItem('email');
+                    localStorage.removeItem('user');
+                }
+            }).catch(() => {});
         }
 
         async function doLogin(forceLogin = false) {
@@ -96,6 +110,7 @@
                     localStorage.setItem('token', data.token);
                     localStorage.setItem('username', data.username || email);
                     localStorage.setItem('email', data.email || email);
+                    if (data.deviceId) localStorage.setItem('deviceId', data.deviceId);
                     
                     const returnUrl = urlParams.get('returnUrl');
                     if (returnUrl) {

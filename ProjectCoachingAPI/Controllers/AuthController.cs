@@ -113,8 +113,8 @@ namespace ProjectCoachingAPI.Controllers
 
                 string token = CreateToken(user);
 
-                // Return the token, username, and email
-                return Ok(new { Token = token, Username = user.Name ?? "", Email = user.Email ?? "" });
+                // Return the token, username, email, and active deviceId
+                return Ok(new { Token = token, Username = user.Name ?? "", Email = user.Email ?? "", DeviceId = user.DeviceId ?? "" });
             }
             catch (Exception ex)
             {
@@ -126,9 +126,11 @@ namespace ProjectCoachingAPI.Controllers
         {
             var claims = new List<Claim>
             {
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Name, user.Name ?? "Student"),
                 new Claim(ClaimTypes.Email, user.Email ?? ""),
-                new Claim(ClaimTypes.Role, user.Role ?? "Student")
+                new Claim(ClaimTypes.Role, user.Role ?? "Student"),
+                new Claim("DeviceId", user.DeviceId ?? "")
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
@@ -147,6 +149,71 @@ namespace ProjectCoachingAPI.Controllers
             var jwt = new JwtSecurityTokenHandler().WriteToken(token);
 
             return jwt;
+        }
+
+        [HttpGet("validate-session")]
+        public async Task<IActionResult> ValidateSession()
+        {
+            string? identifier = User.FindFirstValue(ClaimTypes.Email)
+                            ?? User.FindFirstValue("email")
+                            ?? User.FindFirstValue(ClaimTypes.Name)
+                            ?? User.FindFirstValue("name")
+                            ?? User.Claims.FirstOrDefault(c => c.Type.EndsWith("/emailaddress") || c.Type == "email" || c.Type.EndsWith("/name") || c.Type == "name")?.Value;
+
+            string? tokenDeviceId = User.FindFirstValue("DeviceId")
+                                ?? User.Claims.FirstOrDefault(c => c.Type == "DeviceId" || c.Type == "deviceId")?.Value;
+
+            if (string.IsNullOrEmpty(identifier))
+            {
+                var authHeader = Request.Headers["Authorization"].FirstOrDefault();
+                if (!string.IsNullOrEmpty(authHeader) && authHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+                {
+                    try
+                    {
+                        var handler = new JwtSecurityTokenHandler();
+                        var jwt = handler.ReadJwtToken(authHeader.Substring("Bearer ".Length).Trim());
+                        identifier = jwt.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email || c.Type == "email" || c.Type.EndsWith("/emailaddress"))?.Value
+                                     ?? jwt.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name || c.Type == "name" || c.Type.EndsWith("/name"))?.Value;
+                        tokenDeviceId = jwt.Claims.FirstOrDefault(c => c.Type == "DeviceId" || c.Type == "deviceId")?.Value;
+                    }
+                    catch { }
+                }
+            }
+
+            if (string.IsNullOrEmpty(identifier))
+            {
+                return Unauthorized(new { isValid = false, message = "No valid authentication token found." });
+            }
+
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == identifier.ToLower() || u.Name.ToLower() == identifier.ToLower());
+            if (user == null)
+            {
+                return Unauthorized(new { isValid = false, message = "User not found." });
+            }
+
+            if (user.Role == "Admin")
+            {
+                return Ok(new { isValid = true, username = user.Name, role = user.Role });
+            }
+
+            var clientDeviceId = Request.Headers["X-Device-Id"].FirstOrDefault();
+            if (string.IsNullOrEmpty(clientDeviceId))
+            {
+                clientDeviceId = tokenDeviceId;
+            }
+
+            // If user's DeviceId in DB has changed and is different from this client's device:
+            if (!string.IsNullOrEmpty(user.DeviceId) && !string.IsNullOrEmpty(clientDeviceId) && user.DeviceId != clientDeviceId)
+            {
+                return StatusCode(401, new {
+                    isValid = false,
+                    code = "SESSION_TERMINATED",
+                    sessionTerminated = true,
+                    message = "অন্য একটি ব্রাউজার বা ডিভাইসে লগইন করার কারণে এই সেশনটি বন্ধ করা হয়েছে।"
+                });
+            }
+
+            return Ok(new { isValid = true, username = user.Name, role = user.Role, deviceId = user.DeviceId });
         }
 
         [HttpPost("logout")]
