@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - Project Coaching</title>
+    <link rel="stylesheet" href="/styles.css">
+    <script src="/Scripts/Common/session-guard.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8fafc;
+        }
+        .profile-container {
+            max-width: 1200px;
+            margin: 3rem auto;
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 2rem;
+            padding: 0 1rem;
+        }
+        
+        .sidebar {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            height: fit-content;
+        }
+        .sidebar img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 1rem;
+            border: 4px solid #f0f4f8;
+        }
+        .sidebar h3 {
+            margin: 0;
+            color: #1f2937;
+            font-size: 1.2rem;
+        }
+        .sidebar p {
+            color: #6b7280;
+            margin: 0.5rem 0 1.5rem;
+            font-size: 0.9rem;
+        }
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            text-align: left;
+            border-top: 1px solid #f0f4f8;
+            padding-top: 1rem;
+        }
+        .sidebar-menu li a {
+            display: block;
+            padding: 10px 15px;
+            color: #4b5563;
+            text-decoration: none;
+            font-weight: 500;
+            border-radius: 6px;
+            margin-bottom: 5px;
+            transition: all 0.2s;
+        }
+        .sidebar-menu li a:hover, .sidebar-menu li a.active {
+            background: #e6f7ef;
+            color: #1a9c5c;
+        }
+        
+        .main-content {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+        .main-content h2 {
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+            color: #1f2937;
+            border-bottom: 2px solid #f0f4f8;
+            padding-bottom: 1rem;
+        }
+        
+        .course-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .course-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            overflow: hidden;
+            transition: transform 0.2s;
+            background: #fff;
+        }
+        .course-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        .course-card img {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+        }
+        .course-card-content {
+            padding: 1.2rem;
+        }
+        .course-card-content h4 {
+            margin: 0 0 0.5rem;
+            font-size: 1.1rem;
+            color: #1f2937;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        .status-approved { background: #e6f7ef; color: #1a9c5c; }
+        .status-pending { background: #fef3c7; color: #d97706; }
+        .status-rejected { background: #fee2e2; color: #dc2626; }
+        
+        .btn-action {
+            display: block;
+            text-align: center;
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+        .btn-play {
+            background: #1a9c5c;
+            color: white;
+        }
+        .btn-play:hover { background: #15804b; }
+        
+        .btn-disabled {
+            background: #f3f4f6;
+            color: #9ca3af;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <header class="main-header">
+        <a href="/" class="logo" style="text-decoration: none; color: inherit;">
+            <span class="logo-icon">🎯</span>
+            <span class="logo-text">P-Coaching</span>
+        </a>
+        <div class="header-right">
+            <a href="/" class="btn-login" style="background: transparent; color: #1f2937; border: 1px solid #d1d5db;">← হোমপেজে ফিরে যান</a>
+        </div>
+    </header>
+
+    <div class="profile-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <img src="https://ui-avatars.com/api/?name=User&background=1a9c5c&color=fff&size=150" id="profileImage" alt="Profile">
+            <h3 id="profileName">Loading...</h3>
+            <p id="profileEmail">loading@email.com</p>
+            
+            <ul class="sidebar-menu">
+                <li><a href="#" id="tabMyCourses" class="active">📚 আমার কোর্সসমূহ</a></li>
+                <li><a href="#" id="tabSettings">⚙️ সেটিংস</a></li>
+                <li><a href="#" id="logoutBtn" style="color: #ef4444;">🚪 লগআউট</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Courses View -->
+            <div id="viewMyCourses">
+                <h2 style="border-bottom: 2px solid #f0f4f8; padding-bottom: 1rem;">আমার এনরোলকৃত কোর্সসমূহ</h2>
+                
+                <div id="loadingMsg" style="text-align: center; padding: 2rem; color: #6b7280;">
+                    কোর্স লোড হচ্ছে...
+                </div>
+                
+                <div class="course-grid" id="myCoursesGrid" style="display: none;"></div>
+                
+                <div id="noCoursesMsg" style="display: none; text-align: center; padding: 3rem; background: #f9fafb; border-radius: 10px; border: 2px dashed #e5e7eb;">
+                    <span style="font-size: 3rem;">🎓</span>
+                    <h3 style="margin-top: 1rem; color: #4b5563;">আপনি এখনো কোনো কোর্সে জয়েন করেননি!</h3>
+                    <a href="/" style="display: inline-block; margin-top: 1rem; padding: 10px 20px; background: #1a9c5c; color: white; text-decoration: none; border-radius: 6px; font-weight: 600;">কোর্সগুলো দেখুন</a>
+                </div>
+            </div>
+
+            <!-- Settings View -->
+            <div id="viewSettings" style="display: none;">
+                <h2 style="border-bottom: 2px solid #f0f4f8; padding-bottom: 1rem;">অ্যাকাউন্ট সেটিংস</h2>
+                
+                <div style="max-width: 500px; margin-top: 2rem;">
+                    <h3 style="font-size: 1.1rem; color: #1f2937; margin-bottom: 1.5rem;">পাসওয়ার্ড পরিবর্তন করুন</h3>
+                    
+                    <form id="changePasswordForm">
+                        <div style="margin-bottom: 1rem;">
+                            <label style="display: block; font-weight: 500; color: #4b5563; margin-bottom: 0.5rem;">বর্তমান পাসওয়ার্ড</label>
+                            <input type="password" id="oldPassword" required style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-family: inherit;">
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <label style="display: block; font-weight: 500; color: #4b5563; margin-bottom: 0.5rem;">নতুন পাসওয়ার্ড</label>
+                            <input type="password" id="newPassword" required minlength="6" style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-family: inherit;">
+                        </div>
+                        <div style="margin-bottom: 1.5rem;">
+                            <label style="display: block; font-weight: 500; color: #4b5563; margin-bottom: 0.5rem;">নতুন পাসওয়ার্ড আবার লিখুন</label>
+                            <input type="password" id="confirmPassword" required style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-family: inherit;">
+                        </div>
+                        
+                        <button type="submit" id="btnChangePassword" style="background: #1a9c5c; color: white; border: none; padding: 10px 20px; border-radius: 6px; font-weight: 600; cursor: pointer; font-family: inherit; width: 100%;">পরিবর্তন করুন</button>
+                    </form>
+                    
+                    <div id="pwdMessage" style="margin-top: 15px; text-align: center; font-weight: 500; display: none;"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Profile Script -->
+    <script src="/Scripts/Profile/profile.js"></script>
+</body>
+</html>

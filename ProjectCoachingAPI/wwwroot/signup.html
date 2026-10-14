@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign Up - P-Coaching</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="/styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         .auth-container {
@@ -77,13 +77,13 @@
 </head>
 <body>
     <header class="main-header">
-        <div class="logo">
+        <a href="/" class="logo" style="text-decoration: none; color: inherit;">
             <span class="logo-icon">🎯</span>
             <span class="logo-text">P-Coaching</span>
-        </div>
+        </a>
         
         <div class="header-right">
-            <a href="index.html" class="btn-login" style="border: none;">হোম পেজে ফিরে যান</a>
+            <a href="/" class="btn-login" style="border: none;">হোম পেজে ফিরে যান</a>
         </div>
     </header>
 
@@ -113,56 +113,12 @@
             <div id="message"></div>
 
             <div class="auth-footer">
-                আগে থেকে একাউন্ট আছে? <a href="login.html">লগইন করুন</a>
+                আগে থেকে একাউন্ট আছে? <a href="/Views/Auth/login.html">লগইন করুন</a>
             </div>
         </div>
     </main>
 
-    <script>
-        document.getElementById('signupForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const btn = document.getElementById('submitBtn');
-            const msgBox = document.getElementById('message');
-            
-            // Get values
-            const name = document.getElementById('name').value;
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            
-            // Show loading
-            btn.innerText = 'অপেক্ষা করুন...';
-            btn.disabled = true;
-            msgBox.style.display = 'none';
-            msgBox.className = '';
-
-            try {
-                // Call our ASP.NET Core API
-                // Assuming HTTPS port 7015 from launchSettings.json
-                const response = await fetch('/api/auth/register', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ Name: name, Email: email, Password: password })
-                });
-
-                if (response.ok) {
-                    msgBox.innerText = "অভিনন্দন! আপনার একাউন্ট সফলভাবে তৈরি হয়েছে।";
-                    msgBox.classList.add('msg-success');
-                    document.getElementById('signupForm').reset();
-                } else {
-                    const errorText = await response.text();
-                    msgBox.innerText = errorText || "দুঃখিত, কোনো একটি সমস্যা হয়েছে!";
-                    msgBox.classList.add('msg-error');
-                }
-            } catch (error) {
-                msgBox.innerText = "সার্ভারের সাথে কানেক্ট করা যাচ্ছে না। দয়া করে নিশ্চিত করুন আপনার Visual Studio তে API রান করা আছে।";
-                msgBox.classList.add('msg-error');
-            }
-
-            msgBox.style.display = 'block';
-            btn.innerText = 'সাইন আপ করুন';
-            btn.disabled = false;
-        });
-    </script>
+    <!-- Signup Script -->
+    <script src="/Scripts/Auth/signup.js"></script>
 </body>
 </html>

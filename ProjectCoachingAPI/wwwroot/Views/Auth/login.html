@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - PhysicsAcademy</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/styles.css">
+    <style>
+        .hero-bg {
+            background: linear-gradient(135deg, #0f172a 0%, #172554 50%, #0f172a 100%);
+        }
+    </style>
+</head>
+<body class="hero-bg font-sans text-slate-800 flex items-center justify-center min-h-screen p-4">
+
+    <div class="bg-white p-8 md:p-12 rounded-2xl shadow-2xl max-w-md w-full border border-slate-100">
+        <div class="text-center mb-8">
+            <a href="/" class="text-inherit no-underline">
+                <i class="fa-solid fa-atom text-5xl text-blue-600 mb-4 hover:scale-105 transition-transform"></i>
+            </a>
+            <h2 class="text-3xl font-extrabold text-slate-900">Welcome Back</h2>
+            <p class="text-slate-500 mt-2">Login to your account to enroll in courses.</p>
+        </div>
+
+        <form id="loginForm" class="space-y-6">
+            <div>
+                <label class="block text-slate-700 font-bold mb-2">Username or Email</label>
+                <input type="text" id="username" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" required>
+            </div>
+            <div>
+                <label class="block text-slate-700 font-bold mb-2">Password</label>
+                <input type="password" id="password" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" required>
+            </div>
+            
+            <div id="errorMsg" class="hidden bg-red-50 text-red-600 p-3 rounded-lg text-sm font-medium text-center"></div>
+
+            <div id="alreadyLoggedInBox" class="hidden bg-amber-50 border border-amber-200 p-4 rounded-xl text-center space-y-3">
+                <p class="text-amber-800 text-sm font-semibold">
+                    <i class="fa-solid fa-triangle-exclamation mr-1"></i> আপনি ইতিমধ্যে অন্য ডিভাইসে লগইন আছেন!
+                </p>
+                <p class="text-xs text-slate-600">আপনি কি অন্য ডিভাইস থেকে লগআউট করে এই ডিভাইসে লগইন করতে চান?</p>
+                <button type="button" id="forceLoginBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg text-sm transition shadow-md">
+                    হ্যাঁ, এখানে লগইন করুন
+                </button>
+            </div>
+
+            <button type="submit" id="submitBtn" class="w-full bg-blue-600 text-white font-bold rounded-lg px-4 py-3 hover:bg-blue-700 transition shadow-lg shadow-blue-600/30">
+                Login
+            </button>
+        </form>
+        
+        <div class="mt-6 text-center text-sm text-slate-500">
+            Don't have an account? <a href="/Views/Auth/register.html" class="text-blue-600 font-bold hover:underline">Register</a>
+        </div>
+    </div>
+
+    <!-- Login Script -->
+    <script src="/Scripts/Auth/login.js"></script>
+</body>
+</html>

@@ -6,7 +6,7 @@
     <title>Admin Dashboard - P-Coaching (Kendo UI)</title>
     
     <!-- Custom Styles -->
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="/styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <!-- Kendo UI CSS -->
@@ -139,7 +139,7 @@
             <span class="logo-text">Admin Panel</span>
         </div>
         <div class="header-right">
-            <a href="index.html" style="color: white; text-decoration: none; background: #1a9c5c; padding: 8px 15px; border-radius: 5px;">ওয়েবসাইটে যান</a>
+            <a href="/Views/Home/index.html" style="color: white; text-decoration: none; background: #1a9c5c; padding: 8px 15px; border-radius: 5px;">ওয়েবসাইটে যান</a>
         </div>
     </header>
 
@@ -148,17 +148,11 @@
         <div style="margin-bottom: 20px; border-bottom: 2px solid #e5e7eb;">
             <button id="tabDashboard" style="padding: 10px 20px; background: transparent; border: none; font-size: 1.1rem; font-weight: bold; color: #1a9c5c; border-bottom: 3px solid #1a9c5c; cursor: pointer;">ড্যাশবোর্ড ওভারভিউ</button>
             <button id="tabCourses" style="padding: 10px 20px; background: transparent; border: none; font-size: 1.1rem; font-weight: bold; color: #6b7280; border-bottom: 3px solid transparent; cursor: pointer;">কোর্স ম্যানেজমেন্ট</button>
-            <a href="admin-contents.html" id="tabContents" style="text-decoration: none; padding: 10px 20px; background: transparent; border: none; font-size: 1.1rem; font-weight: bold; color: #6b7280; border-bottom: 3px solid transparent; cursor: pointer; display: inline-block;">Course Contents (চ্যাপ্টার ও ভিডিও)</a>
-            
-            
-            
-            <a href="admin-success.html" id="tabSuccess" style="text-decoration: none; padding: 10px 20px; background: transparent; border: none; font-size: 1.1rem; font-weight: bold; color: #6b7280; border-bottom: 3px solid transparent; cursor: pointer; display: inline-block;">Success Students</a>
-
-            <a href="admin-about.html" id="tabAbout" style="text-decoration: none; padding: 10px 20px; background: transparent; border: none; font-size: 1.1rem; font-weight: bold; color: #6b7280; border-bottom: 3px solid transparent; cursor: pointer; display: inline-block;">About</a>
-
-            <a href="admin-freeclasses.html" id="tabFreeClasses" style="text-decoration: none; padding: 10px 20px; background: transparent; border: none; font-size: 1.1rem; font-weight: bold; color: #6b7280; border-bottom: 3px solid transparent; cursor: pointer; display: inline-block;">Free Classes</a>
-
-            <a href="admin-teachers.html" id="tabTeachers" style="text-decoration: none; padding: 10px 20px; background: transparent; border: none; font-size: 1.1rem; font-weight: bold; color: #6b7280; border-bottom: 3px solid transparent; cursor: pointer; display: inline-block;">টিচার ম্যানেজমেন্ট</a>
+            <a href="/Views/Admin/admin-contents.html" id="tabContents" style="text-decoration: none; padding: 10px 20px; background: transparent; border: none; font-size: 1.1rem; font-weight: bold; color: #6b7280; border-bottom: 3px solid transparent; cursor: pointer; display: inline-block;">Course Contents (চ্যাপ্টার ও ভিডিও)</a>
+            <a href="/Views/Admin/admin-success.html" id="tabSuccess" style="text-decoration: none; padding: 10px 20px; background: transparent; border: none; font-size: 1.1rem; font-weight: bold; color: #6b7280; border-bottom: 3px solid transparent; cursor: pointer; display: inline-block;">Success Students</a>
+            <a href="/Views/Admin/admin-about.html" id="tabAbout" style="text-decoration: none; padding: 10px 20px; background: transparent; border: none; font-size: 1.1rem; font-weight: bold; color: #6b7280; border-bottom: 3px solid transparent; cursor: pointer; display: inline-block;">About</a>
+            <a href="/Views/Admin/admin-freeclasses.html" id="tabFreeClasses" style="text-decoration: none; padding: 10px 20px; background: transparent; border: none; font-size: 1.1rem; font-weight: bold; color: #6b7280; border-bottom: 3px solid transparent; cursor: pointer; display: inline-block;">Free Classes</a>
+            <a href="/Views/Admin/admin-teachers.html" id="tabTeachers" style="text-decoration: none; padding: 10px 20px; background: transparent; border: none; font-size: 1.1rem; font-weight: bold; color: #6b7280; border-bottom: 3px solid transparent; cursor: pointer; display: inline-block;">টিচার ম্যানেজমেন্ট</a>
             <button id="tabPayments" style="padding: 10px 20px; background: transparent; border: none; font-size: 1.1rem; font-weight: bold; color: #6b7280; border-bottom: 3px solid transparent; cursor: pointer;">পেমেন্ট রিকোয়েস্ট (Pending)</button>
         </div>
 
@@ -226,21 +220,21 @@
                         Quick Actions
                     </h3>
                     <div style="display: flex; flex-direction: column; gap: 12px; flex-grow: 1;">
-                        <button onclick="document.querySelector('ul.k-widget li:nth-child(2)').click()" class="stat-card" style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 15px; text-align: left; display: flex; align-items: center; gap: 15px; cursor: pointer;">
+                        <button onclick="$('#tabCourses').click()" class="stat-card" style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 15px; text-align: left; display: flex; align-items: center; gap: 15px; cursor: pointer;">
                             <div style="background: #dbeafe; color: #2563eb; width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;"><i class="fa-solid fa-book-medical"></i></div>
                             <div>
                                 <h4 style="margin: 0; color: #1e293b; font-size: 0.95rem; font-weight: 600;">Manage Courses</h4>
                                 <p style="margin: 3px 0 0; color: #64748b; font-size: 0.8rem;">Add or edit your courses</p>
                             </div>
                         </button>
-                        <button onclick="document.querySelector('ul.k-widget li:nth-child(4)').click()" class="stat-card" style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 15px; text-align: left; display: flex; align-items: center; gap: 15px; cursor: pointer;">
+                        <button onclick="$('#tabPayments').click()" class="stat-card" style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 15px; text-align: left; display: flex; align-items: center; gap: 15px; cursor: pointer;">
                             <div style="background: #ffedd5; color: #ea580c; width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;"><i class="fa-solid fa-clock-rotate-left"></i></div>
                             <div>
                                 <h4 style="margin: 0; color: #1e293b; font-size: 0.95rem; font-weight: 600;">Pending Requests</h4>
                                 <p style="margin: 3px 0 0; color: #64748b; font-size: 0.8rem;">Review student payments</p>
                             </div>
                         </button>
-                        <button onclick="window.open('/', '_blank')" class="stat-card" style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 15px; text-align: left; display: flex; align-items: center; gap: 15px; cursor: pointer;">
+                        <button onclick="window.open('/Views/Home/index.html', '_blank')" class="stat-card" style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 15px; text-align: left; display: flex; align-items: center; gap: 15px; cursor: pointer;">
                             <div style="background: #dcfce7; color: #16a34a; width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;"><i class="fa-solid fa-globe"></i></div>
                             <div>
                                 <h4 style="margin: 0; color: #1e293b; font-size: 0.95rem; font-weight: 600;">View Website</h4>
@@ -257,7 +251,7 @@
                             <span style="background: #e0e7ff; color: #4f46e5; padding: 5px 10px; border-radius: 8px;"><i class="fa-solid fa-history"></i></span>
                             Recent Enrollments
                         </h3>
-                        <button onclick="document.querySelector('ul.k-widget li:nth-child(4)').click()" style="background: none; border: none; color: #3b82f6; font-size: 0.85rem; font-weight: 600; cursor: pointer;">View All &rarr;</button>
+                        <button onclick="$('#tabPayments').click()" style="background: none; border: none; color: #3b82f6; font-size: 0.85rem; font-weight: 600; cursor: pointer;">View All &rarr;</button>
                     </div>
                     <div id="recentActivityList" style="display: flex; flex-direction: column; gap: 15px;">
                         <div style="text-align: center; color: #94a3b8; padding: 20px;">Loading recent activity...</div>
@@ -266,7 +260,6 @@
             </div>
         </div>
 
-        <!-- Courses View -->
         <!-- Courses View -->
         <div id="viewCourses" style="display: none; animation: fadeIn 0.4s ease;">
             <div style="background: white; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); overflow: hidden; margin-top: 10px; border: 1px solid #f3f4f6;">
@@ -280,7 +273,6 @@
             </div>
         </div>
 
-        <!-- Payments View -->
         <!-- Payments View -->
         <div id="viewPayments" style="display: none; animation: fadeIn 0.4s ease;">
             <div style="background: white; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); overflow: hidden; margin-top: 10px; border: 1px solid #f3f4f6;">
@@ -310,308 +302,6 @@
         </div>
     </main>
 
-    <script>
-        // @ts-nocheck
-        $(document).ready(function () {
-            // Tab Switching Logic
-            function resetTabs() {
-                $('#tabDashboard, #tabCourses, #tabPayments').css({color: '#6b7280', borderBottom: '3px solid transparent'});
-                $('#viewDashboard, #viewCourses, #viewPayments').hide();
-            }
-
-            $('#tabDashboard').click(function() {
-                resetTabs();
-                $(this).css({color: '#1a9c5c', borderBottom: '3px solid #1a9c5c'});
-                $('#viewDashboard').show();
-                loadDashboardStats();
-            });
-
-            $('#tabCourses').click(function() {
-                resetTabs();
-                $(this).css({color: '#1a9c5c', borderBottom: '3px solid #1a9c5c'});
-                $('#viewCourses').show();
-            });
-
-            $('#tabPayments').click(function() {
-                resetTabs();
-                $(this).css({color: '#1a9c5c', borderBottom: '3px solid #1a9c5c'});
-                $('#viewPayments').show();
-                loadPayments();
-            });
-
-            // Kendo Grid initialization
-            $("#grid").kendoGrid({
-                dataSource: {
-                    transport: {
-                        read: { url: "/api/Courses", type: "GET", dataType: "json" },
-                        update: { url: function(data) { return "/api/Courses/" + data.id; }, type: "PUT", dataType: "json", contentType: "application/json" },
-                        destroy: { url: function(data) { return "/api/Courses/" + data.id; }, type: "DELETE", dataType: "json" },
-                        create: { url: "/api/Courses", type: "POST", dataType: "json", contentType: "application/json" },
-                        parameterMap: function(options, operation) {
-                            let data = options;
-                            if (operation !== "read" && options.models) {
-                                data = options.models[0];
-                            }
-                            if (operation === "create" || operation === "update") {
-                                if (operation === "create") data.id = 0;
-                                data.features = data.features || []; // Prevent validation error
-                            }
-                            return JSON.stringify(data);
-                        }
-                    },
-                    schema: {
-                        model: {
-                            id: "id",
-                            fields: {
-                                id: { editable: false, nullable: true },
-                                title: { validation: { required: true } },
-                                description: { type: "string" },
-                                price: { type: "number", validation: { required: true, min: 0 } },
-                                imageUrl: { type: "string" },
-                                videoUrl: { type: "string" },
-                                badge: { type: "string" }
-                            }
-                        }
-                    }
-                },
-                height: 550,
-                toolbar: ["create"],
-                columns: [
-                    { field: "title", title: "Course Title" },
-                    { field: "price", title: "Price (BDT)", width: "120px" },
-                    { field: "badge", title: "Badge", width: "120px" },
-                    { 
-                        field: "description", 
-                        title: "Description", 
-                        hidden: true,
-                        editor: function(container, options) {
-                            $('<textarea data-bind="value:' + options.field + '" class="k-textbox" style="width:100%;height:100px;padding:8px;border-radius:6px;"></textarea>').appendTo(container);
-                        }
-                    },
-                    { field: "imageUrl", title: "Image URL (Thumbnail)", hidden: true },
-                    { field: "videoUrl", title: "Video URL (FB/YT)", hidden: true },
-                    { command: ["edit", "destroy"], title: "", width: "220px" }
-                ],
-                editable: "popup"
-            });
-
-            const token = localStorage.getItem('token');
-        if (!token) {
-            window.location.href = 'login.html';
-        }
-            function loadPayments() {
-                if(!token) return;
-                fetch('/api/Enrollments/admin/all', {
-                    headers: { 'Authorization': 'Bearer ' + token }
-                })
-                .then(res => res.json())
-                .then(data => {
-                    let html = '';
-                    if(data.length === 0) {
-                        html = '<tr><td colspan="7" style="padding: 20px; text-align: center;">কোনো পেমেন্ট রিকোয়েস্ট নেই।</td></tr>';
-                    } else {
-                        data.forEach(req => {
-                            let statusBadge = '';
-                            if(req.status === 'Pending') statusBadge = '<span style="background:#fef3c7; color:#92400e; padding:4px 8px; border-radius:4px; font-size:0.85rem; font-weight:600;">Pending</span>';
-                            else if(req.status === 'Approved') statusBadge = '<span style="background:#d1fae5; color:#065f46; padding:4px 8px; border-radius:4px; font-size:0.85rem; font-weight:600;">Approved</span>';
-                            else statusBadge = '<span style="background:#fee2e2; color:#991b1b; padding:4px 8px; border-radius:4px; font-size:0.85rem; font-weight:600;">Rejected</span>';
-
-                            let actionBtns = '';
-                            if(req.status === 'Pending') {
-                                actionBtns = `
-                                    <button onclick="approveReq(${req.id})" style="background:#10b981; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer; margin-right:5px;">Approve</button>
-                                    <button onclick="rejectReq(${req.id})" style="background:#ef4444; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">Reject</button>
-                                `;
-                            } else {
-                                actionBtns = `<span style="color:#6b7280; font-size:0.9rem;">No action</span>`;
-                            }
-
-                            html += `
-                                <tr style="border-bottom: 1px solid #f3f4f6;">
-                                    <td style="padding: 15px;">${new Date(req.date).toLocaleDateString()}</td>
-                                    <td style="padding: 15px; font-weight: 600;">${req.userName}</td>
-                                    <td style="padding: 15px;">${req.courseTitle}</td>
-                                    <td style="padding: 15px;">${req.phone || '-'}</td>
-                                    <td style="padding: 15px; font-family: monospace;">${req.trxId || '-'}</td>
-                                    <td style="padding: 15px;">${statusBadge}</td>
-                                    <td style="padding: 15px;">${actionBtns}</td>
-                                </tr>
-                            `;
-                        });
-                    }
-                    document.getElementById('paymentsTbody').innerHTML = html;
-                })
-                .catch(err => console.error(err));
-            }
-            
-            window.approveReq = function(id) {
-                if(!confirm("Are you sure you want to approve this payment? The student will get access.")) return;
-                fetch('/api/Enrollments/admin/approve/' + id, {
-                    method: 'PUT',
-                    headers: { 'Authorization': 'Bearer ' + token }
-                }).then(() => loadPayments());
-            };
-
-            window.rejectReq = function(id) {
-                if(!confirm("Are you sure you want to reject this payment?")) return;
-                fetch('/api/Enrollments/admin/reject/' + id, {
-                    method: 'PUT',
-                    headers: { 'Authorization': 'Bearer ' + token }
-                }).then(() => loadPayments());
-            };
-            
-            let dashboardChart = null;
-            let pieChart = null;
-
-            function loadDashboardStats() {
-                fetch('/api/Enrollments/admin/stats', {
-                    headers: { 'Authorization': 'Bearer ' + token }
-                })
-                .then(res => res.json())
-                .then(data => {
-                    $('#statStudents').text(data.totalStudents);
-                    $('#statSales').text(data.totalEnrollments);
-                    $('#statPending').text(data.pendingRequests);
-
-                    
-                    // Render Chart
-                    const ctx = document.getElementById('courseChart').getContext('2d');
-                    
-                    if (dashboardChart) {
-                        dashboardChart.destroy();
-                    }
-
-                    const labels = data.courseStats.map(c => c.courseName);
-                    const values = data.courseStats.map(c => c.enrolledCount);
-                    
-                    // Create a pattern for the background (if we wanted to go that far, but let's stick to solid colors for now)
-                    const bgColors = values.map((val, index) => {
-                        if (index === 0) return '#14532d'; // Dark Green
-                        if (index === 1) return '#6ee7b7'; // Light Green
-                        return '#e5e7eb'; // Light Gray for others
-                    });
-
-                    
-                    
-                    // Load Recent Activity
-                    fetch('/api/Enrollments/admin/payments', {
-                        headers: { 'Authorization': 'Bearer ' + token }
-                    })
-                    .then(res => res.json())
-                    .then(payments => {
-                        const list = document.getElementById('recentActivityList');
-                        list.innerHTML = '';
-                        if(!payments || payments.length === 0) {
-                            list.innerHTML = '<div style="text-align: center; color: #94a3b8; padding: 20px;">No recent enrollments found.</div>';
-                            return;
-                        }
-                        
-                        // Sort by latest and take top 4
-                        const recent = payments.reverse().slice(0, 4);
-                        recent.forEach(p => {
-                            const isApproved = p.isApproved;
-                            const statusColor = isApproved ? '#10b981' : '#f59e0b';
-                            const statusBg = isApproved ? '#d1fae5' : '#fef3c7';
-                            const statusText = isApproved ? 'Approved' : 'Pending';
-                            
-                            const html = `
-                                <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 12px; border-bottom: 1px solid #f1f5f9;">
-                                    <div style="display: flex; align-items: center; gap: 12px;">
-                                        <div style="width: 40px; height: 40px; border-radius: 50%; background: #f8fafc; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: center; color: #64748b; font-weight: bold;">
-                                            ${p.studentEmail.charAt(0).toUpperCase()}
-                                        </div>
-                                        <div>
-                                            <div style="font-weight: 600; color: #1e293b; font-size: 0.9rem;">${p.studentEmail}</div>
-                                            <div style="color: #64748b; font-size: 0.75rem;">TrxID: ${p.transactionId}</div>
-                                        </div>
-                                    </div>
-                                    <div style="background: ${statusBg}; color: ${statusColor}; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700;">
-                                        ${statusText}
-                                    </div>
-                                </div>
-                            `;
-                            list.insertAdjacentHTML('beforeend', html);
-                        });
-                    });
-
-                    // Render Pie Chart
-                    const pieCtx = document.getElementById('enrollmentPieChart').getContext('2d');
-                    if(pieChart) pieChart.destroy();
-                    const pieColors = ['#6bc117', '#14532d', '#0ea5e9', '#f59e0b', '#8b5cf6', '#ef4444', '#64748b'];
-                    pieChart = new Chart(pieCtx, {
-                        type: 'doughnut',
-                        data: {
-                            labels: labels,
-                            datasets: [{
-                                data: values,
-                                backgroundColor: pieColors,
-                                borderWidth: 0,
-                                hoverOffset: 8
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            cutout: '65%',
-                            plugins: {
-                                legend: {
-                                    position: 'bottom',
-                                    labels: { padding: 20, font: { family: "'Inter', sans-serif", size: 12 } }
-                                }
-                            }
-                        }
-                    });
-
-                    dashboardChart = new Chart(ctx, {
-                        type: 'bar',
-                        data: {
-                            labels: labels,
-                            datasets: [{
-                                label: 'মোট সেলস (এনরোলমেন্ট)',
-                                data: values,
-                                backgroundColor: bgColors,
-                                borderRadius: 100, // fully rounded pills
-                                borderSkipped: false,
-                                barThickness: 40
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: {
-                                legend: { display: false }
-                            },
-                            scales: {
-                                x: {
-                                    grid: { display: false },
-                                    border: { display: false }
-                                },
-                                y: { 
-                                    beginAtZero: true, 
-                                    ticks: { stepSize: 1, display: false },
-                                    grid: { display: false },
-                                    border: { display: false }
-                                }
-                            }
-                        }
-                    });
-                })
-                .catch(err => console.error(err));
-            }
-
-            // Load dashboard on initial page load
-            loadDashboardStats();
-        });
-    </script>
-    <script>
-        // Force remove Kendo UI license warning dynamically
-        setInterval(() => {
-            document.querySelectorAll('div').forEach(div => {
-                if (div.innerText && div.innerText.includes('No license found for Kendo UI')) {
-                    div.style.display = 'none';
-                }
-            });
-        }, 500);
-    </script>
+    <script src="/Scripts/Admin/admin.js"></script>
 </body>
 </html>

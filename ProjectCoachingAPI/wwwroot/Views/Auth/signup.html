@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - P-Coaching</title>
+    <link rel="stylesheet" href="/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .auth-container {
+            max-width: 450px;
+            margin: 4rem auto;
+            background: #fff;
+            padding: 2.5rem;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+            border: 1px solid #f0f4f8;
+        }
+
+        .auth-container h2 {
+            text-align: center;
+            font-size: 2rem;
+            color: #1f2937;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #4b5563;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            border-color: #1a9c5c;
+            box-shadow: 0 0 0 3px rgba(26, 156, 92, 0.1);
+        }
+
+        .auth-footer {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: #6b7280;
+        }
+
+        .auth-footer a {
+            color: #1a9c5c;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        #message {
+            margin-top: 1rem;
+            text-align: center;
+            font-weight: 600;
+            padding: 10px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .msg-success { background: #e6f7ef; color: #1a9c5c; }
+        .msg-error { background: #ffeae6; color: #ff5722; }
+    </style>
+</head>
+<body>
+    <header class="main-header">
+        <a href="/" class="logo" style="text-decoration: none; color: inherit;">
+            <span class="logo-icon">🎯</span>
+            <span class="logo-text">P-Coaching</span>
+        </a>
+        
+        <div class="header-right">
+            <a href="/" class="btn-login" style="border: none;">হোম পেজে ফিরে যান</a>
+        </div>
+    </header>
+
+    <main>
+        <div class="auth-container">
+            <h2>নতুন একাউন্ট খুলুন</h2>
+            
+            <form id="signupForm">
+                <div class="form-group">
+                    <label>আপনার নাম</label>
+                    <input type="text" id="name" placeholder="যেমন: রহিম মিয়া" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>ইমেইল এড্রেস</label>
+                    <input type="email" id="email" placeholder="example@gmail.com" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>পাসওয়ার্ড</label>
+                    <input type="password" id="password" placeholder="গোপন পাসওয়ার্ড দিন" required minlength="6">
+                </div>
+                
+                <button type="submit" class="btn btn-primary" id="submitBtn">সাইন আপ করুন</button>
+            </form>
+
+            <div id="message"></div>
+
+            <div class="auth-footer">
+                আগে থেকে একাউন্ট আছে? <a href="/Views/Auth/login.html">লগইন করুন</a>
+            </div>
+        </div>
+    </main>
+
+    <!-- Signup Script -->
+    <script src="/Scripts/Auth/signup.js"></script>
+</body>
+</html>

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -6,6 +6,7 @@
     <title>Register - PhysicsAcademy</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/styles.css">
     <style>
         .hero-bg {
             background: linear-gradient(135deg, #0f172a 0%, #172554 50%, #0f172a 100%);
@@ -16,7 +17,9 @@
 
     <div class="bg-white p-8 md:p-12 rounded-2xl shadow-xl max-w-md w-full border border-slate-100">
         <div class="text-center mb-8">
-            <i class="fa-solid fa-user-plus text-5xl text-blue-600 mb-4"></i>
+            <a href="/" class="text-inherit no-underline">
+                <i class="fa-solid fa-user-plus text-5xl text-blue-600 mb-4 hover:scale-105 transition-transform"></i>
+            </a>
             <h2 class="text-3xl font-bold text-slate-900">Create Account</h2>
         </div>
 
@@ -42,57 +45,11 @@
         </form>
         
         <div class="mt-6 text-center text-sm text-slate-500">
-            Already have an account? <a href="login.html" class="text-blue-600 font-bold hover:underline">Login</a>
+            Already have an account? <a href="/Views/Auth/login.html" class="text-blue-600 font-bold hover:underline">Login</a>
         </div>
     </div>
 
-    <script>
-        const existingToken = localStorage.getItem('token');
-        if (existingToken) {
-            window.location.href = 'profile.html';
-        }
-
-        document.getElementById('registerForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const btn = document.getElementById('submitBtn');
-            const errorMsg = document.getElementById('errorMsg');
-            btn.innerText = 'Creating...';
-            btn.disabled = true;
-            errorMsg.classList.add('hidden');
-
-            const username = document.getElementById('username').value;
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-
-            try {
-                const response = await fetch('/api/Auth/register', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, email, password })
-                });
-
-                if (response.ok) {
-                    window.location.href = 'login.html';
-                } else {
-                    const data = await response.json();
-                    errorMsg.innerText = data.message || "Registration failed.";
-                    errorMsg.classList.remove('hidden');
-                }
-            } catch (err) {
-                errorMsg.innerText = "Connection error.";
-                errorMsg.classList.remove('hidden');
-            } finally {
-                btn.innerText = 'Register';
-                btn.disabled = false;
-            }
-        });
-    </script>
+    <!-- Register Script -->
+    <script src="/Scripts/Auth/register.js"></script>
 </body>
 </html>
-
-
-
-
-
-
-

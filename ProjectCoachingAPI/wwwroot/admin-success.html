@@ -19,7 +19,7 @@
                 <h1 class="text-4xl font-extrabold text-white tracking-tight mb-2">Manage Success Students</h1>
                 <p class="text-purple-200 font-medium text-lg">Add and organize successful students for the homepage.</p>
             </div>
-            <a href="admin.html" class="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-sm px-6 py-3 rounded-xl font-bold transition flex items-center gap-2 shadow-lg">
+            <a href="/Views/Admin/admin.html" class="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-sm px-6 py-3 rounded-xl font-bold transition flex items-center gap-2 shadow-lg">
                 <i class="fa-solid fa-arrow-left"></i> Dashboard
             </a>
         </div>
@@ -31,35 +31,32 @@
                     <i class="fa-solid fa-trophy text-yellow-500"></i> Add New Student
                 </h2>
                 
-                
                 <form id="successForm" class="space-y-4">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="space-y-4">
                         <div>
-                            <label class="block text-sm font-bold text-slate-700 mb-2">Student Name</label>
-                            <input type="text" id="ssName" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500" required>
+                            <label class="block text-sm font-bold text-slate-700 mb-1">Student Name</label>
+                            <input type="text" id="ssName" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:border-emerald-500" required>
                         </div>
                         <div>
-                            <label class="block text-sm font-bold text-slate-700 mb-2">University / Institution</label>
-                            <input type="text" id="ssUni" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500" required>
+                            <label class="block text-sm font-bold text-slate-700 mb-1">University / Institution</label>
+                            <input type="text" id="ssUni" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:border-emerald-500" required>
                         </div>
                         <div>
-                            <label class="block text-sm font-bold text-slate-700 mb-2">Batch (e.g. HSC 2024)</label>
-                            <input type="text" id="ssBatch" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500" required>
+                            <label class="block text-sm font-bold text-slate-700 mb-1">Batch (e.g. HSC 2024)</label>
+                            <input type="text" id="ssBatch" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:border-emerald-500" required>
                         </div>
                         <div>
-                            <label class="block text-sm font-bold text-slate-700 mb-2">Student Photo (Upload or URL)</label>
-                            <div class="flex gap-2">
+                            <label class="block text-sm font-bold text-slate-700 mb-1">Student Photo</label>
+                            <div class="space-y-2">
                                 <input type="file" id="ssImgFile" accept="image/*" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 focus:outline-none focus:border-emerald-500 text-sm">
                                 <input type="text" id="ssImg" placeholder="Or paste image URL..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 focus:outline-none focus:border-emerald-500 text-sm">
                             </div>
-                            <p class="text-xs text-slate-500 mt-1">Optional. Upload a picture from your computer, or paste a link.</p>
                         </div>
                     </div>
-                    <div class="flex gap-4">
-                        <button type="submit" id="saveBtn" class="bg-emerald-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-emerald-700 transition">Add Student</button>
+                    <div class="pt-2">
+                        <button type="submit" id="saveBtn" class="w-full bg-emerald-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-emerald-700 transition">Add Student</button>
                     </div>
                 </form>
-
 
             </div>
 
@@ -77,133 +74,7 @@
         </div>
     </div>
 
-    <script>
-
-        const token = localStorage.getItem('token');
-        let editId = null;
-        if (!token) window.location.href = 'login.html';
-
-        async function loadStudents() {
-            try {
-                const res = await fetch('/api/SuccessStudents');
-                const data = await res.json();
-                const container = document.getElementById('teachersList');
-                container.innerHTML = '';
-                
-                if(data.length === 0) {
-                    container.innerHTML = '<div class="col-span-full text-center text-slate-400 py-10">No students added yet.</div>';
-                    return;
-                }
-
-                data.forEach(s => {
-                    container.innerHTML += `
-                    <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex items-center gap-6">
-                        <img src="${s.imageUrl}" class="w-20 h-20 object-cover rounded-full bg-slate-100">
-                        <div class="flex-1">
-                            <h3 class="text-xl font-bold text-slate-800">${s.name}</h3>
-                            <p class="text-emerald-600 font-bold">${s.institution}</p>
-                            <p class="text-slate-500 text-sm mt-1">${s.batch}</p>
-                        </div>
-                        
-                        <div class="flex gap-2">
-                                <button onclick="editStudent(${s.id}, '${s.name.replace(/'/g, "\'")}', '${s.institution.replace(/'/g, "\'")}', '${s.batch.replace(/'/g, "\'")}', '${s.imageUrl.replace(/'/g, "\'")}')" class="bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white px-4 py-2 rounded-xl font-bold transition">Edit</button>
-                                <button onclick="deleteStudent(${s.id})" class="bg-red-50 text-red-500 hover:bg-red-500 hover:text-white px-4 py-2 rounded-xl font-bold transition">Delete</button>
-                            </div>
-
-                        </div>
-
-                        </div>
-
-                    </div>`;
-                });
-            } catch (err) {
-                console.error(err);
-            }
-        }
-
-        document.getElementById('successForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const fileInput = document.getElementById('ssImgFile');
-            let editId = null;
-            let imageUrl = document.getElementById('ssImg').value;
-
-            if (fileInput.files.length > 0) {
-                const formData = new FormData();
-                formData.append('file', fileInput.files[0]);
-                
-                try {
-                    const uploadRes = await fetch('/api/Uploads', {
-                        method: 'POST',
-                        headers: { 'Authorization': 'Bearer ' + token },
-                        body: formData
-                    });
-                    if (uploadRes.ok) {
-                        const uploadData = await uploadRes.json();
-                        imageUrl = uploadData.url;
-                    }
-                } catch (e) {
-                    console.error("Upload failed", e);
-                }
-            }
-
-            // Fallback image if both are empty
-            if (!imageUrl || imageUrl.trim() === '') {
-                imageUrl = 'https://via.placeholder.com/150?text=Student';
-            }
-
-            const payload = {
-                name: document.getElementById('ssName').value,
-                institution: document.getElementById('ssUni').value,
-                batch: document.getElementById('ssBatch').value,
-                imageUrl: imageUrl,
-                orderIndex: 0
-            };
-
-            if (editId) {
-                payload.id = editId;
-                await fetch('/api/SuccessStudents/' + editId, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-                    body: JSON.stringify(payload)
-                });
-                editId = null;
-                document.getElementById('saveBtn').innerText = 'Add Student';
-            } else {
-                await fetch('/api/SuccessStudents', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-                    body: JSON.stringify(payload)
-                });
-            }
-
-            document.getElementById('successForm').reset();
-            document.getElementById('ssImgFile').value = '';
-            loadStudents();
-        });
-
-        
-        function editStudent(id, name, institution, batch, img) {
-            editId = id;
-            document.getElementById('ssName').value = name;
-            document.getElementById('ssUni').value = institution;
-            document.getElementById('ssBatch').value = batch;
-            document.getElementById('ssImg').value = img;
-            document.getElementById('saveBtn').innerText = 'Update Student';
-            document.getElementById('saveBtn').scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-
-        async function deleteStudent(id) {
-            if(!confirm("Are you sure?")) return;
-            await fetch('/api/SuccessStudents/' + id, {
-                method: 'DELETE',
-                headers: { 'Authorization': 'Bearer ' + token }
-            });
-            loadStudents();
-        }
-
-        loadStudents();
-
-</script>
+    <!-- Scripts -->
+    <script src="/Scripts/Admin/admin-success.js"></script>
 </body>
 </html>

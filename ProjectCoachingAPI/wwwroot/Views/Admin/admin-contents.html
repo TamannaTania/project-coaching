@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Course Contents</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+    </style>
+</head>
+<body class="text-slate-900 p-8">
+
+    <div class="max-w-5xl mx-auto">
+        <div class="flex justify-between items-center mb-10 bg-gradient-to-br from-indigo-900 to-blue-700 p-8 rounded-3xl shadow-xl border border-indigo-800/50">
+            <div>
+                <h1 class="text-4xl font-extrabold text-white tracking-tight mb-2">Manage Contents</h1>
+                <p class="text-indigo-200 font-medium text-lg">Organize chapters and upload videos/PDFs for your courses.</p>
+            </div>
+            <a href="/Views/Admin/admin.html" class="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-sm px-6 py-3 rounded-xl font-bold transition flex items-center gap-2 shadow-lg">
+                <i class="fa-solid fa-arrow-left"></i> Dashboard
+            </a>
+        </div>
+
+        <!-- Course Selector -->
+        <div class="bg-white p-8 rounded-2xl shadow-md border border-slate-100 mb-10">
+            <label class="block text-sm font-bold text-slate-700 mb-3 uppercase tracking-wider">Select a Course to Edit</label>
+            <div class="relative w-full" id="customDropdown">
+                <input type="hidden" id="courseSelect">
+                <button type="button" onclick="toggleDropdown()" id="dropdownTrigger" class="w-full flex justify-between items-center bg-slate-50 border-2 border-slate-200 rounded-xl px-5 py-4 text-lg font-medium text-slate-800 hover:border-emerald-400 focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-50 transition-all shadow-sm">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-sm"><i class="fa-solid fa-book"></i></div>
+                        <span id="dropdownSelectedText">-- Choose a Course --</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-down text-slate-400 transition-transform duration-300" id="dropdownIcon"></i>
+                </button>
+                
+                <div id="dropdownMenu" class="absolute z-50 w-full mt-2 bg-white border border-slate-100 rounded-xl shadow-2xl overflow-hidden hidden transform origin-top transition-all duration-200 scale-95 opacity-0" style="max-height: 300px; overflow-y: auto;">
+                    <div class="p-2 space-y-1" id="dropdownOptions">
+                        <!-- Options will be injected here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="contentArea" class="hidden space-y-8 animate-fade-in">
+            <div class="flex justify-between items-center border-b-2 border-slate-200 pb-4">
+                <h2 class="text-2xl font-extrabold text-slate-800 flex items-center gap-3">
+                    <i class="fa-solid fa-layer-group text-emerald-500"></i>
+                    <span id="courseTitleDisplay">Chapters</span>
+                </h2>
+                <button onclick="showChapterModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl font-bold transition shadow-lg shadow-emerald-200 flex items-center gap-2 transform hover:-translate-y-0.5">
+                    <i class="fa-solid fa-folder-plus"></i> Add New Chapter
+                </button>
+            </div>
+
+            <div class="mb-6 relative">
+                <input type="text" id="adminSearch" onkeyup="filterAdminChapters()" placeholder="Search chapters, videos, or PDFs..." class="w-full bg-white border border-slate-200 rounded-xl pl-12 pr-4 py-3 font-medium focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 shadow-sm transition">
+                <i class="fa-solid fa-search absolute left-4 top-3.5 text-slate-400"></i>
+            </div>
+
+            <div id="chaptersContainer" class="space-y-6">
+                <!-- Chapters will be rendered here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Add / Edit Chapter Modal -->
+    <div id="chapterModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+        <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md transform transition-all">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-slate-800" id="chapterModalTitle">Add Chapter</h3>
+                <button onclick="hideChapterModal()" class="text-slate-400 hover:text-slate-600 text-xl"><i class="fa-solid fa-times"></i></button>
+            </div>
+            <input type="hidden" id="chapterEditId">
+            <div class="space-y-5">
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">Chapter Title</label>
+                    <input type="text" id="chapterTitle" placeholder="e.g. Chapter 1: Introduction" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500 font-medium">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">Order Index (Sort Order)</label>
+                    <input type="number" id="chapterOrder" value="1" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500 font-medium">
+                </div>
+                <div class="pt-2">
+                    <button id="chapterModalSubmitBtn" onclick="saveChapter()" class="w-full bg-emerald-600 text-white py-3.5 rounded-xl font-bold hover:bg-emerald-700 transition shadow-lg shadow-emerald-200">Save Chapter</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add / Edit Content Modal -->
+    <div id="contentModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+        <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md transform transition-all">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-slate-800" id="contentModalTitle">Add Content</h3>
+                <button onclick="hideContentModal()" class="text-slate-400 hover:text-slate-600 text-xl"><i class="fa-solid fa-times"></i></button>
+            </div>
+            <input type="hidden" id="contentChapterId">
+            <input type="hidden" id="contentEditId">
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">Type</label>
+                    <div class="relative">
+                        <select id="contentType" class="w-full appearance-none bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-medium focus:outline-none focus:border-emerald-500">
+                            <option value="Video">📺 Video Link (YouTube/Vimeo/MP4)</option>
+                            <option value="PDF">📄 PDF Document Link</option>
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-500"><i class="fa-solid fa-chevron-down"></i></div>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">Content Title</label>
+                    <input type="text" id="contentTitle" placeholder="e.g. Lecture 1: Motion" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500 font-medium">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2 flex justify-between items-center">
+                        <span>URL / Link</span>
+                        <span class="text-xs text-blue-700 cursor-pointer font-bold bg-blue-100 hover:bg-blue-200 transition px-3 py-1 rounded-md" onclick="document.getElementById('contentFileInput').click()">
+                            <i class="fa-solid fa-cloud-arrow-up"></i> Upload File Instead
+                        </span>
+                    </label>
+                    <input type="text" id="contentUrl" placeholder="https://... or click Upload" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500 font-medium transition-colors">
+                    <input type="file" id="contentFileInput" class="hidden" onchange="handleFileUpload(this)">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">Order Index</label>
+                    <input type="number" id="contentOrder" value="1" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500 font-medium">
+                </div>
+                <div class="pt-4">
+                    <button id="contentModalSubmitBtn" onclick="saveContent()" class="w-full bg-emerald-600 text-white py-3.5 rounded-xl font-bold hover:bg-emerald-700 transition shadow-lg shadow-emerald-200">Save Content</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/Scripts/Admin/admin-contents.js"></script>
+</body>
+</html>
