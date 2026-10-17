@@ -65,20 +65,10 @@ namespace ProjectCoachingAPI.Controllers
                 }
 
                 bool passwordValid = !string.IsNullOrEmpty(user.PasswordHash) && BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash);
-                if (!passwordValid)
-                {
-                    var fallbackPasswords = new[] { "123456", "password", "12345678", "test1234", "tania", "Tania", "admin" };
-                    if (fallbackPasswords.Contains(request.Password) || (request.Password.Length >= 4 && user.Role != "Admin"))
-                    {
-                        user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
-                        await _context.SaveChangesAsync();
-                        passwordValid = true;
-                    }
-                }
 
                 if (!passwordValid)
                 {
-                    return BadRequest("Wrong password!");
+                    return BadRequest("ভুল পাসওয়ার্ড! অনুগ্রহ করে সঠিক পাসওয়ার্ড দিন।");
                 }
 
                 // --- Device Limit Logic ---
@@ -299,6 +289,70 @@ namespace ProjectCoachingAPI.Controllers
             }
             await _context.SaveChangesAsync();
             return Ok("All device limits have been reset! You can now log in from any device.");
+        }
+
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto dto)
+        {
+            var search = (dto.Email ?? "").Trim().ToLower();
+            if (string.IsNullOrEmpty(search))
+            {
+                return BadRequest("অনুগ্রহ করে আপনার নিবন্ধিত ইমেইল বা ইউজারনেম দিন।");
+            }
+
+            var user = await _context.Users.FirstOrDefaultAsync(u => 
+                (u.Email != null && u.Email.ToLower() == search) || 
+                (u.Name != null && u.Name.ToLower() == search)
+            );
+
+            if (user == null)
+            {
+                return NotFound("এই ইমেইল বা ইউজারনেম দিয়ে কোনো অ্যাকাউন্ট খুঁজে পাওয়া যায়নি!");
+            }
+
+            return Ok(new { 
+                success = true, 
+                message = "অ্যাকাউন্ট ভেরিফাই করা হয়েছে! এবার আপনার নতুন পাসওয়ার্ড দিন।",
+                email = user.Email
+            });
+        }
+
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto dto)
+        {
+            var search = (dto.Email ?? "").Trim().ToLower();
+            if (string.IsNullOrEmpty(search))
+            {
+                return BadRequest("ইমেইল ঠিকানা দেওয়া হয়নি।");
+            }
+
+            if (string.IsNullOrEmpty(dto.NewPassword) || dto.NewPassword.Length < 4)
+            {
+                return BadRequest("নতুন পাসওয়ার্ড কমপক্ষে ৪ অক্ষরের হতে হবে।");
+            }
+
+            if (!string.IsNullOrEmpty(dto.ConfirmPassword) && dto.NewPassword != dto.ConfirmPassword)
+            {
+                return BadRequest("নতুন পাসওয়ার্ড এবং কনফার্ম পাসওয়ার্ড মিলছে না!");
+            }
+
+            var user = await _context.Users.FirstOrDefaultAsync(u => 
+                (u.Email != null && u.Email.ToLower() == search) || 
+                (u.Name != null && u.Name.ToLower() == search)
+            );
+
+            if (user == null)
+            {
+                return NotFound("ব্যবহারকারী খুঁজে পাওয়া যায়নি!");
+            }
+
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { 
+                success = true, 
+                message = "আপনার পাসওয়ার্ড সফলভাবে পরিবর্তন করা হয়েছে! এখন নতুন পাসওয়ার্ড দিয়ে লগইন করুন।" 
+            });
         }
     }
 }

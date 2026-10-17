@@ -57,6 +57,16 @@ async function doLogin(forceLogin = false) {
             localStorage.setItem('username', data.username || email);
             localStorage.setItem('email', data.email || email);
             if (data.deviceId) localStorage.setItem('deviceId', data.deviceId);
+
+            // Handle Remember Me
+            const rememberCheckbox = document.getElementById('rememberMe');
+            if (rememberCheckbox && rememberCheckbox.checked) {
+                localStorage.setItem('remember_me', 'true');
+                localStorage.setItem('remembered_username', email);
+            } else {
+                localStorage.removeItem('remember_me');
+                localStorage.removeItem('remembered_username');
+            }
             
             const returnUrl = urlParams.get('returnUrl');
             if (returnUrl) {
@@ -84,6 +94,20 @@ async function doLogin(forceLogin = false) {
     }
 }
 
+// Remember Me Auto-fill on Load
+const rememberCheckbox = document.getElementById('rememberMe');
+const usernameInput = document.getElementById('username');
+const passwordInput = document.getElementById('password');
+
+if (localStorage.getItem('remember_me') === 'true') {
+    const savedUsername = localStorage.getItem('remembered_username');
+    if (savedUsername && usernameInput) {
+        usernameInput.value = savedUsername;
+        if (rememberCheckbox) rememberCheckbox.checked = true;
+        if (passwordInput) setTimeout(() => passwordInput.focus(), 150);
+    }
+}
+
 const loginForm = document.getElementById('loginForm');
 if (loginForm) {
     loginForm.addEventListener('submit', (e) => {
@@ -96,5 +120,192 @@ const forceBtn = document.getElementById('forceLoginBtn');
 if (forceBtn) {
     forceBtn.addEventListener('click', () => {
         doLogin(true);
+    });
+}
+
+// --- Forgot Password Modal Logic (Multi-step interactive reset) ---
+const forgotBtn = document.getElementById('forgotPasswordBtn');
+const forgotModal = document.getElementById('forgotPasswordModal');
+const closeForgotModal = document.getElementById('closeForgotModal');
+const forgotEmailInput = document.getElementById('forgotEmailInput');
+const verifyAccountBtn = document.getElementById('verifyAccountBtn');
+const forgotAlert = document.getElementById('forgotAlert');
+
+const forgotStep1 = document.getElementById('forgotStep1');
+const forgotStep2 = document.getElementById('forgotStep2');
+const forgotStep3 = document.getElementById('forgotStep3');
+const verifiedUserEmail = document.getElementById('verifiedUserEmail');
+
+const newPasswordInput = document.getElementById('newPasswordInput');
+const confirmPasswordInput = document.getElementById('confirmPasswordInput');
+const step2Alert = document.getElementById('step2Alert');
+const backToStep1Btn = document.getElementById('backToStep1Btn');
+const saveNewPasswordBtn = document.getElementById('saveNewPasswordBtn');
+const useNewPasswordToLoginBtn = document.getElementById('useNewPasswordToLoginBtn');
+
+let activeVerifiedEmail = '';
+
+function resetForgotModalState() {
+    if (forgotStep1) forgotStep1.classList.remove('hidden');
+    if (forgotStep2) forgotStep2.classList.add('hidden');
+    if (forgotStep3) forgotStep3.classList.add('hidden');
+    if (forgotAlert) forgotAlert.classList.add('hidden');
+    if (step2Alert) step2Alert.classList.add('hidden');
+    if (newPasswordInput) newPasswordInput.value = '';
+    if (confirmPasswordInput) confirmPasswordInput.value = '';
+}
+
+function showForgotModal() {
+    if (!forgotModal) return;
+    resetForgotModalState();
+    if (usernameInput && usernameInput.value.trim() && forgotEmailInput) {
+        forgotEmailInput.value = usernameInput.value.trim();
+    }
+    forgotModal.classList.remove('hidden');
+    if (forgotEmailInput) setTimeout(() => forgotEmailInput.focus(), 150);
+}
+
+function hideForgotModal() {
+    if (forgotModal) forgotModal.classList.add('hidden');
+}
+
+if (forgotBtn) {
+    forgotBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        showForgotModal();
+    });
+}
+
+if (closeForgotModal) closeForgotModal.addEventListener('click', hideForgotModal);
+if (forgotModal) {
+    forgotModal.addEventListener('click', (e) => {
+        if (e.target === forgotModal) hideForgotModal();
+    });
+}
+
+// Step 1: Verify Account
+if (verifyAccountBtn) {
+    verifyAccountBtn.addEventListener('click', async () => {
+        const email = forgotEmailInput ? forgotEmailInput.value.trim() : '';
+        if (!email) {
+            if (forgotAlert) {
+                forgotAlert.className = 'mb-4 p-3 rounded-lg text-sm font-medium bg-red-50 text-red-600 block';
+                forgotAlert.innerText = 'অনুগ্রহ করে আপনার ইমেইল বা ইউজারনেম দিন।';
+            }
+            return;
+        }
+
+        verifyAccountBtn.disabled = true;
+        verifyAccountBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> যাচাই করা হচ্ছে...';
+        if (forgotAlert) forgotAlert.classList.add('hidden');
+
+        try {
+            const res = await fetch('/api/Auth/forgot-password', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email })
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                activeVerifiedEmail = data.email || email;
+                if (verifiedUserEmail) verifiedUserEmail.innerText = activeVerifiedEmail;
+                if (forgotStep1) forgotStep1.classList.add('hidden');
+                if (forgotStep2) forgotStep2.classList.remove('hidden');
+                if (newPasswordInput) setTimeout(() => newPasswordInput.focus(), 150);
+            } else {
+                const errText = await res.text();
+                if (forgotAlert) {
+                    forgotAlert.className = 'mb-4 p-3 rounded-lg text-sm font-medium bg-red-50 text-red-600 block';
+                    forgotAlert.innerText = errText || 'কোনো অ্যাকাউন্ট খুঁজে পাওয়া যায়নি।';
+                }
+            }
+        } catch (err) {
+            if (forgotAlert) {
+                forgotAlert.className = 'mb-4 p-3 rounded-lg text-sm font-medium bg-red-50 text-red-600 block';
+                forgotAlert.innerText = 'সার্ভার সংযোগে সমস্যা হয়েছে। আবার চেষ্টা করুন।';
+            }
+        } finally {
+            verifyAccountBtn.disabled = false;
+            verifyAccountBtn.innerHTML = '<span>অ্যাকাউন্ট যাচাই করুন</span> <i class="fa-solid fa-arrow-right text-xs"></i>';
+        }
+    });
+}
+
+// Step 2: Back to Step 1
+if (backToStep1Btn) {
+    backToStep1Btn.addEventListener('click', () => {
+        if (forgotStep2) forgotStep2.classList.add('hidden');
+        if (forgotStep1) forgotStep1.classList.remove('hidden');
+    });
+}
+
+// Step 2: Save New Password
+if (saveNewPasswordBtn) {
+    saveNewPasswordBtn.addEventListener('click', async () => {
+        const newPassword = newPasswordInput ? newPasswordInput.value : '';
+        const confirmPassword = confirmPasswordInput ? confirmPasswordInput.value : '';
+
+        if (!newPassword || newPassword.length < 4) {
+            if (step2Alert) {
+                step2Alert.className = 'p-3 rounded-lg text-sm font-medium bg-red-50 text-red-600 block';
+                step2Alert.innerText = 'পাসওয়ার্ড কমপক্ষে ৪ অক্ষরের হতে হবে।';
+            }
+            return;
+        }
+
+        if (newPassword !== confirmPassword) {
+            if (step2Alert) {
+                step2Alert.className = 'p-3 rounded-lg text-sm font-medium bg-red-50 text-red-600 block';
+                step2Alert.innerText = 'কনফার্ম পাসওয়ার্ডের সাথে নতুন পাসওয়ার্ড মেলেনি!';
+            }
+            return;
+        }
+
+        saveNewPasswordBtn.disabled = true;
+        saveNewPasswordBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> সেভ হচ্ছে...';
+        if (step2Alert) step2Alert.classList.add('hidden');
+
+        try {
+            const res = await fetch('/api/Auth/reset-password', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    email: activeVerifiedEmail,
+                    newPassword: newPassword,
+                    confirmPassword: confirmPassword
+                })
+            });
+
+            if (res.ok) {
+                if (forgotStep2) forgotStep2.classList.add('hidden');
+                if (forgotStep3) forgotStep3.classList.remove('hidden');
+            } else {
+                const errText = await res.text();
+                if (step2Alert) {
+                    step2Alert.className = 'p-3 rounded-lg text-sm font-medium bg-red-50 text-red-600 block';
+                    step2Alert.innerText = errText || 'পাসওয়ার্ড রিসেট ব্যর্থ হয়েছে।';
+                }
+            }
+        } catch (err) {
+            if (step2Alert) {
+                step2Alert.className = 'p-3 rounded-lg text-sm font-medium bg-red-50 text-red-600 block';
+                step2Alert.innerText = 'সার্ভারে সংযোগ দেওয়া যায়নি।';
+            }
+        } finally {
+            saveNewPasswordBtn.disabled = false;
+            saveNewPasswordBtn.innerHTML = '<span>পাসওয়ার্ড সেভ করুন</span> <i class="fa-solid fa-check text-xs"></i>';
+        }
+    });
+}
+
+// Step 3: Login with New Password
+if (useNewPasswordToLoginBtn) {
+    useNewPasswordToLoginBtn.addEventListener('click', () => {
+        hideForgotModal();
+        if (usernameInput) usernameInput.value = activeVerifiedEmail;
+        if (passwordInput && newPasswordInput) passwordInput.value = newPasswordInput.value;
+        const loginBtn = document.getElementById('submitBtn');
+        if (loginBtn) loginBtn.focus();
     });
 }
