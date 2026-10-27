@@ -4,7 +4,17 @@ using Microsoft.IdentityModel.Tokens;
 using ProjectCoachingAPI.Data;
 using System.Text;
 
-var builder = WebApplication.CreateBuilder(args);
+var contentRoot = AppContext.BaseDirectory;
+var wwwrootCandidate = System.IO.Path.Combine(contentRoot, "wwwroot");
+var webRoot = System.IO.Directory.Exists(wwwrootCandidate) ? wwwrootCandidate : contentRoot;
+
+var webAppOptions = new WebApplicationOptions
+{
+    Args = args,
+    ContentRootPath = contentRoot,
+    WebRootPath = webRoot
+};
+var builder = WebApplication.CreateBuilder(webAppOptions);
 
 // Add Database Context
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -50,8 +60,23 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-app.UseDefaultFiles();
+var defaultFileOptions = new DefaultFilesOptions();
+defaultFileOptions.DefaultFileNames.Clear();
+defaultFileOptions.DefaultFileNames.Add("index.html");
+app.UseDefaultFiles(defaultFileOptions);
+
 app.UseStaticFiles();
+
+// Support static files placed directly in application root as well as wwwroot
+try
+{
+    app.UseStaticFiles(new StaticFileOptions
+    {
+        FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(contentRoot),
+        RequestPath = ""
+    });
+}
+catch { }
 
 app.UseCors("AllowAll");
 // Do not redirect to HTTPS locally so API calls on http://localhost:3340 work seamlessly
@@ -62,5 +87,36 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+// Explicit handler for root / and /index.html
+app.MapGet("/", async context =>
+{
+    string indexPath = System.IO.Path.Combine(webRoot, "index.html");
+    if (!System.IO.File.Exists(indexPath)) indexPath = System.IO.Path.Combine(contentRoot, "index.html");
+    if (System.IO.File.Exists(indexPath))
+    {
+        context.Response.ContentType = "text/html; charset=utf-8";
+        await context.Response.SendFileAsync(indexPath);
+    }
+    else
+    {
+        context.Response.StatusCode = 404;
+        await context.Response.WriteAsync("PhysicsClassroom: index.html not found.");
+    }
+});
+
+app.MapGet("/index.html", async context =>
+{
+    string indexPath = System.IO.Path.Combine(webRoot, "index.html");
+    if (!System.IO.File.Exists(indexPath)) indexPath = System.IO.Path.Combine(contentRoot, "index.html");
+    if (System.IO.File.Exists(indexPath))
+    {
+        context.Response.ContentType = "text/html; charset=utf-8";
+        await context.Response.SendFileAsync(indexPath);
+    }
+});
+
+// Fallback to index.html for root or SPA paths
+app.MapFallbackToFile("index.html");
 
 app.Run();

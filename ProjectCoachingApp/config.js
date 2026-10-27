@@ -1,9 +1,9 @@
-import { Platform } from 'react-native';
+﻿import { Platform } from 'react-native';
 
 // Use localhost for web, and PC's local IP for mobile (Expo Go)
 // Important: Replace 192.168.0.165 with your actual IPv4 address if it changes!
-const IP_ADDRESS = '192.168.0.165'; //home
-//const IP_ADDRESS = '192.168.1.102'; //azolution
+//const IP_ADDRESS = '192.168.0.165'; //home
+const IP_ADDRESS = '192.168.1.102'; //azolution
 
 
 export const API_HOST = Platform.OS === 'web' 

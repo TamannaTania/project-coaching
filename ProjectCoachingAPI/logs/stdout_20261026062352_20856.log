@@ -1,0 +1,221 @@
+warn: Microsoft.EntityFrameworkCore.Model.Validation[30000]
+      No store type was specified for the decimal property 'Price' on entity type 'Course'. This will cause values to be silently truncated if they do not fit in the default precision and scale. Explicitly specify the SQL server column type that can accommodate all the values in 'OnModelCreating' using 'HasColumnType', specify precision and scale using 'HasPrecision', or configure a value converter using 'HasConversion'.
+warn: Microsoft.EntityFrameworkCore.Query[10103]
+      The query uses the 'First'/'FirstOrDefault' operator without 'OrderBy' and filter operators. This may lead to unpredictable results.
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (275ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [t].[Id], [t].[Bio], [t].[CreatedAt], [t].[Designation], [t].[FacebookUrl], [t].[ImageUrl], [t].[LinkedInUrl], [t].[Name], [t].[Subject]
+      FROM [Teachers] AS [t]
+      ORDER BY [t].[Id] DESC
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (151ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [s].[Id], [s].[Batch], [s].[ImageUrl], [s].[Institution], [s].[Name], [s].[OrderIndex]
+      FROM [SuccessStudents] AS [s]
+      ORDER BY [s].[OrderIndex]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (108ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [f].[Id], [f].[Category], [f].[Description], [f].[OrderIndex], [f].[ThumbnailUrl], [f].[Title], [f].[VideoUrl]
+      FROM [FreeClasses] AS [f]
+      ORDER BY [f].[OrderIndex], [f].[Id] DESC
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (305ms) [Parameters=[@ToLower='?' (Size = 4000)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(1) [u].[Id], [u].[DeviceId], [u].[Email], [u].[Name], [u].[PasswordHash], [u].[Role]
+      FROM [Users] AS [u]
+      WHERE LOWER([u].[Email]) = @ToLower OR LOWER([u].[Name]) = @ToLower
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (455ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(1) [a].[Id], [a].[Description], [a].[ImageUrl], [a].[Title]
+      FROM [AboutContents] AS [a]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (170ms) [Parameters=[@ToLower='?' (Size = 4000)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(1) [u].[Id], [u].[DeviceId], [u].[Email], [u].[Name], [u].[PasswordHash], [u].[Role]
+      FROM [Users] AS [u]
+      WHERE LOWER([u].[Email]) = @ToLower OR LOWER([u].[Name]) = @ToLower
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (55ms) [Parameters=[@user_Id='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [e].[CourseId] AS [courseId], [c].[Title] AS [title], [c].[ImageUrl] AS [imageUrl], [e].[Status] AS [status], [e].[TrxId] AS [trxId], [e].[EnrollmentDate] AS [enrollmentDate], [c].[Id] AS [id], [c].[Price] AS [price], [c].[Description] AS [description]
+      FROM [Enrollments] AS [e]
+      INNER JOIN [Courses] AS [c] ON [e].[CourseId] = [c].[Id]
+      WHERE [e].[UserId] = @user_Id
+      ORDER BY [e].[EnrollmentDate] DESC
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (5ms) [Parameters=[@ToLower='?' (Size = 4000)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(1) [u].[Id], [u].[DeviceId], [u].[Email], [u].[Name], [u].[PasswordHash], [u].[Role]
+      FROM [Users] AS [u]
+      WHERE LOWER([u].[Email]) = @ToLower OR LOWER([u].[Name]) = @ToLower
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (11ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [c].[Id], [c].[Badge], [c].[Description], [c].[ImageUrl], [c].[Price], [c].[Title], [c].[VideoUrl], [c0].[Id], [c0].[CourseId], [c0].[FeatureText]
+      FROM [Courses] AS [c]
+      LEFT JOIN [CourseFeatures] AS [c0] ON [c].[Id] = [c0].[CourseId]
+      ORDER BY [c].[Id]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (4ms) [Parameters=[@ToLower='?' (Size = 4000)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(1) [u].[Id], [u].[DeviceId], [u].[Email], [u].[Name], [u].[PasswordHash], [u].[Role]
+      FROM [Users] AS [u]
+      WHERE LOWER([u].[Email]) = @ToLower OR LOWER([u].[Name]) = @ToLower
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (6ms) [Parameters=[@ToLower='?' (Size = 4000)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(1) [u].[Id], [u].[DeviceId], [u].[Email], [u].[Name], [u].[PasswordHash], [u].[Role]
+      FROM [Users] AS [u]
+      WHERE LOWER([u].[Email]) = @ToLower OR LOWER([u].[Name]) = @ToLower
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (8ms) [Parameters=[@ToLower='?' (Size = 4000)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(1) [u].[Id], [u].[DeviceId], [u].[Email], [u].[Name], [u].[PasswordHash], [u].[Role]
+      FROM [Users] AS [u]
+      WHERE LOWER([u].[Email]) = @ToLower OR LOWER([u].[Name]) = @ToLower
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (10ms) [Parameters=[@ToLower='?' (Size = 4000)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(1) [u].[Id], [u].[DeviceId], [u].[Email], [u].[Name], [u].[PasswordHash], [u].[Role]
+      FROM [Users] AS [u]
+      WHERE LOWER([u].[Email]) = @ToLower OR LOWER([u].[Name]) = @ToLower
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (9ms) [Parameters=[@ToLower='?' (Size = 4000)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(1) [u].[Id], [u].[DeviceId], [u].[Email], [u].[Name], [u].[PasswordHash], [u].[Role]
+      FROM [Users] AS [u]
+      WHERE LOWER([u].[Email]) = @ToLower OR LOWER([u].[Name]) = @ToLower
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (246ms) [Parameters=[@p1='?' (DbType = Int32), @p0='?' (Size = 4000)], CommandType='Text', CommandTimeout='30']
+      SET IMPLICIT_TRANSACTIONS OFF;
+      SET NOCOUNT ON;
+      UPDATE [Users] SET [DeviceId] = @p0
+      OUTPUT 1
+      WHERE [Id] = @p1;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (18ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [t].[Id], [t].[Bio], [t].[CreatedAt], [t].[Designation], [t].[FacebookUrl], [t].[ImageUrl], [t].[LinkedInUrl], [t].[Name], [t].[Subject]
+      FROM [Teachers] AS [t]
+      ORDER BY [t].[Id] DESC
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (24ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [c].[Id], [c].[Badge], [c].[Description], [c].[ImageUrl], [c].[Price], [c].[Title], [c].[VideoUrl], [c0].[Id], [c0].[CourseId], [c0].[FeatureText]
+      FROM [Courses] AS [c]
+      LEFT JOIN [CourseFeatures] AS [c0] ON [c].[Id] = [c0].[CourseId]
+      ORDER BY [c].[Id]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (75ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(1) [a].[Id], [a].[Description], [a].[ImageUrl], [a].[Title]
+      FROM [AboutContents] AS [a]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (71ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [f].[Id], [f].[Category], [f].[Description], [f].[OrderIndex], [f].[ThumbnailUrl], [f].[Title], [f].[VideoUrl]
+      FROM [FreeClasses] AS [f]
+      ORDER BY [f].[OrderIndex], [f].[Id] DESC
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (110ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [s].[Id], [s].[Batch], [s].[ImageUrl], [s].[Institution], [s].[Name], [s].[OrderIndex]
+      FROM [SuccessStudents] AS [s]
+      ORDER BY [s].[OrderIndex]
+warn: Microsoft.EntityFrameworkCore.Query[20504]
+      Compiling a query which loads related collections for more than one collection navigation, either via 'Include' or through projection, but no 'QuerySplittingBehavior' has been configured. By default, Entity Framework will use 'QuerySplittingBehavior.SingleQuery', which can potentially result in slow query performance. See https://go.microsoft.com/fwlink/?linkid=2134277 for more information. To identify the query that's triggering this warning call 'ConfigureWarnings(w => w.Throw(RelationalEventId.MultipleCollectionIncludeWarning))'.
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (286ms) [Parameters=[@id='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT [c3].[Id], [c3].[Badge], [c3].[Description], [c3].[ImageUrl], [c3].[Price], [c3].[Title], [c3].[VideoUrl], [c0].[Id], [c0].[CourseId], [c0].[FeatureText], [s].[Id], [s].[CourseId], [s].[OrderIndex], [s].[Title], [s].[Id0], [s].[ChapterId], [s].[OrderIndex0], [s].[Title0], [s].[Type], [s].[Url]
+      FROM (
+          SELECT TOP(1) [c].[Id], [c].[Badge], [c].[Description], [c].[ImageUrl], [c].[Price], [c].[Title], [c].[VideoUrl]
+          FROM [Courses] AS [c]
+          WHERE [c].[Id] = @id
+      ) AS [c3]
+      LEFT JOIN [CourseFeatures] AS [c0] ON [c3].[Id] = [c0].[CourseId]
+      LEFT JOIN (
+          SELECT [c1].[Id], [c1].[CourseId], [c1].[OrderIndex], [c1].[Title], [c2].[Id] AS [Id0], [c2].[ChapterId], [c2].[OrderIndex] AS [OrderIndex0], [c2].[Title] AS [Title0], [c2].[Type], [c2].[Url]
+          FROM [CourseChapters] AS [c1]
+          LEFT JOIN [CourseContents] AS [c2] ON [c1].[Id] = [c2].[ChapterId]
+      ) AS [s] ON [c3].[Id] = [s].[CourseId]
+      ORDER BY [c3].[Id], [c0].[Id], [s].[Id]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (32ms) [Parameters=[@id='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SELECT COUNT(*)
+      FROM [Enrollments] AS [e]
+      WHERE [e].[CourseId] = @id AND [e].[Status] = N'Approved'
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (6ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [s].[Id], [s].[Batch], [s].[ImageUrl], [s].[Institution], [s].[Name], [s].[OrderIndex]
+      FROM [SuccessStudents] AS [s]
+      ORDER BY [s].[OrderIndex]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (24ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(1) [a].[Id], [a].[Description], [a].[ImageUrl], [a].[Title]
+      FROM [AboutContents] AS [a]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (36ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [t].[Id], [t].[Bio], [t].[CreatedAt], [t].[Designation], [t].[FacebookUrl], [t].[ImageUrl], [t].[LinkedInUrl], [t].[Name], [t].[Subject]
+      FROM [Teachers] AS [t]
+      ORDER BY [t].[Id] DESC
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (72ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [c].[Id], [c].[Badge], [c].[Description], [c].[ImageUrl], [c].[Price], [c].[Title], [c].[VideoUrl], [c0].[Id], [c0].[CourseId], [c0].[FeatureText]
+      FROM [Courses] AS [c]
+      LEFT JOIN [CourseFeatures] AS [c0] ON [c].[Id] = [c0].[CourseId]
+      ORDER BY [c].[Id]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (107ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [f].[Id], [f].[Category], [f].[Description], [f].[OrderIndex], [f].[ThumbnailUrl], [f].[Title], [f].[VideoUrl]
+      FROM [FreeClasses] AS [f]
+      ORDER BY [f].[OrderIndex], [f].[Id] DESC
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (36ms) [Parameters=[@request_Email='?' (Size = 4000)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(1) [u].[Id], [u].[DeviceId], [u].[Email], [u].[Name], [u].[PasswordHash], [u].[Role]
+      FROM [Users] AS [u]
+      WHERE [u].[Email] = @request_Email
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (35ms) [Parameters=[@request_Email='?' (Size = 4000)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(1) [u].[Id], [u].[DeviceId], [u].[Email], [u].[Name], [u].[PasswordHash], [u].[Role]
+      FROM [Users] AS [u]
+      WHERE [u].[Email] = @request_Email
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (82ms) [Parameters=[@p0='?' (Size = 4000), @p1='?' (Size = 4000), @p2='?' (Size = 4000), @p3='?' (Size = 4000), @p4='?' (Size = 4000)], CommandType='Text', CommandTimeout='30']
+      SET IMPLICIT_TRANSACTIONS OFF;
+      SET NOCOUNT ON;
+      INSERT INTO [Users] ([DeviceId], [Email], [Name], [PasswordHash], [Role])
+      OUTPUT INSERTED.[Id]
+      VALUES (@p0, @p1, @p2, @p3, @p4);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (14ms) [Parameters=[@request_Email='?' (Size = 4000)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(1) [u].[Id], [u].[DeviceId], [u].[Email], [u].[Name], [u].[PasswordHash], [u].[Role]
+      FROM [Users] AS [u]
+      WHERE [u].[Email] = @request_Email
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (5ms) [Parameters=[@request_Email='?' (Size = 4000)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(1) [u].[Id], [u].[DeviceId], [u].[Email], [u].[Name], [u].[PasswordHash], [u].[Role]
+      FROM [Users] AS [u]
+      WHERE [u].[Email] = @request_Email
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (5ms) [Parameters=[@request_Email='?' (Size = 4000)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(1) [u].[Id], [u].[DeviceId], [u].[Email], [u].[Name], [u].[PasswordHash], [u].[Role]
+      FROM [Users] AS [u]
+      WHERE [u].[Email] = @request_Email
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (3ms) [Parameters=[@request_Email='?' (Size = 4000)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(1) [u].[Id], [u].[DeviceId], [u].[Email], [u].[Name], [u].[PasswordHash], [u].[Role]
+      FROM [Users] AS [u]
+      WHERE [u].[Email] = @request_Email
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (5ms) [Parameters=[@request_Email='?' (Size = 4000)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(1) [u].[Id], [u].[DeviceId], [u].[Email], [u].[Name], [u].[PasswordHash], [u].[Role]
+      FROM [Users] AS [u]
+      WHERE [u].[Email] = @request_Email
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (5ms) [Parameters=[@request_Email='?' (Size = 4000)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(1) [u].[Id], [u].[DeviceId], [u].[Email], [u].[Name], [u].[PasswordHash], [u].[Role]
+      FROM [Users] AS [u]
+      WHERE [u].[Email] = @request_Email
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (4ms) [Parameters=[@request_Email='?' (Size = 4000)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(1) [u].[Id], [u].[DeviceId], [u].[Email], [u].[Name], [u].[PasswordHash], [u].[Role]
+      FROM [Users] AS [u]
+      WHERE [u].[Email] = @request_Email
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (4ms) [Parameters=[@request_Email='?' (Size = 4000)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(1) [u].[Id], [u].[DeviceId], [u].[Email], [u].[Name], [u].[PasswordHash], [u].[Role]
+      FROM [Users] AS [u]
+      WHERE [u].[Email] = @request_Email
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (6ms) [Parameters=[@p0='?' (Size = 4000), @p1='?' (Size = 4000), @p2='?' (Size = 4000), @p3='?' (Size = 4000), @p4='?' (Size = 4000)], CommandType='Text', CommandTimeout='30']
+      SET IMPLICIT_TRANSACTIONS OFF;
+      SET NOCOUNT ON;
+      INSERT INTO [Users] ([DeviceId], [Email], [Name], [PasswordHash], [Role])
+      OUTPUT INSERTED.[Id]
+      VALUES (@p0, @p1, @p2, @p3, @p4);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed D

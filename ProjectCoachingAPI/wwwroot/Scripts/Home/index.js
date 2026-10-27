@@ -1,4 +1,4 @@
-// index.js - Homepage Scripts (Courses, Teachers, Success Students, About, Free Classes)
+﻿// index.js - Homepage Scripts (Courses, Teachers, Success Students, About, Free Classes)
 // @ts-nocheck
 
 const translations = {
@@ -14,7 +14,7 @@ const translations = {
         f4Title: "Regular Exams", f4Desc: "Weekly tests and evaluations to track student progress.",
         coursesTitle: "Featured Courses",
         teachersTitle: "Meet Our Teachers", teachersDesc: "Learn from the best educators in the field.",
-        appTitle: "Learn Anywhere, Anytime.", appDesc: "Download the <span class='font-bold text-emerald-600 font-sans'>PhysicsAcademy</span> mobile app to watch premium video lectures, give exams, and access study materials on the go.",
+        appTitle: "Learn Anywhere, Anytime.", appDesc: "Download the <span class='font-bold text-emerald-600 font-sans'>PhysicsClassroom</span> mobile app to watch premium video lectures, give exams, and access study materials on the go.",
         successTitle: "Our Pride: Successful Students", successDesc: "Hundreds of our students are studying in top universities.",
         freeTitle: "Free Masterclasses", freeDesc: "Watch our free physics classes to experience our teaching methodology before enrolling.",
         ctaTitle: "Ready to Make Physics Easier?", ctaDesc: "Join our upcoming batches and start your journey towards excellence.", ctaBtn: "Join Our Course Today"
@@ -31,7 +31,7 @@ const translations = {
         f4Title: "নিয়মিত পরীক্ষা", f4Desc: "স্টুডেন্টদের অবস্থা যাচাই করার জন্য নিয়মিত মূল্যায়ন পরীক্ষা নেওয়া হয়",
         coursesTitle: "আমাদের কোর্সসমূহ",
         teachersTitle: "আমাদের শিক্ষকবৃন্দ", teachersDesc: "দেশের সেরা শিক্ষকদের কাছ থেকে শিখুন",
-        appTitle: "যেকোনো জায়গায়, যেকোনো সময় শিখুন", appDesc: "<span class='font-bold text-emerald-600 font-sans'>PhysicsAcademy</span> মোবাইল অ্যাপ ডাউনলোড করে যেকোনো সময় প্রিমিয়াম ভিডিও লেকচার, এক্সাম ও স্টাডি ম্যাটেরিয়ালস অ্যাক্সেস করুন।",
+        appTitle: "যেকোনো জায়গায়, যেকোনো সময় শিখুন", appDesc: "<span class='font-bold text-emerald-600 font-sans'>PhysicsClassroom</span> মোবাইল অ্যাপ ডাউনলোড করে যেকোনো সময় প্রিমিয়াম ভিডিও লেকচার, এক্সাম ও স্টাডি ম্যাটেরিয়ালস অ্যাক্সেস করুন।",
         successTitle: "আমাদের গর্ব: সফল ছাত্রছাত্রীরা", successDesc: "আমাদের শত শত ছাত্রছাত্রী দেশের সেরা বিশ্ববিদ্যালয়গুলোতে পড়াশোনা করছে।",
         freeTitle: "ফ্রি মাস্টারক্লাস", freeDesc: "আমাদের কোর্সে যুক্ত হওয়ার আগে আমাদের পড়ানোর স্টাইল বুঝতে ফ্রি ক্লাসগুলো দেখতে পারেন।",
         ctaTitle: "ফিজিক্সকে জয় করতে প্রস্তুত?", ctaDesc: "আমাদের নতুন ব্যাচগুলোতে জয়েন করে নিজের বেসিক শক্ত করুন এখনই।", ctaBtn: "আজই কোর্সে এনরোল হন"

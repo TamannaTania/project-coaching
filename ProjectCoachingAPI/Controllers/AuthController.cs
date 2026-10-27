@@ -25,19 +25,20 @@ namespace ProjectCoachingAPI.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<ActionResult<string>> Register(UserRegisterDto request)
+        public async Task<IActionResult> Register(UserRegisterDto request)
         {
             var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
             if (existingUser != null)
             {
-                return BadRequest("User with this email already exists!");
+                return BadRequest(new { message = "User with this email already exists!" });
             }
 
             string passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
+            string finalName = !string.IsNullOrWhiteSpace(request.Name) ? request.Name : (!string.IsNullOrWhiteSpace(request.Username) ? request.Username : request.Email);
 
             var user = new User
             {
-                Name = request.Name,
+                Name = finalName,
                 Email = request.Email,
                 PasswordHash = passwordHash,
                 Role = "Student" 
@@ -46,7 +47,7 @@ namespace ProjectCoachingAPI.Controllers
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
-            return Ok("Registration successful!");
+            return Ok(new { message = "Registration successful!" });
         }
 
         [HttpPost("login")]

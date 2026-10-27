@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProjectCoachingAPI.Data;
@@ -74,6 +74,7 @@ namespace ProjectCoachingAPI.Controllers
 
         // PUT: api/Teachers/5
         [HttpPut("{id}")]
+        [HttpPost("{id}")]
         // [Authorize(Roles = "Admin")]
         public async Task<IActionResult> PutTeacher(int id, Teacher teacher)
         {
@@ -112,6 +113,7 @@ namespace ProjectCoachingAPI.Controllers
 
         // DELETE: api/Teachers/5
         [HttpDelete("{id}")]
+        [HttpPost("delete/{id}")]
         // [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteTeacher(int id)
         {
