@@ -18,6 +18,7 @@
         localStorage.removeItem('token');
         localStorage.removeItem('username');
         localStorage.removeItem('email');
+        localStorage.removeItem('role');
         localStorage.removeItem('user');
         sessionStorage.clear();
 
@@ -109,6 +110,8 @@
     };
 
     // 4. Periodic Heartbeat to validate session in real-time
+    let hasValidatedOnce = false;
+
     async function validateCurrentSession() {
         const token = localStorage.getItem('token');
         if (!token || isTerminating) return;
@@ -124,7 +127,20 @@
                 }
             });
 
-            if (res.status === 401) {
+            hasValidatedOnce = true;
+
+            if (res.ok) {
+                try {
+                    const data = await res.json();
+                    if (data && data.role) {
+                        localStorage.setItem('role', data.role);
+                    }
+                    if (data && data.username) {
+                        localStorage.setItem('username', data.username);
+                    }
+                    applyAdminMenuVisibility();
+                } catch(e) {}
+            } else if (res.status === 401) {
                 let msg = '';
                 try {
                     const data = await res.json();
@@ -135,6 +151,69 @@
         } catch(e) {
             // Ignore transient network errors
         }
+    }
+
+    // Role detection & Admin Menu Visibility Guard
+    function getUserRole() {
+        let role = localStorage.getItem('role');
+        const token = localStorage.getItem('token');
+        
+        // Also verify token claims if role in localStorage is missing or was defaulted to Student
+        if ((!role || role.toLowerCase() === 'student') && token) {
+            try {
+                const base64Url = token.split('.')[1];
+                const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                }).join(''));
+                const payload = JSON.parse(jsonPayload);
+                const tokenRole = payload["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"] || payload.role || payload.Role;
+                if (tokenRole) {
+                    role = tokenRole;
+                    localStorage.setItem('role', role);
+                }
+            } catch(e) {}
+        }
+        return role || null;
+    }
+    window.getUserRole = getUserRole;
+
+    function applyAdminMenuVisibility() {
+        const role = getUserRole();
+        const isAdmin = (role && role.toString().trim().toLowerCase() === 'admin');
+
+        // Toggle Admin links across navbar, mobile menus, sidebar & headers
+        const adminInline = document.querySelectorAll('#navAdmin, .nav-admin-link, #headerAdminBtn, #authNavAdminBtn');
+        adminInline.forEach(el => {
+            el.style.display = isAdmin ? 'inline-flex' : 'none';
+        });
+
+        const adminBlocks = document.querySelectorAll('#navAdminMobile, #adminSidebarItem');
+        adminBlocks.forEach(el => {
+            el.style.display = isAdmin ? 'block' : 'none';
+        });
+
+        // Guard admin pages: if non-admin tries to browse /Views/Admin/...
+        const currentPath = window.location.pathname.toLowerCase();
+        if (currentPath.includes('/views/admin/') || currentPath.includes('/admin-') || currentPath.endsWith('/admin.html')) {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = '/Views/Auth/login.html?returnUrl=' + encodeURIComponent(window.location.pathname);
+            } else if (!isAdmin && hasValidatedOnce) {
+                // Redirect only after backend validation confirms user is not admin
+                alert('অ্যাক্সেস ডিনাইড: এই পেজটি শুধুমাত্র অ্যাডমিনদের জন্য প্রযোজ্য।');
+                window.location.href = '/';
+            }
+        }
+    }
+    window.applyAdminMenuVisibility = applyAdminMenuVisibility;
+
+    // Apply visibility immediately and when DOM is ready
+    applyAdminMenuVisibility();
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', applyAdminMenuVisibility);
+    } else {
+        applyAdminMenuVisibility();
     }
 
     // Run check on page load if logged in

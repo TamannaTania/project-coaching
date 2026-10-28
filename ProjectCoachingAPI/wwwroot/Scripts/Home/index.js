@@ -54,6 +54,7 @@ async function logout() {
     localStorage.removeItem('token');
     localStorage.removeItem('username');
     localStorage.removeItem('email');
+    localStorage.removeItem('role');
     sessionStorage.clear();
     window.location.reload();
 }
@@ -63,6 +64,12 @@ function updateAuthNav(lang) {
     const username = localStorage.getItem('username');
     const container = document.getElementById('authNavContainer');
     if(!container) return;
+
+    const navAdmin = document.getElementById('navAdmin');
+    if (navAdmin) {
+        const role = (typeof getUserRole === 'function') ? getUserRole() : localStorage.getItem('role');
+        navAdmin.style.display = (role && role.toString().trim().toLowerCase() === 'admin') ? 'inline-block' : 'none';
+    }
     
     if(token) {
         const logoutText = lang === 'bn' ? 'লগআউট' : 'Logout';

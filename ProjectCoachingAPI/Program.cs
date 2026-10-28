@@ -4,17 +4,31 @@ using Microsoft.IdentityModel.Tokens;
 using ProjectCoachingAPI.Data;
 using System.Text;
 
-var contentRoot = AppContext.BaseDirectory;
-var wwwrootCandidate = System.IO.Path.Combine(contentRoot, "wwwroot");
-var webRoot = System.IO.Directory.Exists(wwwrootCandidate) ? wwwrootCandidate : contentRoot;
+var builder = WebApplication.CreateBuilder(args);
 
-var webAppOptions = new WebApplicationOptions
+// Search for the actual wwwroot folder across common development and production locations
+string currentDir = Directory.GetCurrentDirectory();
+string baseDir = AppContext.BaseDirectory;
+string defaultContentRoot = builder.Environment.ContentRootPath;
+
+string[] candidateRoots = new[]
 {
-    Args = args,
-    ContentRootPath = contentRoot,
-    WebRootPath = webRoot
+    Path.Combine(defaultContentRoot, "wwwroot"),
+    Path.Combine(currentDir, "wwwroot"),
+    Path.Combine(baseDir, "wwwroot"),
+    defaultContentRoot,
+    currentDir,
+    baseDir
 };
-var builder = WebApplication.CreateBuilder(webAppOptions);
+
+string resolvedWebRoot = candidateRoots.FirstOrDefault(p => Directory.Exists(p) && File.Exists(Path.Combine(p, "index.html")))
+    ?? Path.Combine(defaultContentRoot, "wwwroot");
+
+if (Directory.Exists(resolvedWebRoot))
+{
+    builder.Environment.WebRootPath = resolvedWebRoot;
+    builder.Environment.WebRootFileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(resolvedWebRoot);
+}
 
 // Add Database Context
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -67,20 +81,24 @@ app.UseDefaultFiles(defaultFileOptions);
 
 app.UseStaticFiles();
 
-// Support static files placed directly in application root as well as wwwroot
-try
+// In case static files are also in other directories
+foreach (var dir in new[] { resolvedWebRoot, baseDir, currentDir, defaultContentRoot }.Distinct())
 {
-    app.UseStaticFiles(new StaticFileOptions
+    if (Directory.Exists(dir) && dir != resolvedWebRoot)
     {
-        FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(contentRoot),
-        RequestPath = ""
-    });
+        try
+        {
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(dir),
+                RequestPath = ""
+            });
+        }
+        catch { }
+    }
 }
-catch { }
 
 app.UseCors("AllowAll");
-// Do not redirect to HTTPS locally so API calls on http://localhost:3340 work seamlessly
-// and avoid stripping Authorization headers in browser fetches
 
 // Use Authentication before Authorization
 app.UseAuthentication();
@@ -91,9 +109,12 @@ app.MapControllers();
 // Explicit handler for root / and /index.html
 app.MapGet("/", async context =>
 {
-    string indexPath = System.IO.Path.Combine(webRoot, "index.html");
-    if (!System.IO.File.Exists(indexPath)) indexPath = System.IO.Path.Combine(contentRoot, "index.html");
-    if (System.IO.File.Exists(indexPath))
+    string indexPath = Path.Combine(resolvedWebRoot, "index.html");
+    if (!File.Exists(indexPath)) indexPath = Path.Combine(baseDir, "index.html");
+    if (!File.Exists(indexPath)) indexPath = Path.Combine(currentDir, "index.html");
+    if (!File.Exists(indexPath)) indexPath = Path.Combine(defaultContentRoot, "index.html");
+
+    if (File.Exists(indexPath))
     {
         context.Response.ContentType = "text/html; charset=utf-8";
         await context.Response.SendFileAsync(indexPath);
@@ -107,9 +128,12 @@ app.MapGet("/", async context =>
 
 app.MapGet("/index.html", async context =>
 {
-    string indexPath = System.IO.Path.Combine(webRoot, "index.html");
-    if (!System.IO.File.Exists(indexPath)) indexPath = System.IO.Path.Combine(contentRoot, "index.html");
-    if (System.IO.File.Exists(indexPath))
+    string indexPath = Path.Combine(resolvedWebRoot, "index.html");
+    if (!File.Exists(indexPath)) indexPath = Path.Combine(baseDir, "index.html");
+    if (!File.Exists(indexPath)) indexPath = Path.Combine(currentDir, "index.html");
+    if (!File.Exists(indexPath)) indexPath = Path.Combine(defaultContentRoot, "index.html");
+
+    if (File.Exists(indexPath))
     {
         context.Response.ContentType = "text/html; charset=utf-8";
         await context.Response.SendFileAsync(indexPath);

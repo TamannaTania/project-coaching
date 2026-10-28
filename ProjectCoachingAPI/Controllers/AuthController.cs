@@ -104,8 +104,8 @@ namespace ProjectCoachingAPI.Controllers
 
                 string token = CreateToken(user);
 
-                // Return the token, username, email, and active deviceId
-                return Ok(new { Token = token, Username = user.Name ?? "", Email = user.Email ?? "", DeviceId = user.DeviceId ?? "" });
+                // Return the token, username, email, active deviceId, and role
+                return Ok(new { Token = token, Username = user.Name ?? "", Email = user.Email ?? "", DeviceId = user.DeviceId ?? "", Role = user.Role ?? "Student" });
             }
             catch (Exception ex)
             {

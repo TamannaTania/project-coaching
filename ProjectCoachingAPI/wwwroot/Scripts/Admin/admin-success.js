@@ -1,8 +1,9 @@
-// admin-success.js - Admin Success Students Management Logic
+﻿// admin-success.js - Admin Success Students Management Logic
 // @ts-nocheck
 const token = localStorage.getItem('token');
 let editId = null;
-if (!token) {
+const role = (typeof getUserRole === 'function') ? getUserRole() : localStorage.getItem('role');
+    if (!token || (role && role.toString().trim().toLowerCase() !== 'admin')) {
     window.location.href = '/Views/Auth/login.html?returnUrl=' + encodeURIComponent(window.location.pathname);
 }
 

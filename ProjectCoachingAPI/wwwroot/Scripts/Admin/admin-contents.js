@@ -1,7 +1,8 @@
-// admin-contents.js - Admin Course Chapters & Content Management Logic
+﻿// admin-contents.js - Admin Course Chapters & Content Management Logic
 // @ts-nocheck
 const token = localStorage.getItem('token');
-if (!token) {
+const role = (typeof getUserRole === 'function') ? getUserRole() : localStorage.getItem('role');
+    if (!token || (role && role.toString().trim().toLowerCase() !== 'admin')) {
     window.location.href = '/Views/Auth/login.html?returnUrl=' + encodeURIComponent(window.location.pathname);
 }
 

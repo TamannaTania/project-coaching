@@ -16,14 +16,30 @@ if (existingToken) {
             'Authorization': 'Bearer ' + existingToken,
             'X-Device-Id': localStorage.getItem('deviceId') || ''
         }
-    }).then(r => {
+    }).then(async r => {
         if (r.ok) {
-            const dest = (isExplicitAppMode && window.innerWidth <= 640) ? '/Views/App/app.html' : (urlParams.get('returnUrl') || '/');
-            window.location.href = dest;
+            const data = await r.json().catch(() => ({}));
+            if (data && data.role) {
+                localStorage.setItem('role', data.role);
+            }
+            if (data && data.username) {
+                localStorage.setItem('username', data.username);
+            }
+            const returnUrl = urlParams.get('returnUrl');
+            if (returnUrl) {
+                window.location.href = returnUrl;
+            } else if ((data.role || localStorage.getItem('role') || '').toLowerCase() === 'admin') {
+                window.location.href = '/Views/Admin/admin.html';
+            } else if (isExplicitAppMode && window.innerWidth <= 640) {
+                window.location.href = '/Views/App/app.html';
+            } else {
+                window.location.href = '/';
+            }
         } else {
             localStorage.removeItem('token');
             localStorage.removeItem('username');
             localStorage.removeItem('email');
+            localStorage.removeItem('role');
             localStorage.removeItem('user');
         }
     }).catch(() => {});
@@ -56,6 +72,8 @@ async function doLogin(forceLogin = false) {
             localStorage.setItem('token', data.token);
             localStorage.setItem('username', data.username || email);
             localStorage.setItem('email', data.email || email);
+            const userRole = data.role || data.Role || 'Student';
+            localStorage.setItem('role', userRole);
             if (data.deviceId) localStorage.setItem('deviceId', data.deviceId);
 
             // Handle Remember Me
@@ -71,6 +89,8 @@ async function doLogin(forceLogin = false) {
             const returnUrl = urlParams.get('returnUrl');
             if (returnUrl) {
                 window.location.href = returnUrl;
+            } else if (userRole.toLowerCase() === 'admin') {
+                window.location.href = '/Views/Admin/admin.html';
             } else if (isExplicitAppMode && window.innerWidth <= 640) {
                 window.location.href = '/Views/App/app.html';
             } else {
