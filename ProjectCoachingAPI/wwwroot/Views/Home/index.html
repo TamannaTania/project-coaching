@@ -263,7 +263,33 @@
             </div>
 
             <!-- Dynamic Courses Grid -->
-            <div id="coursesGrid" class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+                                <!-- ACS Style Batch Filter Tabs -->
+            <div class="flex items-center justify-center gap-2 sm:gap-3 flex-wrap mb-10 max-w-4xl mx-auto px-2" id="batchTabsContainer">
+                <button type="button" onclick="filterCoursesByBatch('ALL')" class="batch-tab-btn px-4 sm:px-5 py-2.5 rounded-full font-bold text-xs sm:text-sm transition-all shadow-md bg-blue-600 text-white shadow-blue-500/20" data-batch="ALL">
+                    <i class="fa-solid fa-layer-group mr-1.5"></i> সকল কোর্স
+                </button>
+                <button type="button" onclick="filterCoursesByBatch('HSC 2028')" class="batch-tab-btn px-4 sm:px-5 py-2.5 rounded-full font-bold text-xs sm:text-sm transition-all bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 shadow-sm" data-batch="HSC 2028">
+                    <i class="fa-solid fa-graduation-cap mr-1.5 text-blue-500"></i> HSC 2028
+                </button>
+                <button type="button" onclick="filterCoursesByBatch('HSC 2027')" class="batch-tab-btn px-4 sm:px-5 py-2.5 rounded-full font-bold text-xs sm:text-sm transition-all bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 shadow-sm" data-batch="HSC 2027">
+                    <i class="fa-solid fa-graduation-cap mr-1.5 text-indigo-500"></i> HSC 2027
+                </button>
+                <button type="button" onclick="filterCoursesByBatch('HSC 2026')" class="batch-tab-btn px-4 sm:px-5 py-2.5 rounded-full font-bold text-xs sm:text-sm transition-all bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 shadow-sm" data-batch="HSC 2026">
+                    <i class="fa-solid fa-graduation-cap mr-1.5 text-purple-500"></i> HSC 2026
+                </button>
+                <button type="button" onclick="filterCoursesByBatch('SSC 2029')" class="batch-tab-btn px-4 sm:px-5 py-2.5 rounded-full font-bold text-xs sm:text-sm transition-all bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 shadow-sm" data-batch="SSC 2029">
+                    <i class="fa-solid fa-book-open mr-1.5 text-emerald-500"></i> SSC 2029
+                </button>
+                <button type="button" onclick="filterCoursesByBatch('SSC 2028')" class="batch-tab-btn px-4 sm:px-5 py-2.5 rounded-full font-bold text-xs sm:text-sm transition-all bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 shadow-sm" data-batch="SSC 2028">
+                    <i class="fa-solid fa-book-open mr-1.5 text-teal-500"></i> SSC 2028
+                </button>
+                <button type="button" onclick="filterCoursesByBatch('Admission')" class="batch-tab-btn px-4 sm:px-5 py-2.5 rounded-full font-bold text-xs sm:text-sm transition-all bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 shadow-sm" data-batch="Admission">
+                    <i class="fa-solid fa-rocket mr-1.5 text-amber-500"></i> এডমিশন
+                </button>
+            </div>
+
+        <!-- Dynamic Courses Grid -->
+        <div id="coursesGrid" class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
                 <!-- Courses will be loaded here via JS -->
             </div>
         </div>

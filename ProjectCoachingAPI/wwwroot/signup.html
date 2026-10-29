@@ -92,24 +92,47 @@
         <div class="auth-container">
             <h2>নতুন একাউন্ট খুলুন</h2>
             
-            <form id="signupForm">
-                <div class="form-group">
-                    <label>আপনার নাম</label>
-                    <input type="text" id="name" placeholder="যেমন: রহিম মিয়া" required>
+            <form id="registerForm" class="space-y-4">
+            <div>
+                <label class="block text-slate-700 font-bold mb-1 text-sm">আপনার নাম (Full Name) <span class="text-red-500">*</span></label>
+                <div class="relative">
+                    <span class="absolute left-3.5 top-3.5 text-slate-400 text-sm"><i class="fa-solid fa-user"></i></span>
+                    <input type="text" id="username" placeholder="যেমন: মোঃ সাকিব হোসেন" class="w-full bg-slate-50 border border-slate-200 rounded-lg pl-10 pr-4 py-3 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" required>
                 </div>
-                
-                <div class="form-group">
-                    <label>ইমেইল এড্রেস</label>
-                    <input type="email" id="email" placeholder="example@gmail.com" required>
+            </div>
+            <div>
+                <label class="block text-slate-700 font-bold mb-1 text-sm">
+                    মোবাইল নম্বর <span class="text-red-500">*</span> <span class="text-[11px] font-normal text-slate-500">(লগইন করতে লাগবে)</span>
+                </label>
+                <div class="relative">
+                    <span class="absolute left-3.5 top-3 text-slate-500 font-bold text-xs bg-slate-200 px-1.5 py-0.5 rounded">+88</span>
+                    <input type="tel" id="phone" placeholder="01XXXXXXXXX" pattern="01[3-9][0-9]{8}" maxlength="11" class="w-full bg-slate-50 border border-slate-200 rounded-lg pl-14 pr-4 py-3 text-sm font-mono font-medium focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" required>
                 </div>
-                
-                <div class="form-group">
-                    <label>পাসওয়ার্ড</label>
-                    <input type="password" id="password" placeholder="গোপন পাসওয়ার্ড দিন" required minlength="6">
+                <p class="text-[11px] text-slate-500 mt-1">১১ ডিজিটের সচল মোবাইল নম্বর দিন (যেমন: 01712345678)</p>
+            </div>
+            <div>
+                <label class="block text-slate-700 font-bold mb-1 text-sm">
+                    ইমেইল <span class="text-xs font-normal text-slate-400">(ঐচ্ছিক / না থাকলেও চলবে)</span>
+                </label>
+                <div class="relative">
+                    <span class="absolute left-3.5 top-3.5 text-slate-400 text-sm"><i class="fa-solid fa-envelope"></i></span>
+                    <input type="email" id="email" placeholder="name@example.com (না থাকলে ফাঁকা রাখুন)" class="w-full bg-slate-50 border border-slate-200 rounded-lg pl-10 pr-4 py-3 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
                 </div>
-                
-                <button type="submit" class="btn btn-primary" id="submitBtn">সাইন আপ করুন</button>
-            </form>
+            </div>
+            <div>
+                <label class="block text-slate-700 font-bold mb-1 text-sm">পাসওয়ার্ড (Password) <span class="text-red-500">*</span></label>
+                <div class="relative">
+                    <span class="absolute left-3.5 top-3.5 text-slate-400 text-sm"><i class="fa-solid fa-lock"></i></span>
+                    <input type="password" id="password" placeholder="কমপক্ষে ৪ সংখ্যার পাসওয়ার্ড দিন" class="w-full bg-slate-50 border border-slate-200 rounded-lg pl-10 pr-4 py-3 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" required minlength="4">
+                </div>
+            </div>
+            
+            <div id="errorMsg" class="hidden bg-red-50 text-red-600 p-3 rounded-lg text-sm font-medium text-center border border-red-200"></div>
+
+            <button type="submit" id="submitBtn" class="w-full bg-blue-600 text-white font-bold rounded-lg px-4 py-3 mt-4 hover:bg-blue-700 transition shadow-lg shadow-blue-600/30 flex items-center justify-center gap-2">
+                <i class="fa-solid fa-user-plus"></i> অ্যাকাউন্ট তৈরি করুন
+            </button>
+        </form>
 
             <div id="message"></div>
 

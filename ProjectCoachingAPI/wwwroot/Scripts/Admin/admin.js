@@ -1,4 +1,21 @@
-﻿// admin.js - Admin Dashboard & Course/Payment Management Logic
+﻿function batchDropDownEditor(container, options) {
+    $('<input required name="' + options.field + '"/>')
+        .appendTo(container)
+        .kendoDropDownList({
+            autoBind: true,
+            dataSource: [
+                'HSC 2028',
+                'HSC 2027',
+                'HSC 2026',
+                'SSC 2029',
+                'SSC 2028',
+                'Admission',
+                'General'
+            ]
+        });
+}
+
+// admin.js - Admin Dashboard & Course/Payment Management Logic
 // @ts-nocheck
 $(document).ready(function () {
     const token = localStorage.getItem('token');
@@ -60,6 +77,7 @@ $(document).ready(function () {
                     fields: {
                         id: { editable: false, nullable: true },
                         title: { validation: { required: true } },
+                        batch: { type: "string", defaultValue: "HSC 2028" },
                         description: { type: "string" },
                         price: { type: "number", validation: { required: true, min: 0 } },
                         imageUrl: { type: "string" },
@@ -73,6 +91,7 @@ $(document).ready(function () {
         toolbar: ["create"],
         columns: [
             { field: "title", title: "Course Title" },
+            { field: "batch", title: "Batch / Category", width: "140px", editor: batchDropDownEditor },
             { field: "price", title: "Price (BDT)", width: "120px" },
             { field: "badge", title: "Badge", width: "120px" },
             { 

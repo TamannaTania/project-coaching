@@ -1,49 +1,65 @@
-// signup.js - Signup logic
+// register.js - User Registration Logic
 // @ts-nocheck
 
-const signupForm = document.getElementById('signupForm');
-if (signupForm) {
-    signupForm.addEventListener('submit', async function(e) {
+const existingToken = localStorage.getItem('token');
+if (existingToken) {
+    window.location.href = '/Views/Profile/profile.html';
+}
+
+const regForm = document.getElementById('signupForm');
+if (regForm) {
+    regForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        
         const btn = document.getElementById('submitBtn');
-        const msgBox = document.getElementById('message');
-        
-        const name = document.getElementById('name').value;
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
-        
-        btn.innerText = 'অপেক্ষা করুন...';
+        const errorMsg = document.getElementById('errorMsg');
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> অ্যাকাউন্ট তৈরি হচ্ছে...';
         btn.disabled = true;
-        msgBox.style.display = 'none';
-        msgBox.className = '';
+        errorMsg.classList.add('hidden');
+
+        const name = (document.getElementById('username')?.value || '').trim();
+        const phone = (document.getElementById('phone')?.value || '').trim();
+        const email = (document.getElementById('email')?.value || '').trim();
+        const password = document.getElementById('password')?.value || '';
+
+        // Validate Phone Number
+        const bdPhoneRegex = /^01[3-9]\d{8}$/;
+        if (!bdPhoneRegex.test(phone)) {
+            errorMsg.innerText = "অনুগ্রহ করে সঠিক ১১ ডিজিটের মোবাইল নম্বর দিন (যেমন: 01712345678)।";
+            errorMsg.classList.remove('hidden');
+            btn.innerHTML = '<i class="fa-solid fa-user-plus"></i> অ্যাকাউন্ট তৈরি করুন';
+            btn.disabled = false;
+            return;
+        }
 
         try {
             const response = await fetch('/api/Auth/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ Name: name, Email: email, Password: password })
+                body: JSON.stringify({ 
+                    name: name,
+                    username: name,
+                    phone: phone,
+                    email: email || (phone + '@physicsclassroombd.com'),
+                    password: password 
+                })
             });
 
+            const data = await response.json().catch(() => ({}));
+
             if (response.ok) {
-                msgBox.innerText = "অভিনন্দন! আপনার একাউন্ট সফলভাবে তৈরি হয়েছে।";
-                msgBox.classList.add('msg-success');
-                signupForm.reset();
-                setTimeout(() => {
-                    window.location.href = '/Views/Auth/login.html';
-                }, 1500);
+                // Pre-fill login with registered phone
+                sessionStorage.setItem('just_registered_user', phone);
+                window.location.href = '/Views/Auth/login.html?registered=true';
             } else {
-                const errorText = await response.text();
-                msgBox.innerText = errorText || "দুঃখিত, কোনো একটি সমস্যা হয়েছে!";
-                msgBox.classList.add('msg-error');
+                errorMsg.innerText = data.message || "রেজিস্ট্রেশন সফল হয়নি। দয়া করে পুনরায় চেষ্টা করুন।";
+                errorMsg.classList.remove('hidden');
             }
-        } catch (error) {
-            msgBox.innerText = "সার্ভারের সাথে কানেক্ট করা যাচ্ছে না। দয়া করে নিশ্চিত করুন আপনার Visual Studio তে API রান করা আছে।";
-            msgBox.classList.add('msg-error');
+        } catch (err) {
+            errorMsg.innerText = "সার্ভারের সাথে সংযোগ স্থাপন করা যায়নি।";
+            errorMsg.classList.remove('hidden');
         } finally {
-            btn.innerText = 'সাইন আপ করুন';
+            btn.innerHTML = '<i class="fa-solid fa-user-plus"></i> অ্যাকাউন্ট তৈরি করুন';
             btn.disabled = false;
-            msgBox.style.display = 'block';
         }
     });
 }

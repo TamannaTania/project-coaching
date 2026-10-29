@@ -1,4 +1,4 @@
-﻿// index.js - Homepage Scripts (Courses, Teachers, Success Students, About, Free Classes)
+// index.js - Homepage Scripts (Courses, Teachers, Success Students, About, Free Classes)
 // @ts-nocheck
 
 const translations = {
@@ -61,15 +61,37 @@ async function logout() {
 
 function updateAuthNav(lang) {
     const token = localStorage.getItem('token');
-    const username = localStorage.getItem('username');
+    let username = localStorage.getItem('fullName') || localStorage.getItem('name') || localStorage.getItem('username');
+    const userJson = localStorage.getItem('user');
+    if (userJson) {
+        try {
+            const u = JSON.parse(userJson);
+            if (u.fullName || u.name) username = u.fullName || u.name;
+        } catch(e) {}
+    }
     const container = document.getElementById('authNavContainer');
-    if(!container) return;
+    const mobileContainer = document.getElementById('mobileAuthNavContainer');
 
     const navAdmin = document.getElementById('navAdmin');
-    if (navAdmin) {
-        const role = (typeof getUserRole === 'function') ? getUserRole() : localStorage.getItem('role');
-        navAdmin.style.display = (role && role.toString().trim().toLowerCase() === 'admin') ? 'inline-block' : 'none';
+    const navAdminMobile = document.getElementById('navAdminMobileBtn');
+    const role = (typeof getUserRole === 'function') ? getUserRole() : localStorage.getItem('role');
+    const isAdmin = (role && role.toString().trim().toLowerCase() === 'admin');
+    
+    if (navAdmin) navAdmin.style.display = isAdmin ? 'inline-block' : 'none';
+    if (navAdminMobile) navAdminMobile.style.display = isAdmin ? 'inline-flex' : 'none';
+    
+    if (mobileContainer) {
+        if (token) {
+            mobileContainer.innerHTML = `
+                <a href="/Views/Profile/profile.html" class="p-1.5 text-slate-700 hover:text-blue-600 font-bold text-xs flex items-center gap-1">
+                    <i class="fa-solid fa-user-circle text-lg text-blue-600"></i> <span class="max-w-[90px] truncate">${username || 'Student'}</span>
+                </a>
+            `;
+        } else {
+            mobileContainer.innerHTML = `<a href="/Views/Auth/login.html" class="bg-blue-600 text-white px-3 py-1.5 rounded-full text-xs font-bold shadow-sm">লগইন</a>`;
+        }
     }
+    if (!container) return;
     
     if(token) {
         const logoutText = lang === 'bn' ? 'লগআউট' : 'Logout';
@@ -143,10 +165,121 @@ function setLanguage(lang) {
     }
 }
 
+let allFetchedCourses = [];
+let userEnrolledCourseIds = new Set();
+let currentSelectedBatch = 'ALL';
+
+function filterCoursesByBatch(batch) {
+    currentSelectedBatch = batch || 'ALL';
+    
+    // Update button active state
+    const buttons = document.querySelectorAll('#batchTabsContainer .batch-tab-btn');
+    buttons.forEach(btn => {
+        const btnBatch = btn.getAttribute('data-batch');
+        if (btnBatch === currentSelectedBatch) {
+            btn.className = 'batch-tab-btn px-4 sm:px-5 py-2.5 rounded-full font-bold text-xs sm:text-sm transition-all shadow-md bg-blue-600 text-white shadow-blue-500/20';
+        } else {
+            btn.className = 'batch-tab-btn px-4 sm:px-5 py-2.5 rounded-full font-bold text-xs sm:text-sm transition-all bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 shadow-sm';
+        }
+    });
+
+    renderCoursesList();
+}
+window.filterCoursesByBatch = filterCoursesByBatch;
+
+function renderCoursesList() {
+    const grid = document.getElementById('coursesGrid');
+    if (!grid) return;
+
+    let filtered = allFetchedCourses;
+    if (currentSelectedBatch && currentSelectedBatch !== 'ALL') {
+        const searchBatch = currentSelectedBatch.trim().toUpperCase();
+        filtered = allFetchedCourses.filter(c => {
+            const cBatch = (c.batch || 'HSC 2028').trim().toUpperCase();
+            return cBatch === searchBatch || (searchBatch === 'ADMISSION' && cBatch.includes('ADMISSION'));
+        });
+    }
+
+    if (!filtered || filtered.length === 0) {
+        grid.innerHTML = `
+            <div class="col-span-full py-16 px-4 text-center bg-white rounded-3xl border border-dashed border-slate-300 my-4 shadow-sm">
+                <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4 text-2xl shadow-inner">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                </div>
+                <h4 class="text-xl font-bold text-slate-800 mb-2">${currentSelectedBatch} ব্যাচের নতুন কোর্স শীঘ্রই আসছে!</h4>
+                <p class="text-slate-500 text-sm max-w-md mx-auto">আমরা এই ব্যাচের জন্য সেরা পাঠ্যক্রম ও লাইভ ক্লাস তৈরি করছি। নতুন কোর্স আসা মাত্রই এখানে দেখতে পাবেন।</p>
+                <button type="button" onclick="filterCoursesByBatch('ALL')" class="mt-5 px-6 py-2.5 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-md transition transform hover:-translate-y-0.5">
+                    <i class="fa-solid fa-layer-group mr-1.5"></i> সকল কোর্স দেখুন
+                </button>
+            </div>
+        `;
+        return;
+    }
+
+    grid.innerHTML = '';
+    filtered.forEach(course => {
+        let imgUrl = course.imageUrl || 'https://via.placeholder.com/400x200?text=Physics+Course';
+        if (!imgUrl.startsWith('http')) {
+            imgUrl = '/' + imgUrl.replace(/^\//, '');
+        }
+
+        const isEnrolled = userEnrolledCourseIds.has(course.id);
+        const batchTag = course.batch || 'HSC 2028';
+
+        const batchBadgeHtml = `<span class="absolute top-3 right-3 bg-slate-900/80 backdrop-blur-md text-white text-xs font-bold px-3 py-1 rounded-full border border-white/20 shadow-md z-10 flex items-center gap-1.5">
+            <i class="fa-solid fa-graduation-cap text-blue-400 text-[11px]"></i> ${batchTag}
+        </span>`;
+
+        const badgeHtml = isEnrolled 
+            ? `<span class="absolute top-3 left-3 bg-emerald-600/95 backdrop-blur-sm text-white text-xs sm:text-sm font-bold px-3 py-1.5 rounded-full shadow-md flex items-center gap-1.5 z-10 border border-emerald-400/30"><i class="fa-solid fa-circle-check"></i> কেনা হয়েছে (Active)</span>`
+            : '';
+            
+        const priceHtml = isEnrolled
+            ? `<span class="text-base sm:text-lg font-extrabold text-emerald-600 flex items-center gap-1.5 whitespace-nowrap"><i class="fa-solid fa-lock-open text-sm"></i> আনলকড</span>`
+            : `<span class="text-2xl sm:text-3xl font-black text-blue-900 group-hover:scale-105 ease-out transition-transform origin-left whitespace-nowrap">৳${course.price}</span>`;
+
+        const btnHtml = isEnrolled
+            ? `<button class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-5 py-2.5 rounded-xl font-bold text-sm sm:text-base flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all whitespace-nowrap">
+                    ▶ সরাসরি ক্লাস শুরু করুন <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+               </button>`
+            : `<button class="bg-slate-900 hover:bg-blue-600 text-white px-5 py-2.5 rounded-xl font-bold text-sm sm:text-base transition-colors flex items-center justify-center gap-2 shadow-sm hover:shadow-md whitespace-nowrap">
+                    View Details <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+               </button>`;
+
+        const card = `
+            <div class="group course-card-shine bg-white rounded-3xl overflow-hidden shadow-md hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 border ${isEnrolled ? 'border-2 border-emerald-500/50 ring-4 ring-emerald-500/10' : 'border-slate-200/80'} flex flex-col h-full cursor-pointer" onclick="window.location.href='/Views/Course/course.html?id=${course.id}'">
+                <div class="relative overflow-hidden w-full h-44 sm:h-48 bg-slate-900">
+                    <img src="${imgUrl}" alt="${course.title}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 ease-out">
+                    ${badgeHtml}
+                    ${batchBadgeHtml}
+                    <div class="absolute inset-0 bg-slate-900/10 group-hover:bg-transparent transition-colors duration-300"></div>
+                </div>
+                <div class="p-5 sm:p-6 flex flex-col flex-grow">
+                    <div class="flex items-start justify-between gap-3 mb-2">
+                        <h3 class="text-xl sm:text-2xl font-black text-slate-900 group-hover:text-blue-600 transition-colors leading-snug line-clamp-1">${course.title}</h3>
+                        ${isEnrolled ? '<span class="text-xs bg-emerald-100 text-emerald-800 font-bold px-3 py-1 rounded-full border border-emerald-300 flex-shrink-0">Active</span>' : ''}
+                    </div>
+                    <p class="text-slate-600 mb-4 line-clamp-2 text-sm leading-relaxed flex-grow">${course.description || ''}</p>
+                    <div class="flex items-center justify-between gap-4 pt-4 border-t border-slate-100 mt-auto">
+                        <div class="flex items-center flex-shrink-0">
+                            ${priceHtml}
+                        </div>
+                        <div class="flex-shrink-0">
+                            ${btnHtml}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        grid.innerHTML += card;
+    });
+}
+window.renderCoursesList = renderCoursesList;
+
 async function loadCourses() {
     try {
         const token = localStorage.getItem('token');
-        let enrolledCourseIds = new Set();
+        userEnrolledCourseIds = new Set();
         
         const guestBanner = document.getElementById('guestLoginBanner');
 
@@ -166,7 +299,7 @@ async function loadCourses() {
                     myCourses.forEach(c => {
                         if (c.status === 'Approved') {
                             const cId = c.courseId || c.course?.id;
-                            if (cId) enrolledCourseIds.add(cId);
+                            if (cId) userEnrolledCourseIds.add(cId);
                         }
                     });
                 }
@@ -176,62 +309,9 @@ async function loadCourses() {
         }
 
         const response = await fetch('/api/Courses');
-        const courses = await response.json();
+        allFetchedCourses = await response.json();
         
-        const grid = document.getElementById('coursesGrid');
-        if (!grid) return;
-        grid.innerHTML = '';
-
-        courses.forEach(course => {
-            let imgUrl = course.imageUrl || 'https://via.placeholder.com/400x200?text=Physics+Course';
-            if(!imgUrl.startsWith('http')) {
-                imgUrl = '/' + imgUrl.replace(/^\//, '');
-            }
-
-            const isEnrolled = enrolledCourseIds.has(course.id);
-            
-            const badgeHtml = isEnrolled 
-                ? `<span class="absolute top-3 left-3 bg-emerald-600/95 backdrop-blur-sm text-white text-xs sm:text-sm font-bold px-3 py-1.5 rounded-full shadow-md flex items-center gap-1.5 z-10 border border-emerald-400/30"><i class="fa-solid fa-circle-check"></i> কেনা হয়েছে (Active)</span>`
-                : '';
-                
-            const priceHtml = isEnrolled
-                ? `<span class="text-base sm:text-lg font-extrabold text-emerald-600 flex items-center gap-1.5 whitespace-nowrap"><i class="fa-solid fa-lock-open text-sm"></i> আনলকড</span>`
-                : `<span class="text-2xl sm:text-3xl font-black text-blue-900 group-hover:scale-105 ease-out transition-transform origin-left whitespace-nowrap">৳${course.price}</span>`;
-
-            const btnHtml = isEnrolled
-                ? `<button class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-5 py-2.5 rounded-xl font-bold text-sm sm:text-base flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all whitespace-nowrap">
-                        ▶ সরাসরি ক্লাস শুরু করুন <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
-                   </button>`
-                : `<button class="bg-slate-900 hover:bg-blue-600 text-white px-5 py-2.5 rounded-xl font-bold text-sm sm:text-base transition-colors flex items-center justify-center gap-2 shadow-sm hover:shadow-md whitespace-nowrap">
-                        View Details <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
-                   </button>`;
-
-            const card = `
-                <div class="group course-card-shine bg-white rounded-3xl overflow-hidden shadow-md hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 border ${isEnrolled ? 'border-2 border-emerald-500/50 ring-4 ring-emerald-500/10' : 'border-slate-200/80'} flex flex-col h-full cursor-pointer" onclick="window.location.href='/Views/Course/course.html?id=${course.id}'">
-                    <div class="relative overflow-hidden w-full h-44 sm:h-48 bg-slate-900">
-                        <img src="${imgUrl}" alt="${course.title}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 ease-out">
-                        ${badgeHtml}
-                        <div class="absolute inset-0 bg-slate-900/10 group-hover:bg-transparent transition-colors duration-300"></div>
-                    </div>
-                    <div class="p-5 sm:p-6 flex flex-col flex-grow">
-                        <div class="flex items-start justify-between gap-3 mb-2">
-                            <h3 class="text-xl sm:text-2xl font-black text-slate-900 group-hover:text-blue-600 transition-colors leading-snug line-clamp-1">${course.title}</h3>
-                            ${isEnrolled ? '<span class="text-xs bg-emerald-100 text-emerald-800 font-bold px-3 py-1 rounded-full border border-emerald-300 flex-shrink-0">Active</span>' : ''}
-                        </div>
-                        <p class="text-slate-600 mb-4 line-clamp-2 text-sm leading-relaxed flex-grow">${course.description || ''}</p>
-                        <div class="flex items-center justify-between gap-4 pt-4 border-t border-slate-100 mt-auto">
-                            <div class="flex items-center flex-shrink-0">
-                                ${priceHtml}
-                            </div>
-                            <div class="flex-shrink-0">
-                                ${btnHtml}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-            grid.innerHTML += card;
-        });
+        renderCoursesList();
     } catch (error) {
         console.error("Error loading courses:", error);
     }

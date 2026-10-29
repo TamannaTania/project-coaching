@@ -3,6 +3,7 @@
 
 // Parse Query Parameters
 const urlParams = new URLSearchParams(window.location.search);
+let currentLectureId = parseInt(urlParams.get('lectureId')) || null;
 const courseId = urlParams.get('courseId');
 let currentVideoUrl = urlParams.get('url') || '';
 let currentTitle = urlParams.get('title') || '';
@@ -112,8 +113,18 @@ async function initPlayer() {
         // Render Curriculum / Playlist
         renderPlaylist();
 
-        // If no initial video specified in URL, pick the first video
-        if (!currentVideoUrl && allVideoLectures.length > 0) {
+        // If lectureId is provided, find that specific lecture
+        if (currentLectureId) {
+            const found = allVideoLectures.find(v => v.id === currentLectureId);
+            if (found) {
+                currentVideoUrl = found.normalizedUrl;
+                currentTitle = found.title;
+            }
+        } else if (currentVideoUrl) {
+            const found = allVideoLectures.find(v => v.normalizedUrl === normalizeUrl(currentVideoUrl));
+            if (found) currentLectureId = found.id;
+        } else if (allVideoLectures.length > 0) {
+            currentLectureId = allVideoLectures[0].id;
             currentVideoUrl = allVideoLectures[0].normalizedUrl;
             currentTitle = allVideoLectures[0].title;
         }
@@ -174,11 +185,11 @@ function renderPlaylist() {
         // Render Videos
         videos.forEach((v) => {
             const normUrl = normalizeUrl(v.url);
-            const isPlaying = normUrl === normalizeUrl(currentVideoUrl);
+            const isPlaying = currentLectureId ? (v.id === currentLectureId) : (normUrl === normalizeUrl(currentVideoUrl));
             const safeTitle = v.title.replace(/'/g, "\\'");
 
             html += `
-                <div onclick="selectLecture('${normUrl}', '${safeTitle}')" 
+                <div onclick="selectLecture(${v.id}, '${normUrl}', '${safeTitle}')" 
                      class="lecture-item p-2.5 rounded-xl cursor-pointer transition flex items-center justify-between gap-3 border ${isPlaying ? 'bg-blue-600/20 border-blue-500/50 text-blue-300 font-bold shadow-md shadow-blue-500/10' : 'bg-slate-900/60 border-slate-800/70 text-slate-300 hover:bg-slate-800 hover:text-white'}"
                      data-url="${normUrl}">
                     <div class="flex items-center gap-2.5 overflow-hidden">
@@ -231,13 +242,15 @@ function toggleChapterAccordion(contentId, iconId) {
 }
 
 // Switch to a new video lecture
-function selectLecture(videoUrl, title) {
+function selectLecture(lectureId, videoUrl, title) {
+    currentLectureId = lectureId;
     currentVideoUrl = normalizeUrl(videoUrl);
     currentTitle = title;
     setVideo(currentVideoUrl, currentTitle);
 
     // Update URL without reloading page
     const newUrl = new URL(window.location.href);
+    if (currentLectureId) newUrl.searchParams.set('lectureId', currentLectureId);
     newUrl.searchParams.set('url', currentVideoUrl);
     newUrl.searchParams.set('title', currentTitle);
     window.history.replaceState({}, '', newUrl);
@@ -255,6 +268,10 @@ function setVideo(url, title) {
 
     if (source) source.src = url;
     if (player) {
+        player.setAttribute('controlsList', 'nodownload');
+        player.setAttribute('disablePictureInPicture', 'true');
+        player.controlsList = 'nodownload';
+        player.oncontextmenu = () => false;
         player.load();
         player.play().catch(e => {
             console.log('Autoplay deferred until interaction:', e);
@@ -269,10 +286,11 @@ function setVideo(url, title) {
         document.getElementById('lectureTitle').innerText = title || 'ভিডিও লেকচার';
     }
 
-    // Find current lecture index
-    currentIndex = allVideoLectures.findIndex(v => v.normalizedUrl === url);
+    // Find current lecture index by lectureId or URL
+    currentIndex = allVideoLectures.findIndex(v => (currentLectureId && v.id === currentLectureId) || v.normalizedUrl === url);
     if (currentIndex !== -1) {
         const currentObj = allVideoLectures[currentIndex];
+        currentLectureId = currentObj.id;
         if (document.getElementById('currentChapterName')) {
             document.getElementById('currentChapterName').innerText = `${currentObj.chapterTitle || 'চ্যাপ্টার'}`;
         }
@@ -288,14 +306,14 @@ function setVideo(url, title) {
 function playPreviousLecture() {
     if (currentIndex > 0) {
         const prev = allVideoLectures[currentIndex - 1];
-        selectLecture(prev.normalizedUrl, prev.title);
+        selectLecture(prev.id, prev.normalizedUrl, prev.title);
     }
 }
 
 function playNextLecture() {
     if (currentIndex >= 0 && currentIndex < allVideoLectures.length - 1) {
         const next = allVideoLectures[currentIndex + 1];
-        selectLecture(next.normalizedUrl, next.title);
+        selectLecture(next.id, next.normalizedUrl, next.title);
     }
 }
 
@@ -337,5 +355,71 @@ function toggleTheaterMode() {
     }
 }
 
+// --- Video Protection & Dynamic Watermark ---
+function initVideoProtection() {
+    const watermarkEl = document.getElementById('videoWatermark');
+    const container = document.getElementById('videoContainer');
+    
+    // Set watermark identity to student's phone or email
+    let identifier = 'PhysicsClassroom';
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+        try {
+            const u = JSON.parse(storedUser);
+            identifier = u.phone || u.email || u.userName || u.fullName || 'Student';
+        } catch(e) {}
+    }
+
+    if (watermarkEl) {
+        watermarkEl.innerHTML = `<i class="fa-solid fa-shield-halved mr-1 text-[9px] text-blue-400"></i> ${identifier} • PhysicsClassroom`;
+        
+        // Randomly reposition watermark every 6 seconds to prevent video scraping/recording
+        function moveWatermark() {
+            if (!container) return;
+            const maxTop = 80;
+            const minTop = 10;
+            const maxLeft = 75;
+            const minLeft = 8;
+            
+            const randomTop = Math.floor(Math.random() * (maxTop - minTop + 1)) + minTop;
+            const randomLeft = Math.floor(Math.random() * (maxLeft - minLeft + 1)) + minLeft;
+            
+            watermarkEl.style.top = randomTop + '%';
+            watermarkEl.style.left = randomLeft + '%';
+        }
+
+        moveWatermark();
+        setInterval(moveWatermark, 6000);
+    }
+
+    // Block keyboard shortcuts: F12, Ctrl+S, Ctrl+U, Ctrl+Shift+I/J/C
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'F12' ||
+            (e.ctrlKey && (e.key === 's' || e.key === 'S' || e.key === 'u' || e.key === 'U')) ||
+            (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j' || e.key === 'C' || e.key === 'c'))) {
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+        }
+    });
+
+    // Disable right click and enforce nodownload on video & container
+    const player = document.getElementById('videoPlayer');
+    if (player) {
+        player.setAttribute('controlsList', 'nodownload');
+        player.setAttribute('disablePictureInPicture', 'true');
+        player.controlsList = 'nodownload';
+        player.oncontextmenu = () => false;
+        player.addEventListener('contextmenu', e => { e.preventDefault(); return false; });
+    }
+    if (container) {
+        container.oncontextmenu = () => false;
+        container.addEventListener('contextmenu', e => { e.preventDefault(); return false; });
+    }
+}
+
 // Run on load
-window.addEventListener('DOMContentLoaded', initPlayer);
+window.addEventListener('DOMContentLoaded', () => {
+    initPlayer();
+    initVideoProtection();
+});

@@ -27,19 +27,57 @@ namespace ProjectCoachingAPI.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register(UserRegisterDto request)
         {
-            var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
-            if (existingUser != null)
+            string? cleanPhone = !string.IsNullOrWhiteSpace(request.Phone) ? request.Phone.Trim() : null;
+            if (!string.IsNullOrWhiteSpace(cleanPhone))
             {
-                return BadRequest(new { message = "User with this email already exists!" });
+                if (cleanPhone.StartsWith("+88"))
+                {
+                    cleanPhone = cleanPhone.Substring(3);
+                }
+                else if (cleanPhone.StartsWith("88"))
+                {
+                    cleanPhone = cleanPhone.Substring(2);
+                }
+            }
+
+            string? cleanEmail = !string.IsNullOrWhiteSpace(request.Email) ? request.Email.Trim().ToLower() : null;
+
+            // Must provide at least one: Phone or Email
+            if (string.IsNullOrWhiteSpace(cleanPhone) && string.IsNullOrWhiteSpace(cleanEmail))
+            {
+                return BadRequest(new { message = "অনুগ্রহ করে মোবাইল নম্বর অথবা ইমেইল প্রদান করুন।" });
+            }
+
+            // Check mobile uniqueness if provided
+            if (!string.IsNullOrWhiteSpace(cleanPhone))
+            {
+                var existingPhone = await _context.Users.AnyAsync(u => u.Phone != null && u.Phone == cleanPhone);
+                if (existingPhone)
+                {
+                    return BadRequest(new { message = "এই মোবাইল নম্বর দিয়ে ইতিমধ্যে একটি অ্যাকাউন্ট তৈরি করা আছে!" });
+                }
+            }
+
+            // Check email uniqueness ONLY if an email was actually provided
+            if (!string.IsNullOrWhiteSpace(cleanEmail))
+            {
+                var existingEmail = await _context.Users.AnyAsync(u => u.Email != null && u.Email.ToLower() == cleanEmail);
+                if (existingEmail)
+                {
+                    return BadRequest(new { message = "এই ইমেইল দিয়ে ইতিমধ্যে একটি অ্যাকাউন্ট তৈরি করা আছে!" });
+                }
             }
 
             string passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
-            string finalName = !string.IsNullOrWhiteSpace(request.Name) ? request.Name : (!string.IsNullOrWhiteSpace(request.Username) ? request.Username : request.Email);
+            string finalName = !string.IsNullOrWhiteSpace(request.Name) 
+                ? request.Name.Trim() 
+                : (!string.IsNullOrWhiteSpace(request.Username) ? request.Username.Trim() : (cleanPhone ?? cleanEmail ?? "Student"));
 
             var user = new User
             {
                 Name = finalName,
-                Email = request.Email,
+                Phone = cleanPhone,
+                Email = cleanEmail, // NULL if not provided!
                 PasswordHash = passwordHash,
                 Role = "Student" 
             };
@@ -47,7 +85,12 @@ namespace ProjectCoachingAPI.Controllers
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
-            return Ok(new { message = "Registration successful!" });
+            return Ok(new { 
+                message = "Registration successful!",
+                name = user.Name,
+                phone = user.Phone,
+                email = user.Email
+            });
         }
 
         [HttpPost("login")]
@@ -56,13 +99,29 @@ namespace ProjectCoachingAPI.Controllers
             try
             {
                 var search = (request.Email ?? "").Trim();
+                if (string.IsNullOrWhiteSpace(search))
+                {
+                    return BadRequest("অনুগ্রহ করে মোবাইল নম্বর অথবা ইমেইল দিন।");
+                }
+
+                string phoneSearch = search;
+                if (phoneSearch.StartsWith("+88"))
+                {
+                    phoneSearch = phoneSearch.Substring(3);
+                }
+                else if (phoneSearch.StartsWith("88"))
+                {
+                    phoneSearch = phoneSearch.Substring(2);
+                }
+
                 var user = await _context.Users.FirstOrDefaultAsync(u => 
-                    (u.Email != null && u.Email == search) || 
-                    (u.Name != null && u.Name == search)
+                    (u.Phone != null && (u.Phone == search || u.Phone == phoneSearch)) ||
+                    (u.Email != null && u.Email.ToLower() == search.ToLower()) || 
+                    (u.Name != null && u.Name.ToLower() == search.ToLower())
                 );
                 if (user == null)
                 {
-                    return BadRequest("User not found!");
+                    return BadRequest("কোনো অ্যাকাউন্ট পাওয়া যায়নি! সঠিক মোবাইল নম্বর বা ইমেইল দিন।");
                 }
 
                 bool passwordValid = !string.IsNullOrEmpty(user.PasswordHash) && BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash);
@@ -104,8 +163,17 @@ namespace ProjectCoachingAPI.Controllers
 
                 string token = CreateToken(user);
 
-                // Return the token, username, email, active deviceId, and role
-                return Ok(new { Token = token, Username = user.Name ?? "", Email = user.Email ?? "", DeviceId = user.DeviceId ?? "", Role = user.Role ?? "Student" });
+                // Return the token, full name, username, phone, email, active deviceId, and role
+                return Ok(new { 
+                    Token = token, 
+                    Username = user.Name ?? "", 
+                    Name = user.Name ?? "",
+                    FullName = user.Name ?? "",
+                    Phone = user.Phone ?? "",
+                    Email = user.Email ?? "", 
+                    DeviceId = user.DeviceId ?? "", 
+                    Role = user.Role ?? "Student" 
+                });
             }
             catch (Exception ex)
             {
@@ -119,7 +187,9 @@ namespace ProjectCoachingAPI.Controllers
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Name, user.Name ?? "Student"),
+                new Claim("FullName", user.Name ?? "Student"),
                 new Claim(ClaimTypes.Email, user.Email ?? ""),
+                new Claim("Phone", user.Phone ?? ""),
                 new Claim(ClaimTypes.Role, user.Role ?? "Student"),
                 new Claim("DeviceId", user.DeviceId ?? "")
             };
@@ -176,7 +246,11 @@ namespace ProjectCoachingAPI.Controllers
                 return Unauthorized(new { isValid = false, message = "No valid authentication token found." });
             }
 
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == identifier.ToLower() || u.Name.ToLower() == identifier.ToLower());
+            var user = await _context.Users.FirstOrDefaultAsync(u => 
+                (u.Email != null && u.Email.ToLower() == identifier.ToLower()) || 
+                (u.Name != null && u.Name.ToLower() == identifier.ToLower()) ||
+                (u.Phone != null && u.Phone == identifier)
+            );
             if (user == null)
             {
                 return Unauthorized(new { isValid = false, message = "User not found." });
@@ -184,7 +258,7 @@ namespace ProjectCoachingAPI.Controllers
 
             if (user.Role == "Admin")
             {
-                return Ok(new { isValid = true, username = user.Name, role = user.Role });
+                return Ok(new { isValid = true, username = user.Name, name = user.Name, fullName = user.Name, role = user.Role });
             }
 
             var clientDeviceId = Request.Headers["X-Device-Id"].FirstOrDefault();
@@ -204,7 +278,7 @@ namespace ProjectCoachingAPI.Controllers
                 });
             }
 
-            return Ok(new { isValid = true, username = user.Name, role = user.Role, deviceId = user.DeviceId });
+            return Ok(new { isValid = true, username = user.Name, name = user.Name, fullName = user.Name, role = user.Role, phone = user.Phone ?? "", email = user.Email ?? "", deviceId = user.DeviceId });
         }
 
         [HttpPost("logout")]
@@ -302,6 +376,7 @@ namespace ProjectCoachingAPI.Controllers
             }
 
             var user = await _context.Users.FirstOrDefaultAsync(u => 
+                (u.Phone != null && u.Phone == search) ||
                 (u.Email != null && u.Email.ToLower() == search) || 
                 (u.Name != null && u.Name.ToLower() == search)
             );
@@ -338,6 +413,7 @@ namespace ProjectCoachingAPI.Controllers
             }
 
             var user = await _context.Users.FirstOrDefaultAsync(u => 
+                (u.Phone != null && u.Phone == search) ||
                 (u.Email != null && u.Email.ToLower() == search) || 
                 (u.Name != null && u.Name.ToLower() == search)
             );

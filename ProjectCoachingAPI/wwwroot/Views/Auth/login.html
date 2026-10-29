@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -27,8 +27,13 @@
 
         <form id="loginForm" class="space-y-6">
             <div>
-                <label class="block text-slate-700 font-bold mb-2">Username or Email</label>
-                <input type="text" id="username" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" required>
+                <label class="block text-slate-700 font-bold mb-2 text-sm">
+                    মোবাইল নম্বর অথবা ইমেইল (Mobile / Email)
+                </label>
+                <div class="relative">
+                    <span class="absolute left-3.5 top-3.5 text-slate-400 text-sm"><i class="fa-solid fa-user"></i></span>
+                    <input type="text" id="username" placeholder="01XXXXXXXXX অথবা name@gmail.com" class="w-full bg-slate-50 border border-slate-200 rounded-lg pl-10 pr-4 py-3 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 font-medium" required>
+                </div>
             </div>
             <div>
                 <label class="block text-slate-700 font-bold mb-2">Password</label>
@@ -93,8 +98,8 @@
                 </p>
 
                 <div class="mb-4">
-                    <label class="block text-slate-700 font-bold text-sm mb-2">Email or Username</label>
-                    <input type="text" id="forgotEmailInput" placeholder="name@example.com" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                    <label class="block text-slate-700 font-bold text-sm mb-2">মোবাইল নম্বর অথবা ইমেইল</label>
+                    <input type="text" id="forgotEmailInput" placeholder="01XXXXXXXXX অথবা name@example.com" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
                 </div>
 
                 <div id="forgotAlert" class="hidden mb-4 p-3 rounded-lg text-sm font-medium"></div>
@@ -159,6 +164,6 @@
     </div>
 
     <!-- Login Script -->
-    <script src="/Scripts/Auth/login.js?v=1.2"></script>
+    <script src="/Scripts/Auth/login.js?v=20261029_2"></script>
 </body>
 </html>

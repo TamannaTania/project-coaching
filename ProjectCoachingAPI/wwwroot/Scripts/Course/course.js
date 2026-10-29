@@ -1,4 +1,4 @@
-// course.js - Course Details, Chapters & Enrollment Logic
+﻿// course.js - Course Details, Chapters & Enrollment Logic
 // @ts-nocheck
 
 const urlParams = new URLSearchParams(window.location.search);
@@ -184,7 +184,13 @@ async function loadCourseDetails() {
 
         if(!course) throw new Error("Not found");
 
+        const batchTag = course.batch || course.Batch || 'HSC 2028';
         document.getElementById('courseHeader').innerHTML = `
+            <div class="mb-2">
+                <span class="bg-blue-100 text-blue-800 text-xs font-extrabold px-3 py-1 rounded-full border border-blue-200 inline-flex items-center gap-1.5 shadow-sm">
+                    <i class="fa-solid fa-graduation-cap text-xs"></i> ${batchTag}
+                </span>
+            </div>
             <h1 class="text-3xl md:text-4xl font-bold text-slate-900 mb-2">${course.title}</h1>
             <p class="text-slate-500 font-medium">Complete Physics Preparation Batch</p>
         `;

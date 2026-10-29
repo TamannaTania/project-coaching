@@ -70,10 +70,27 @@ async function doLogin(forceLogin = false) {
         if (response.ok) {
             const data = await response.json();
             localStorage.setItem('token', data.token);
-            localStorage.setItem('username', data.username || email);
-            localStorage.setItem('email', data.email || email);
+            const studentName = data.name || data.fullName || data.Name || data.FullName || data.username || data.Username || email;
+            localStorage.setItem('username', studentName);
+            localStorage.setItem('fullName', studentName);
+            localStorage.setItem('name', studentName);
+            
+            const studentPhone = data.phone || data.Phone || '';
+            const studentEmail = data.email || data.Email || '';
+            localStorage.setItem('phone', studentPhone);
+            localStorage.setItem('email', studentEmail);
+
             const userRole = data.role || data.Role || 'Student';
             localStorage.setItem('role', userRole);
+
+            localStorage.setItem('user', JSON.stringify({
+                fullName: studentName,
+                name: studentName,
+                userName: studentName,
+                phone: studentPhone,
+                email: studentEmail,
+                role: userRole
+            }));
             if (data.deviceId) localStorage.setItem('deviceId', data.deviceId);
 
             // Handle Remember Me
@@ -329,3 +346,16 @@ if (useNewPasswordToLoginBtn) {
         if (loginBtn) loginBtn.focus();
     });
 }
+
+window.addEventListener('DOMContentLoaded', () => {
+    const registeredPhone = sessionStorage.getItem('just_registered_user');
+    if (registeredPhone && document.getElementById('username')) {
+        document.getElementById('username').value = registeredPhone;
+        sessionStorage.removeItem('just_registered_user');
+        const err = document.getElementById('errorMsg');
+        if (err) {
+            err.className = 'bg-emerald-50 text-emerald-700 p-3 rounded-lg text-sm font-medium text-center border border-emerald-200';
+            err.innerText = 'অ্যাকাউন্ট সফলভাবে তৈরি হয়েছে! এবার পাসওয়ার্ড দিয়ে লগইন করুন।';
+        }
+    }
+});
