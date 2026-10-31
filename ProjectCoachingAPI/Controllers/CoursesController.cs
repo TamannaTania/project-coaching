@@ -46,6 +46,7 @@ namespace ProjectCoachingAPI.Controllers
 
             // Check if user is logged in and enrolled
             bool isEnrolled = false;
+            bool isAdmin = false;
             string? userIdentifier = null;
 
             if (User.Identity != null && User.Identity.IsAuthenticated)
@@ -79,6 +80,7 @@ namespace ProjectCoachingAPI.Controllers
                 var user = await _context.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == userIdentifier.ToLower() || u.Name.ToLower() == userIdentifier.ToLower());
                 if (user != null)
                 {
+                    isAdmin = (user.Role == "Admin");
                     var clientDeviceId = Request.Headers["X-Device-Id"].FirstOrDefault();
                     bool isDeviceActive = (user.Role == "Admin")
                         || string.IsNullOrEmpty(user.DeviceId)
@@ -88,7 +90,7 @@ namespace ProjectCoachingAPI.Controllers
                     if (isDeviceActive)
                     {
                         var enrollment = await _context.Enrollments.FirstOrDefaultAsync(e => e.UserId == user.Id && e.CourseId == id && e.Status == "Approved");
-                        if (enrollment != null || user.Role == "Admin")
+                        if (enrollment != null)
                         {
                             isEnrolled = true;
                         }
@@ -107,7 +109,7 @@ namespace ProjectCoachingAPI.Controllers
                     co.Type,
                     co.OrderIndex,
                     // Send URL only if enrolled!
-                    Url = isEnrolled ? co.Url : "" 
+                    Url = (isEnrolled || isAdmin) ? co.Url : "" 
                 }).ToList()
             }).ToList();
 
@@ -118,6 +120,7 @@ namespace ProjectCoachingAPI.Controllers
                 course.Badge,
                 course.Price,
                 course.ImageUrl,
+                course.Batch,
                 course.Features,
                 enrolledCount = enrolledCount,
                 chapters = chapters,

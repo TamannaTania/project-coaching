@@ -83,9 +83,12 @@ function updateAuthNav(lang) {
     if (mobileContainer) {
         if (token) {
             mobileContainer.innerHTML = `
-                <a href="/Views/Profile/profile.html" class="p-1.5 text-slate-700 hover:text-blue-600 font-bold text-xs flex items-center gap-1">
-                    <i class="fa-solid fa-user-circle text-lg text-blue-600"></i> <span class="max-w-[90px] truncate">${username || 'Student'}</span>
+                <a href="/Views/Profile/profile.html" class="px-3 py-1.5 bg-slate-100 hover:bg-blue-50 text-slate-800 font-bold text-sm flex items-center gap-1.5 rounded-full border border-slate-200">
+                    <i class="fa-solid fa-user-circle text-xl text-blue-600"></i> <span class="max-w-[100px] truncate">${username || 'Student'}</span>
                 </a>
+                <button onclick="logout()" class="p-2 bg-red-50 text-red-600 rounded-full text-sm font-bold border border-red-200 ml-1" title="লগআউট">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                </button>
             `;
         } else {
             mobileContainer.innerHTML = `<a href="/Views/Auth/login.html" class="bg-blue-600 text-white px-3 py-1.5 rounded-full text-xs font-bold shadow-sm">লগইন</a>`;
@@ -101,11 +104,11 @@ function updateAuthNav(lang) {
             <a href="/Views/Profile/profile.html" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-2 rounded-full text-xs md:text-sm flex items-center gap-1.5 shadow-md shadow-blue-600/30 transition transform hover:-translate-y-0.5">
                 <i class="fa-solid fa-graduation-cap"></i> <span>` + myCoursesText + `</span>
             </a>
-            <a href="/Views/Profile/profile.html" class="text-slate-700 hover:text-blue-600 font-semibold transition flex items-center gap-2">
-                <i class="fa-solid fa-user-circle text-2xl text-blue-600"></i> <span class="hidden md:inline">` + profileText + `</span>
+            <a href="/Views/Profile/profile.html" class="bg-slate-100 hover:bg-blue-50 text-slate-800 hover:text-blue-700 font-bold px-4 py-2 rounded-full text-sm md:text-base flex items-center gap-2 border border-slate-200 transition shadow-sm hover:shadow">
+                <i class="fa-solid fa-user-circle text-2xl text-blue-600"></i> <span class="inline-block max-w-[120px] truncate">` + profileText + `</span>
             </a>
-            <button onclick="logout()" class="text-red-500 hover:text-red-700 font-bold transition flex items-center gap-1.5 text-sm ml-1">
-                <i class="fa-solid fa-arrow-right-from-bracket"></i> <span class="hidden md:inline">` + logoutText + `</span>
+            <button onclick="logout()" class="bg-red-50 hover:bg-red-100 text-red-600 hover:text-red-700 font-bold px-4 py-2 rounded-full text-sm md:text-base transition flex items-center gap-2 shadow-sm border border-red-200 ml-1 hover:shadow">
+                <i class="fa-solid fa-arrow-right-from-bracket text-base"></i> <span class="hidden sm:inline">` + logoutText + `</span>
             </button>
         `;
     } else {
@@ -177,9 +180,9 @@ function filterCoursesByBatch(batch) {
     buttons.forEach(btn => {
         const btnBatch = btn.getAttribute('data-batch');
         if (btnBatch === currentSelectedBatch) {
-            btn.className = 'batch-tab-btn px-4 sm:px-5 py-2.5 rounded-full font-bold text-xs sm:text-sm transition-all shadow-md bg-blue-600 text-white shadow-blue-500/20';
+            btn.classList.add('active');
         } else {
-            btn.className = 'batch-tab-btn px-4 sm:px-5 py-2.5 rounded-full font-bold text-xs sm:text-sm transition-all bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 shadow-sm';
+            btn.classList.remove('active');
         }
     });
 
@@ -214,6 +217,31 @@ function renderCoursesList() {
             </div>
         `;
         return;
+    }
+
+    const scrollContainer = document.getElementById('coursesScrollContainer');
+    const scrollHint = document.getElementById('courseScrollHint');
+
+    if (scrollContainer) {
+        scrollContainer.scrollTop = 0; // Reset scroll to top when changing batch
+    }
+
+    if (filtered.length > 4) {
+        if (scrollContainer) {
+            scrollContainer.classList.add('max-h-[960px]', 'overflow-y-auto');
+        }
+        if (scrollHint) {
+            scrollHint.classList.remove('hidden');
+            scrollHint.classList.add('flex');
+        }
+    } else {
+        if (scrollContainer) {
+            scrollContainer.classList.remove('max-h-[960px]', 'overflow-y-auto');
+        }
+        if (scrollHint) {
+            scrollHint.classList.add('hidden');
+            scrollHint.classList.remove('flex');
+        }
     }
 
     grid.innerHTML = '';
@@ -395,11 +423,14 @@ async function loadAbout() {
         const res = await fetch('/api/About');
         if(res.ok) {
             const data = await res.json();
-            if(document.getElementById('aboutTitle')) document.getElementById('aboutTitle').innerText = data.title;
-            if(document.getElementById('aboutDesc')) document.getElementById('aboutDesc').innerText = data.description;
-            if(document.getElementById('aboutImg')) document.getElementById('aboutImg').src = data.imageUrl;
+            const safeTitle = (data.title || 'About PhysicsClassroom').replace(/PhysicsAcademy/gi, 'PhysicsClassroom');
+            const safeDesc = (data.description || '').replace(/PhysicsAcademy/gi, 'PhysicsClassroom');
+            if(document.getElementById('aboutTitle')) document.getElementById('aboutTitle').innerText = safeTitle;
+            if(document.getElementById('aboutDesc')) document.getElementById('aboutDesc').innerText = safeDesc;
+            if(document.getElementById('aboutImg') && data.imageUrl) document.getElementById('aboutImg').src = data.imageUrl;
         }
     } catch(e) {}
+}
 }
 
 async function loadFreeClasses() {

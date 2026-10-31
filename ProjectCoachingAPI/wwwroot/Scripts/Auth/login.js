@@ -356,6 +356,7 @@ window.addEventListener('DOMContentLoaded', () => {
         if (err) {
             err.className = 'bg-emerald-50 text-emerald-700 p-3 rounded-lg text-sm font-medium text-center border border-emerald-200';
             err.innerText = 'অ্যাকাউন্ট সফলভাবে তৈরি হয়েছে! এবার পাসওয়ার্ড দিয়ে লগইন করুন।';
+            err.classList.remove('hidden');
         }
     }
 });

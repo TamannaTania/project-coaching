@@ -188,11 +188,18 @@ namespace ProjectCoachingAPI.Controllers
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Name, user.Name ?? "Student"),
                 new Claim("FullName", user.Name ?? "Student"),
-                new Claim(ClaimTypes.Email, user.Email ?? ""),
-                new Claim("Phone", user.Phone ?? ""),
                 new Claim(ClaimTypes.Role, user.Role ?? "Student"),
                 new Claim("DeviceId", user.DeviceId ?? "")
             };
+
+            if (!string.IsNullOrWhiteSpace(user.Email))
+            {
+                claims.Add(new Claim(ClaimTypes.Email, user.Email));
+            }
+            if (!string.IsNullOrWhiteSpace(user.Phone))
+            {
+                claims.Add(new Claim("Phone", user.Phone));
+            }
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
                 _configuration.GetSection("Jwt:Key").Value!));
@@ -215,16 +222,39 @@ namespace ProjectCoachingAPI.Controllers
         [HttpGet("validate-session")]
         public async Task<IActionResult> ValidateSession()
         {
-            string? identifier = User.FindFirstValue(ClaimTypes.Email)
-                            ?? User.FindFirstValue("email")
-                            ?? User.FindFirstValue(ClaimTypes.Name)
-                            ?? User.FindFirstValue("name")
-                            ?? User.Claims.FirstOrDefault(c => c.Type.EndsWith("/emailaddress") || c.Type == "email" || c.Type.EndsWith("/name") || c.Type == "name")?.Value;
+            User? user = null;
+
+            // 1. Search directly by User ID (NameIdentifier) - 100% reliable even when Email is null
+            string? userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (int.TryParse(userIdStr, out int userId))
+            {
+                user = await _context.Users.FindAsync(userId);
+            }
+
+            // 2. Fallback to Phone, Email, or Name
+            if (user == null)
+            {
+                string? identifier = User.FindFirstValue("Phone")
+                                ?? User.FindFirstValue(ClaimTypes.Email)
+                                ?? User.FindFirstValue("email")
+                                ?? User.FindFirstValue(ClaimTypes.Name)
+                                ?? User.FindFirstValue("name");
+
+                if (!string.IsNullOrEmpty(identifier))
+                {
+                    user = await _context.Users.FirstOrDefaultAsync(u => 
+                        (u.Phone != null && u.Phone == identifier) ||
+                        (u.Email != null && u.Email.ToLower() == identifier.ToLower()) || 
+                        (u.Name != null && u.Name.ToLower() == identifier.ToLower())
+                    );
+                }
+            }
 
             string? tokenDeviceId = User.FindFirstValue("DeviceId")
                                 ?? User.Claims.FirstOrDefault(c => c.Type == "DeviceId" || c.Type == "deviceId")?.Value;
 
-            if (string.IsNullOrEmpty(identifier))
+            // 3. Fallback to inspecting raw Authorization Bearer header
+            if (user == null)
             {
                 var authHeader = Request.Headers["Authorization"].FirstOrDefault();
                 if (!string.IsNullOrEmpty(authHeader) && authHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
@@ -233,24 +263,29 @@ namespace ProjectCoachingAPI.Controllers
                     {
                         var handler = new JwtSecurityTokenHandler();
                         var jwt = handler.ReadJwtToken(authHeader.Substring("Bearer ".Length).Trim());
-                        identifier = jwt.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email || c.Type == "email" || c.Type.EndsWith("/emailaddress"))?.Value
-                                     ?? jwt.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name || c.Type == "name" || c.Type.EndsWith("/name"))?.Value;
+                        var idClaim = jwt.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier || c.Type == "nameid")?.Value;
+                        if (int.TryParse(idClaim, out int rawId))
+                        {
+                            user = await _context.Users.FindAsync(rawId);
+                        }
+                        if (user == null)
+                        {
+                            var rawPhone = jwt.Claims.FirstOrDefault(c => c.Type == "Phone" || c.Type == "phone")?.Value;
+                            var rawEmail = jwt.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email || c.Type == "email" || c.Type.EndsWith("/emailaddress"))?.Value;
+                            var rawName = jwt.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name || c.Type == "name" || c.Type.EndsWith("/name"))?.Value;
+
+                            user = await _context.Users.FirstOrDefaultAsync(u => 
+                                (!string.IsNullOrEmpty(rawPhone) && u.Phone == rawPhone) ||
+                                (!string.IsNullOrEmpty(rawEmail) && u.Email != null && u.Email.ToLower() == rawEmail.ToLower()) ||
+                                (!string.IsNullOrEmpty(rawName) && u.Name != null && u.Name.ToLower() == rawName.ToLower())
+                            );
+                        }
                         tokenDeviceId = jwt.Claims.FirstOrDefault(c => c.Type == "DeviceId" || c.Type == "deviceId")?.Value;
                     }
                     catch { }
                 }
             }
 
-            if (string.IsNullOrEmpty(identifier))
-            {
-                return Unauthorized(new { isValid = false, message = "No valid authentication token found." });
-            }
-
-            var user = await _context.Users.FirstOrDefaultAsync(u => 
-                (u.Email != null && u.Email.ToLower() == identifier.ToLower()) || 
-                (u.Name != null && u.Name.ToLower() == identifier.ToLower()) ||
-                (u.Phone != null && u.Phone == identifier)
-            );
             if (user == null)
             {
                 return Unauthorized(new { isValid = false, message = "User not found." });

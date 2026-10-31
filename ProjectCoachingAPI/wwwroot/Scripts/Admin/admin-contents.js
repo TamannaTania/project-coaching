@@ -1,4 +1,4 @@
-﻿// admin-contents.js - Admin Course Chapters & Content Management Logic
+// admin-contents.js - Admin Course Chapters & Content Management Logic
 // @ts-nocheck
 const token = localStorage.getItem('token');
 const role = (typeof getUserRole === 'function') ? getUserRole() : localStorage.getItem('role');
@@ -72,11 +72,16 @@ async function loadCourses() {
                     </div>`;
 
         courses.forEach(c => {
-            html += `<div id="opt-${c.id}" onclick="selectCourse('${c.id}', '${c.title}')" class="dropdown-opt cursor-pointer px-4 py-3 rounded-lg border border-transparent text-slate-700 hover:bg-slate-50 transition flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center"><i class="fa-solid fa-graduation-cap text-emerald-600"></i></div>
+            const badgeLabel = c.badge ? ` (${c.badge})` : '';
+            const fullTitle = `${c.title}${badgeLabel}`;
+            const badgePill = c.badge ? `<span class="bg-emerald-100 text-emerald-800 text-xs px-2 py-0.5 rounded-full font-bold">${c.badge}</span>` : '';
+            const batchPill = c.batch ? `<span class="text-xs text-slate-400 font-medium">${c.batch}</span>` : '';
+            
+            html += `<div id="opt-${c.id}" onclick="selectCourse('${c.id}', '${escapeForJs(fullTitle)}')" class="dropdown-opt cursor-pointer px-4 py-3 rounded-lg border border-transparent text-slate-700 hover:bg-slate-50 transition flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-graduation-cap text-emerald-600"></i></div>
                         <div>
-                            <div class="font-bold">${c.title}</div>
-                            <div class="text-xs text-slate-400">ID: ${c.id}</div>
+                            <div class="font-bold text-slate-800 flex items-center gap-2 flex-wrap">${c.title} ${badgePill}</div>
+                            <div class="text-xs text-slate-400 flex items-center gap-2 mt-0.5"><span>ID: ${c.id}</span> ${batchPill ? '• ' + batchPill : ''}</div>
                         </div>
                     </div>`;
         });
@@ -100,7 +105,8 @@ async function loadCourseDetails() {
         });
         const course = await res.json();
         
-        document.getElementById('courseTitleDisplay').innerText = `Chapters for: ${course.title}`;
+        const courseBadgeText = course.badge ? ` (${course.badge})` : '';
+        document.getElementById('courseTitleDisplay').innerText = `Chapters for: ${course.title}${courseBadgeText}`;
         document.getElementById('contentArea').classList.remove('hidden');
 
         // Remember currently open chapters so update doesn't collapse them

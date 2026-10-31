@@ -129,22 +129,22 @@ $(document).ready(function () {
                     let actionBtns = '';
                     if(req.status === 'Pending') {
                         actionBtns = `
-                            <button onclick="approveReq(${req.id})" style="background:#10b981; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer; margin-right:5px;">Approve</button>
-                            <button onclick="rejectReq(${req.id})" style="background:#ef4444; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">Reject</button>
+                            <button onclick="approveReq(${req.id})" style="background:#10b981; color:white; border:none; padding:6px 14px; border-radius:6px; cursor:pointer; margin-right:6px; font-weight:600; white-space:nowrap; box-shadow:0 2px 4px rgba(16,185,129,0.3);">Approve</button>
+                            <button onclick="rejectReq(${req.id})" style="background:#ef4444; color:white; border:none; padding:6px 14px; border-radius:6px; cursor:pointer; font-weight:600; white-space:nowrap; box-shadow:0 2px 4px rgba(239,68,68,0.3);">Reject</button>
                         `;
                     } else {
-                        actionBtns = `<span style="color:#6b7280; font-size:0.9rem;">No action</span>`;
+                        actionBtns = `<span style="color:#6b7280; font-size:0.9rem; font-weight:500;">No action</span>`;
                     }
 
                     html += `
                         <tr style="border-bottom: 1px solid #f3f4f6;">
-                            <td style="padding: 15px;">${new Date(req.date).toLocaleDateString()}</td>
-                            <td style="padding: 15px; font-weight: 600;">${req.userName}</td>
-                            <td style="padding: 15px;">${req.courseTitle}</td>
-                            <td style="padding: 15px;">${req.phone || '-'}</td>
-                            <td style="padding: 15px; font-family: monospace;">${req.trxId || '-'}</td>
-                            <td style="padding: 15px;">${statusBadge}</td>
-                            <td style="padding: 15px;">${actionBtns}</td>
+                            <td style="padding: 14px 12px; white-space: nowrap; font-size: 0.9rem;">${new Date(req.date).toLocaleDateString()}</td>
+                            <td style="padding: 14px 12px; font-weight: 600; white-space: nowrap;">${req.userName}</td>
+                            <td style="padding: 14px 12px; font-weight: 500;">${req.courseTitle}</td>
+                            <td style="padding: 14px 12px; font-weight: 600; color: #047857; white-space: nowrap;">${req.phone || '-'}</td>
+                            <td style="padding: 14px 12px; font-family: monospace; font-weight: 700; color: #1e40af; white-space: nowrap;">${req.trxId || '-'}</td>
+                            <td style="padding: 14px 12px; white-space: nowrap;">${statusBadge}</td>
+                            <td style="padding: 14px 12px; white-space: nowrap;">${actionBtns}</td>
                         </tr>
                     `;
                 });

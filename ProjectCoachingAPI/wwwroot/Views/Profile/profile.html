@@ -147,6 +147,20 @@
             color: #9ca3af;
             cursor: not-allowed;
         }
+    
+        .btn-back-home:hover {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+            color: white !important;
+            border-color: #059669 !important;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(16, 185, 129, 0.25) !important;
+        }
+        #logoutBtn {
+            font-size: 1.05rem !important;
+            font-weight: 700 !important;
+            padding: 12px 16px !important;
+        }
+        
     </style>
 </head>
 <body>
@@ -156,7 +170,7 @@
             <span class="logo-text">PhysicsClassroom</span>
         </a>
         <div class="header-right"><a href="/Views/Admin/admin.html" id="headerAdminBtn" style="display:none; background:#d97706; color:white; padding:8px 16px; border-radius:6px; font-weight:600; text-decoration:none; margin-right:10px;">🛡️ অ্যাডমিন ড্যাশবোর্ড</a>
-            <a href="/" class="btn-login" style="background: transparent; color: #1f2937; border: 1px solid #d1d5db;">← হোমপেজে ফিরে যান</a>
+            <a href="/" class="btn-back-home" style="display:inline-flex; align-items:center; gap:8px; background:linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); color:#15803d; border:1.5px solid #86efac; padding:10px 22px; border-radius:50px; font-weight:700; font-size:0.95rem; text-decoration:none; box-shadow:0 4px 6px -1px rgba(22, 101, 52, 0.1); transition:all 0.25s ease;"><span style="font-size:1.1rem; line-height:1;">←</span><span>হোমপেজে ফিরে যান</span></a>
         </div>
     </header>
 

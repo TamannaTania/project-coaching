@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProjectCoachingAPI.Data;
 using ProjectCoachingAPI.Models;
@@ -24,11 +24,20 @@ namespace ProjectCoachingAPI.Controllers
             {
                 about = new AboutContent 
                 { 
-                    Title = "About PhysicsAcademy", 
+                    Title = "About PhysicsClassroom", 
                     Description = "We are dedicated to providing the best physics education for HSC and Admission candidates.", 
                     ImageUrl = "https://images.unsplash.com/photo-1524169358666-79f22534bc6e?auto=format&fit=crop&q=80&w=800" 
                 };
                 _context.AboutContents.Add(about);
+                await _context.SaveChangesAsync();
+            }
+            else if (about.Title != null && about.Title.Contains("PhysicsAcademy"))
+            {
+                about.Title = about.Title.Replace("PhysicsAcademy", "PhysicsClassroom");
+                if (about.Description != null && about.Description.Contains("PhysicsAcademy"))
+                {
+                    about.Description = about.Description.Replace("PhysicsAcademy", "PhysicsClassroom");
+                }
                 await _context.SaveChangesAsync();
             }
             return about;
