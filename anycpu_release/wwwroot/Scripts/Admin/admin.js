@@ -52,8 +52,8 @@ $(document).ready(function () {
 
     // Tab Switching Logic
     function resetTabs() {
-        $('#tabDashboard, #tabCourses, #tabPayments, #tabStudents').css({color: '#6b7280', borderBottom: '3px solid transparent'});
-        $('#viewDashboard, #viewCourses, #viewPayments, #viewStudents').hide();
+        $('#tabDashboard, #tabCourses, #tabPayments, #tabReports, #tabStudents').css({color: '#6b7280', borderBottom: '3px solid transparent'});
+        $('#viewDashboard, #viewCourses, #viewPayments, #viewReports, #viewStudents').hide();
     }
 
     $('#tabDashboard').click(function() {
@@ -74,6 +74,13 @@ $(document).ready(function () {
         $(this).css({color: '#1a9c5c', borderBottom: '3px solid #1a9c5c'});
         $('#viewPayments').show();
         loadPayments();
+    });
+
+    $('#tabReports').click(function() {
+        resetTabs();
+        $(this).css({color: '#1a9c5c', borderBottom: '3px solid #1a9c5c'});
+        $('#viewReports').show();
+        loadReportsData();
     });
 
     $('#tabStudents').click(function() {
@@ -568,6 +575,503 @@ $(document).ready(function () {
         })
         .catch(err => console.error(err));
     }
+
+    // ==========================================
+    // 📊 Comprehensive Admin Reports Engine
+    // ==========================================
+    let reportRawData = { enrollments: [], courses: [], summary: {} };
+    let reportActiveType = 'financial';
+    let currentReportRows = [];
+
+    async function loadReportsData() {
+        const tbody = document.getElementById('reportTableBody');
+        if (!tbody) return;
+        tbody.innerHTML = '<tr><td colspan="8" style="padding: 30px; text-align: center; color: #64748b;"><i class="fa-solid fa-spinner fa-spin"></i> রিপোর্ট ডাটা লোড করা হচ্ছে...</td></tr>';
+
+        try {
+            const res = await fetch('/api/Enrollments/admin/reports', {
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
+            if (!res.ok) {
+                tbody.innerHTML = '<tr><td colspan="8" style="padding: 30px; text-align: center; color: #dc2626; font-weight: 700;">রিপোর্ট ডাটা লোড করতে ব্যর্থ হয়েছে!</td></tr>';
+                return;
+            }
+            reportRawData = await res.json();
+            
+            // Populate courses dropdown if not already populated
+            const courseSelect = document.getElementById('reportCourseFilter');
+            if (courseSelect && reportRawData.courses) {
+                courseSelect.innerHTML = '<option value="ALL">সকল কোর্স (All Courses)</option>';
+                reportRawData.courses.forEach(c => {
+                    const opt = document.createElement('option');
+                    opt.value = c.id;
+                    opt.textContent = `${c.title} (${c.batch || 'General'})`;
+                    courseSelect.appendChild(opt);
+                });
+            }
+
+            // Set default date range to This Month in inputs
+            const now = new Date();
+            const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+            const dateToStr = now.toISOString().split('T')[0];
+            const dateFromStr = firstDay.toISOString().split('T')[0];
+            const df = document.getElementById('reportDateFrom');
+            const dt = document.getElementById('reportDateTo');
+            if (df && !df.value) df.value = dateFromStr;
+            if (dt && !dt.value) dt.value = dateToStr;
+
+            // Update top KPIs from API summary
+            if (reportRawData.summary) {
+                $('#reportKpiMonthRevenue').text('৳ ' + (reportRawData.summary.thisMonthRevenue || 0).toLocaleString());
+            }
+
+            applyReportFilters();
+        } catch(e) {
+            console.error("Reports error:", e);
+            tbody.innerHTML = '<tr><td colspan="8" style="padding: 30px; text-align: center; color: #dc2626;">সার্ভার সংযোগ সমস্যা!</td></tr>';
+        }
+    }
+    window.loadReportsData = loadReportsData;
+
+    function onReportDateQuickChange(val) {
+        const customWrap = document.getElementById('reportCustomDateWrap');
+        const now = new Date();
+        const df = document.getElementById('reportDateFrom');
+        const dt = document.getElementById('reportDateTo');
+
+        if (val === 'CUSTOM') {
+            if (customWrap) customWrap.style.display = 'inline-flex';
+        } else {
+            if (customWrap) customWrap.style.display = 'none';
+            if (val === 'TODAY') {
+                const todayStr = now.toISOString().split('T')[0];
+                if (df) df.value = todayStr;
+                if (dt) dt.value = todayStr;
+            } else if (val === '7DAYS') {
+                const past7 = new Date();
+                past7.setDate(past7.getDate() - 7);
+                if (df) df.value = past7.toISOString().split('T')[0];
+                if (dt) dt.value = now.toISOString().split('T')[0];
+            } else if (val === 'THIS_MONTH') {
+                const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+                if (df) df.value = firstDay.toISOString().split('T')[0];
+                if (dt) dt.value = now.toISOString().split('T')[0];
+            } else if (val === 'LAST_MONTH') {
+                const firstDayLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+                const lastDayLastMonth = new Date(now.getFullYear(), now.getMonth(), 0);
+                if (df) df.value = firstDayLastMonth.toISOString().split('T')[0];
+                if (dt) dt.value = lastDayLastMonth.toISOString().split('T')[0];
+            }
+        }
+        applyReportFilters();
+    }
+    window.onReportDateQuickChange = onReportDateQuickChange;
+
+    function switchReportType(type) {
+        reportActiveType = type;
+        const statusWrap = document.getElementById('reportStatusFilterWrap');
+        if (statusWrap) {
+            if (type === 'courses') {
+                statusWrap.style.display = 'none';
+            } else {
+                statusWrap.style.display = 'block';
+            }
+        }
+        applyReportFilters();
+    }
+    window.switchReportType = switchReportType;
+
+    function applyReportFilters() {
+        if (!reportRawData.enrollments) return;
+
+        const dateQuick = $('#reportDateQuickFilter').val();
+        const dateFromVal = $('#reportDateFrom').val();
+        const dateToVal = $('#reportDateTo').val();
+        const courseVal = $('#reportCourseFilter').val();
+        const statusVal = $('#reportStatusFilter').val();
+        const searchVal = ($('#reportSearchInput').val() || '').toLowerCase().trim();
+
+        let filtered = reportRawData.enrollments.slice();
+
+        // 1. Date Filtering
+        if (dateQuick !== 'ALL' && dateFromVal && dateToVal) {
+            const fromDate = new Date(dateFromVal + 'T00:00:00Z');
+            const toDate = new Date(dateToVal + 'T23:59:59Z');
+            filtered = filtered.filter(e => {
+                const d = new Date(e.date);
+                return d >= fromDate && d <= toDate;
+            });
+        }
+
+        // 2. Course Filter
+        if (courseVal && courseVal !== 'ALL') {
+            filtered = filtered.filter(e => e.courseId == courseVal);
+        }
+
+        // 3. Status Filter (Only applied for financial and student views)
+        if (reportActiveType !== 'courses' && statusVal && statusVal !== 'ALL') {
+            filtered = filtered.filter(e => (e.status || '').toLowerCase() === statusVal.toLowerCase());
+        }
+
+        // 4. Search text filter
+        if (searchVal) {
+            filtered = filtered.filter(e => {
+                const name = (e.studentName || '').toLowerCase();
+                const email = (e.studentEmail || '').toLowerCase();
+                const phone = (e.studentPhone || '').toLowerCase();
+                const payPhone = (e.paymentPhone || '').toLowerCase();
+                const course = (e.courseTitle || '').toLowerCase();
+                const batch = (e.batch || '').toLowerCase();
+                const trx = (e.trxId || '').toLowerCase();
+                return name.includes(searchVal) || email.includes(searchVal) || phone.includes(searchVal) || payPhone.includes(searchVal) || course.includes(searchVal) || batch.includes(searchVal) || trx.includes(searchVal);
+            });
+        }
+
+        // Update Dynamic KPI Cards based on filtered dataset
+        const approvedFiltered = filtered.filter(e => e.status === 'Approved');
+        const pendingFiltered = filtered.filter(e => e.status === 'Pending');
+
+        const approvedRevenue = approvedFiltered.reduce((sum, e) => sum + (Number(e.price) || 0), 0);
+        const pendingRevenue = pendingFiltered.reduce((sum, e) => sum + (Number(e.price) || 0), 0);
+
+        $('#reportKpiRevenue').text('৳ ' + approvedRevenue.toLocaleString());
+        $('#reportKpiApprovedCount').text(approvedFiltered.length + ' জন');
+        $('#reportKpiPendingRevenue').text('৳ ' + pendingRevenue.toLocaleString());
+        $('#reportKpiPendingCountSub').text(`⏳ ${pendingFiltered.length}টি আবেদন অনুমোদনের অপেক্ষায়`);
+
+        // Render Active Table
+        if (reportActiveType === 'financial') {
+            renderFinancialReportTable(filtered, approvedRevenue);
+        } else if (reportActiveType === 'courses') {
+            renderCoursesReportTable(filtered);
+        } else if (reportActiveType === 'students') {
+            renderStudentsReportTable(filtered);
+        }
+    }
+    window.applyReportFilters = applyReportFilters;
+
+    function renderFinancialReportTable(rows, totalApprovedRev) {
+        currentReportRows = [];
+        const thead = document.getElementById('reportTableHead');
+        const tbody = document.getElementById('reportTableBody');
+        const tfoot = document.getElementById('reportTableFoot');
+
+        thead.innerHTML = `
+            <tr>
+                <th style="padding: 14px; text-align: left; font-size: 0.85rem; color: #1e293b; font-weight: 700;">তারিখ ও সময়</th>
+                <th style="padding: 14px; text-align: left; font-size: 0.85rem; color: #1e293b; font-weight: 700;">শিক্ষার্থীর নাম</th>
+                <th style="padding: 14px; text-align: left; font-size: 0.85rem; color: #1e293b; font-weight: 700;">মোবাইল / যোগাযোগ</th>
+                <th style="padding: 14px; text-align: left; font-size: 0.85rem; color: #1e293b; font-weight: 700;">কোর্সের নাম ও ব্যাচ</th>
+                <th style="padding: 14px; text-align: right; font-size: 0.85rem; color: #1e293b; font-weight: 700;">কোর্স ফি</th>
+                <th style="padding: 14px; text-align: left; font-size: 0.85rem; color: #1e293b; font-weight: 700;">পেমেন্ট নম্বর</th>
+                <th style="padding: 14px; text-align: left; font-size: 0.85rem; color: #1e293b; font-weight: 700;">TrxID</th>
+                <th style="padding: 14px; text-align: center; font-size: 0.85rem; color: #1e293b; font-weight: 700;">স্ট্যাটাস</th>
+            </tr>
+        `;
+
+        if (!rows || rows.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="8" style="padding: 35px; text-align: center; color: #94a3b8; font-size: 0.95rem;">🔍 এই ফিল্টারে কোনো লেনদেন পাওয়া যায়নি</td></tr>';
+            tfoot.innerHTML = '';
+            return;
+        }
+
+        let html = '';
+        rows.forEach(r => {
+            const dateStr = new Date(r.date).toLocaleString('bn-BD', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+            let statusBadge = '';
+            if (r.status === 'Approved') {
+                statusBadge = '<span style="background: #d1fae5; color: #065f46; padding: 4px 10px; border-radius: 50px; font-size: 0.8rem; font-weight: 700;">✓ Approved</span>';
+            } else if (r.status === 'Pending') {
+                statusBadge = '<span style="background: #fef3c7; color: #92400e; padding: 4px 10px; border-radius: 50px; font-size: 0.8rem; font-weight: 700;">⏳ Pending</span>';
+            } else {
+                statusBadge = '<span style="background: #fee2e2; color: #991b1b; padding: 4px 10px; border-radius: 50px; font-size: 0.8rem; font-weight: 700;">✕ Rejected</span>';
+            }
+
+            const contactPhone = r.paymentPhone || r.studentPhone || '-';
+            const emailPart = (r.studentEmail && !r.studentEmail.includes('@placeholder')) ? `<div style="font-size:0.75rem; color:#64748b;">${r.studentEmail}</div>` : '';
+
+            currentReportRows.push({
+                "তারিখ": new Date(r.date).toLocaleDateString(),
+                "শিক্ষার্থী": r.studentName,
+                "মোবাইল": contactPhone,
+                "ইমেইল": r.studentEmail || '',
+                "কোর্স": r.courseTitle,
+                "ব্যাচ": r.batch || 'General',
+                "ফি (BDT)": r.price,
+                "পেমেন্ট নম্বর": r.paymentPhone || '',
+                "TrxID": r.trxId || '',
+                "স্ট্যাটাস": r.status
+            });
+
+            html += `
+                <tr style="border-bottom: 1px solid #f1f5f9;">
+                    <td style="padding: 12px 14px; font-size: 0.85rem; color: #475569; white-space: nowrap;">${dateStr}</td>
+                    <td style="padding: 12px 14px; font-weight: 700; color: #0f172a; white-space: nowrap;">${r.studentName}</td>
+                    <td style="padding: 12px 14px; font-size: 0.85rem; color: #334155;">
+                        <span style="font-weight: 600; color: #047857;">${contactPhone}</span>
+                        ${emailPart}
+                    </td>
+                    <td style="padding: 12px 14px; font-size: 0.88rem; color: #1e293b;">
+                        <div style="font-weight: 600;">${r.courseTitle}</div>
+                        <span style="display:inline-block; font-size: 0.72rem; background: #e0f2fe; color: #0369a1; padding: 1px 6px; border-radius: 4px; font-weight: 600;">${r.batch || 'General'}</span>
+                    </td>
+                    <td style="padding: 12px 14px; text-align: right; font-weight: 700; color: #0f172a; font-size: 0.95rem;">৳ ${Number(r.price).toLocaleString()}</td>
+                    <td style="padding: 12px 14px; font-weight: 600; color: #475569;">${r.paymentPhone || '-'}</td>
+                    <td style="padding: 12px 14px; font-family: monospace; font-weight: 700; color: #2563eb; background: #f8fafc; border-radius: 4px;">${r.trxId || '-'}</td>
+                    <td style="padding: 12px 14px; text-align: center;">${statusBadge}</td>
+                </tr>
+            `;
+        });
+        tbody.innerHTML = html;
+
+        tfoot.innerHTML = `
+            <tr>
+                <td colspan="4" style="padding: 14px; text-align: right; font-size: 0.95rem; color: #1e293b;">মোট অনুমোদিত আয় (Approved Total):</td>
+                <td style="padding: 14px; text-align: right; font-size: 1.1rem; color: #065f46; font-weight: 800;">৳ ${totalApprovedRev.toLocaleString()}</td>
+                <td colspan="3" style="padding: 14px; font-size: 0.85rem; color: #64748b;">মোট রেকর্ড: ${rows.length}টি</td>
+            </tr>
+        `;
+    }
+
+    function renderCoursesReportTable(filteredEnrollments) {
+        currentReportRows = [];
+        const thead = document.getElementById('reportTableHead');
+        const tbody = document.getElementById('reportTableBody');
+        const tfoot = document.getElementById('reportTableFoot');
+
+        thead.innerHTML = `
+            <tr>
+                <th style="padding: 14px; text-align: left; font-size: 0.85rem; color: #1e293b; font-weight: 700;">#</th>
+                <th style="padding: 14px; text-align: left; font-size: 0.85rem; color: #1e293b; font-weight: 700;">কোর্সের নাম</th>
+                <th style="padding: 14px; text-align: left; font-size: 0.85rem; color: #1e293b; font-weight: 700;">ক্যাটাগরি / ব্যাচ</th>
+                <th style="padding: 14px; text-align: right; font-size: 0.85rem; color: #1e293b; font-weight: 700;">কোর্স ফি</th>
+                <th style="padding: 14px; text-align: center; font-size: 0.85rem; color: #1e293b; font-weight: 700;">মোট আবেদন</th>
+                <th style="padding: 14px; text-align: center; font-size: 0.85rem; color: #1e293b; font-weight: 700;">অনুমোদিত (Approved)</th>
+                <th style="padding: 14px; text-align: center; font-size: 0.85rem; color: #1e293b; font-weight: 700;">পেন্ডিং</th>
+                <th style="padding: 14px; text-align: right; font-size: 0.85rem; color: #1e293b; font-weight: 700;">মোট আদায়কৃত আয়</th>
+            </tr>
+        `;
+
+        const coursesList = reportRawData.courses || [];
+        if (coursesList.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="8" style="padding: 30px; text-align: center; color: #94a3b8;">কোনো কোর্স পাওয়া যায়নি</td></tr>';
+            tfoot.innerHTML = '';
+            return;
+        }
+
+        let totalApps = 0;
+        let totalApproved = 0;
+        let totalPending = 0;
+        let totalRev = 0;
+        let html = '';
+
+        coursesList.forEach((c, idx) => {
+            const courseEnrollments = filteredEnrollments.filter(e => e.courseId === c.id);
+            const appsCount = courseEnrollments.length;
+            const appApproved = courseEnrollments.filter(e => e.status === 'Approved').length;
+            const appPending = courseEnrollments.filter(e => e.status === 'Pending').length;
+            const courseRev = appApproved * (Number(c.price) || 0);
+
+            totalApps += appsCount;
+            totalApproved += appApproved;
+            totalPending += appPending;
+            totalRev += courseRev;
+
+            currentReportRows.push({
+                "নং": idx + 1,
+                "কোর্স": c.title,
+                "ব্যাচ": c.batch || 'General',
+                "ফি (BDT)": c.price,
+                "মোট আবেদন": appsCount,
+                "অনুমোদিত": appApproved,
+                "পেন্ডিং": appPending,
+                "মোট আয় (BDT)": courseRev
+            });
+
+            html += `
+                <tr style="border-bottom: 1px solid #f1f5f9;">
+                    <td style="padding: 12px 14px; font-weight: 600; color: #64748b;">${idx + 1}</td>
+                    <td style="padding: 12px 14px; font-weight: 700; color: #0f172a;">${c.title}</td>
+                    <td style="padding: 12px 14px;">
+                        <span style="background: #e0f2fe; color: #0369a1; padding: 2px 8px; border-radius: 4px; font-size: 0.78rem; font-weight: 700;">${c.batch || 'General'}</span>
+                    </td>
+                    <td style="padding: 12px 14px; text-align: right; font-weight: 600; color: #334155;">৳ ${Number(c.price).toLocaleString()}</td>
+                    <td style="padding: 12px 14px; text-align: center; font-weight: 600; color: #475569;">${appsCount}</td>
+                    <td style="padding: 12px 14px; text-align: center;">
+                        <span style="background: #d1fae5; color: #065f46; font-weight: 700; padding: 2px 10px; border-radius: 20px; font-size: 0.85rem;">${appApproved}</span>
+                    </td>
+                    <td style="padding: 12px 14px; text-align: center;">
+                        <span style="background: #fef3c7; color: #92400e; font-weight: 700; padding: 2px 10px; border-radius: 20px; font-size: 0.85rem;">${appPending}</span>
+                    </td>
+                    <td style="padding: 12px 14px; text-align: right; font-weight: 800; color: #065f46; font-size: 1rem;">৳ ${courseRev.toLocaleString()}</td>
+                </tr>
+            `;
+        });
+        tbody.innerHTML = html;
+
+        tfoot.innerHTML = `
+            <tr>
+                <td colspan="4" style="padding: 14px; text-align: right; font-size: 0.95rem; color: #1e293b;">সর্বমোট (Total):</td>
+                <td style="padding: 14px; text-align: center; font-size: 0.95rem; color: #334155;">${totalApps}</td>
+                <td style="padding: 14px; text-align: center; font-size: 1rem; color: #065f46; font-weight: 800;">${totalApproved}</td>
+                <td style="padding: 14px; text-align: center; font-size: 0.95rem; color: #b45309;">${totalPending}</td>
+                <td style="padding: 14px; text-align: right; font-size: 1.15rem; color: #065f46; font-weight: 800;">৳ ${totalRev.toLocaleString()}</td>
+            </tr>
+        `;
+    }
+
+    function renderStudentsReportTable(filteredEnrollments) {
+        currentReportRows = [];
+        const thead = document.getElementById('reportTableHead');
+        const tbody = document.getElementById('reportTableBody');
+        const tfoot = document.getElementById('reportTableFoot');
+
+        thead.innerHTML = `
+            <tr>
+                <th style="padding: 14px; text-align: left; font-size: 0.85rem; color: #1e293b; font-weight: 700;">#</th>
+                <th style="padding: 14px; text-align: left; font-size: 0.85rem; color: #1e293b; font-weight: 700;">শিক্ষার্থীর নাম</th>
+                <th style="padding: 14px; text-align: left; font-size: 0.85rem; color: #1e293b; font-weight: 700;">মোবাইল নম্বর</th>
+                <th style="padding: 14px; text-align: left; font-size: 0.85rem; color: #1e293b; font-weight: 700;">ইমেইল ঠিকানা</th>
+                <th style="padding: 14px; text-align: center; font-size: 0.85rem; color: #1e293b; font-weight: 700;">অনুমোদিত কোর্স</th>
+                <th style="padding: 14px; text-align: left; font-size: 0.85rem; color: #1e293b; font-weight: 700;">কোর্সের নামসমূহ</th>
+                <th style="padding: 14px; text-align: right; font-size: 0.85rem; color: #1e293b; font-weight: 700;">মোট পরিশোধ (BDT)</th>
+                <th style="padding: 14px; text-align: left; font-size: 0.85rem; color: #1e293b; font-weight: 700;">সর্বশেষ এনরোলমেন্ট</th>
+            </tr>
+        `;
+
+        if (!filteredEnrollments || filteredEnrollments.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="8" style="padding: 35px; text-align: center; color: #94a3b8;">🔍 কোনো শিক্ষার্থী পাওয়া যায়নি</td></tr>';
+            tfoot.innerHTML = '';
+            return;
+        }
+
+        // Group by student
+        const studentMap = new Map();
+        filteredEnrollments.forEach(e => {
+            const key = e.studentId || e.studentPhone || e.studentName;
+            if (!studentMap.has(key)) {
+                studentMap.set(key, {
+                    id: e.studentId,
+                    name: e.studentName,
+                    phone: e.studentPhone || e.paymentPhone || '-',
+                    email: (e.studentEmail && !e.studentEmail.includes('@placeholder')) ? e.studentEmail : '-',
+                    courses: [],
+                    approvedTotalBDT: 0,
+                    lastDate: e.date
+                });
+            }
+            const s = studentMap.get(key);
+            s.courses.push({ title: e.courseTitle, status: e.status, price: e.price, date: e.date });
+            if (e.status === 'Approved') {
+                s.approvedTotalBDT += (Number(e.price) || 0);
+            }
+            if (new Date(e.date) > new Date(s.lastDate)) {
+                s.lastDate = e.date;
+            }
+        });
+
+        const students = Array.from(studentMap.values());
+        let grandTotal = 0;
+        let html = '';
+
+        students.forEach((s, idx) => {
+            grandTotal += s.approvedTotalBDT;
+            const approvedCourses = s.courses.filter(c => c.status === 'Approved');
+            const courseTitles = s.courses.map(c => `${c.title} (${c.status})`).join(', ');
+
+            currentReportRows.push({
+                "নং": idx + 1,
+                "নাম": s.name,
+                "মোবাইল": s.phone,
+                "ইমেইল": s.email,
+                "অনুমোদিত কোর্স সংখ্যা": approvedCourses.length,
+                "কোর্স তালিকা": courseTitles,
+                "মোট পরিশোধ (BDT)": s.approvedTotalBDT,
+                "সর্বশেষ তারিখ": new Date(s.lastDate).toLocaleDateString()
+            });
+
+            html += `
+                <tr style="border-bottom: 1px solid #f1f5f9;">
+                    <td style="padding: 12px 14px; font-weight: 600; color: #64748b;">${idx + 1}</td>
+                    <td style="padding: 12px 14px; font-weight: 700; color: #0f172a; white-space: nowrap;">${s.name}</td>
+                    <td style="padding: 12px 14px; font-weight: 600; color: #047857; white-space: nowrap;">${s.phone}</td>
+                    <td style="padding: 12px 14px; font-size: 0.85rem; color: #475569;">${s.email}</td>
+                    <td style="padding: 12px 14px; text-align: center;">
+                        <span style="background: #d1fae5; color: #065f46; font-weight: 700; padding: 2px 10px; border-radius: 20px; font-size: 0.85rem;">${approvedCourses.length}</span>
+                    </td>
+                    <td style="padding: 12px 14px; font-size: 0.85rem; color: #334155; max-width: 250px;">
+                        ${s.courses.map(c => `<span style="display:inline-block; margin: 2px; padding: 2px 6px; border-radius: 4px; font-size: 0.72rem; ${c.status === 'Approved' ? 'background:#ecfdf5; color:#047857;' : 'background:#fef3c7; color:#92400e;'}">${c.title}</span>`).join(' ')}
+                    </td>
+                    <td style="padding: 12px 14px; text-align: right; font-weight: 800; color: #065f46; font-size: 0.95rem;">৳ ${s.approvedTotalBDT.toLocaleString()}</td>
+                    <td style="padding: 12px 14px; font-size: 0.85rem; color: #64748b; white-space: nowrap;">${new Date(s.lastDate).toLocaleDateString('bn-BD')}</td>
+                </tr>
+            `;
+        });
+        tbody.innerHTML = html;
+
+        tfoot.innerHTML = `
+            <tr>
+                <td colspan="6" style="padding: 14px; text-align: right; font-size: 0.95rem; color: #1e293b;">মোট শিক্ষার্থী: ${students.length} জন | মোট আদায়:</td>
+                <td style="padding: 14px; text-align: right; font-size: 1.15rem; color: #065f46; font-weight: 800;">৳ ${grandTotal.toLocaleString()}</td>
+                <td></td>
+            </tr>
+        `;
+    }
+
+    function exportReportToCSV() {
+        if (!currentReportRows || currentReportRows.length === 0) {
+            alert('এক্সপোর্ট করার মতো কোনো ডাটা নেই!');
+            return;
+        }
+
+        const headers = Object.keys(currentReportRows[0]);
+        let csvContent = '\uFEFF'; // UTF-8 BOM so Excel opens Bangla characters perfectly
+        csvContent += headers.map(h => `"${h.replace(/"/g, '""')}"`).join(',') + '\r\n';
+
+        currentReportRows.forEach(row => {
+            const line = headers.map(h => {
+                const val = (row[h] !== undefined && row[h] !== null) ? String(row[h]) : '';
+                return `"${val.replace(/"/g, '""')}"`;
+            }).join(',');
+            csvContent += line + '\r\n';
+        });
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        const dateStr = new Date().toISOString().split('T')[0];
+        link.setAttribute('href', url);
+        link.setAttribute('download', `PhysicsClassroom_Report_${reportActiveType}_${dateStr}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+    window.exportReportToCSV = exportReportToCSV;
+
+    function printReportDocument() {
+        const titleEl = document.getElementById('printReportTitle');
+        const dateStrEl = document.getElementById('printDateStr');
+        const metaEl = document.getElementById('printReportMeta');
+
+        let titleText = 'আর্থিক ও পেমেন্ট অডিট রিপোর্ট';
+        if (reportActiveType === 'courses') titleText = 'কোর্স ও ব্যাচ ভিত্তিক এনরোলমেন্ট রিপোর্ট';
+        else if (reportActiveType === 'students') titleText = 'শিক্ষার্থী ডিরেক্টরি ও পেমেন্ট রিপোর্ট';
+
+        if (titleEl) titleEl.innerText = titleText;
+        if (dateStrEl) dateStrEl.innerText = new Date().toLocaleString('bn-BD');
+
+        const quickFilter = $('#reportDateQuickFilter option:selected').text();
+        const courseFilter = $('#reportCourseFilter option:selected').text();
+        const revTotal = $('#reportKpiRevenue').text();
+        const approvedCount = $('#reportKpiApprovedCount').text();
+
+        if (metaEl) {
+            metaEl.innerHTML = `<strong>সময়কাল:</strong> ${quickFilter} | <strong>কোর্স:</strong> ${courseFilter} | <strong>মোট আয়:</strong> ${revTotal} | <strong>সফল এনরোলমেন্ট:</strong> ${approvedCount}`;
+        }
+
+        window.print();
+    }
+    window.printReportDocument = printReportDocument;
 
     // Load dashboard on initial page load
     loadDashboardStats();

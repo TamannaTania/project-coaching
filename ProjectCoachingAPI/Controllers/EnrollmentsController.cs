@@ -231,5 +231,78 @@ namespace ProjectCoachingAPI.Controllers
                 .ToListAsync();
             return Ok(payments);
         }
+
+        [HttpGet("admin/reports")]
+        public async Task<IActionResult> GetAdminReports()
+        {
+            try
+            {
+                var enrollments = await _context.Enrollments
+                    .Include(e => e.User)
+                    .Include(e => e.Course)
+                    .OrderByDescending(e => e.EnrollmentDate)
+                    .Select(e => new {
+                        id = e.Id,
+                        studentId = e.UserId,
+                        studentName = (e.User != null && !string.IsNullOrEmpty(e.User.Name)) ? e.User.Name : "Student",
+                        studentEmail = (e.User != null && !string.IsNullOrEmpty(e.User.Email)) ? e.User.Email : "",
+                        studentPhone = (e.User != null && !string.IsNullOrEmpty(e.User.Phone)) ? e.User.Phone : "",
+                        paymentPhone = e.PaymentPhone ?? "",
+                        courseId = e.CourseId,
+                        courseTitle = (e.Course != null && !string.IsNullOrEmpty(e.Course.Title)) ? e.Course.Title : "Course",
+                        batch = (e.Course != null && !string.IsNullOrEmpty(e.Course.Batch)) ? e.Course.Batch : "General",
+                        price = (e.Course != null) ? e.Course.Price : 0,
+                        trxId = e.TrxId ?? "",
+                        status = e.Status ?? "Pending",
+                        date = e.EnrollmentDate
+                    })
+                    .ToListAsync();
+
+                var courses = await _context.Courses
+                    .Select(c => new {
+                        id = c.Id,
+                        title = c.Title,
+                        batch = c.Batch ?? "General",
+                        price = c.Price
+                    })
+                    .ToListAsync();
+
+                var now = DateTime.UtcNow;
+                var startOfMonth = new DateTime(now.Year, now.Month, 1, 0, 0, 0, DateTimeKind.Utc);
+
+                var totalRevenue = enrollments
+                    .Where(e => e.status == "Approved")
+                    .Sum(e => e.price);
+
+                var thisMonthRevenue = enrollments
+                    .Where(e => e.status == "Approved" && e.date >= startOfMonth)
+                    .Sum(e => e.price);
+
+                var pendingRevenue = enrollments
+                    .Where(e => e.status == "Pending")
+                    .Sum(e => e.price);
+
+                var totalStudents = await _context.Users.CountAsync(u => u.Role == "Student");
+                var totalApprovedCount = enrollments.Count(e => e.status == "Approved");
+                var pendingCount = enrollments.Count(e => e.status == "Pending");
+
+                return Ok(new {
+                    enrollments,
+                    courses,
+                    summary = new {
+                        totalRevenue,
+                        thisMonthRevenue,
+                        pendingRevenue,
+                        totalStudents,
+                        totalApprovedCount,
+                        pendingCount
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error loading reports: " + ex.Message });
+            }
+        }
     }
 }

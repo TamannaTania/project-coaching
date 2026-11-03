@@ -254,6 +254,45 @@
                 margin-bottom: 12px;
             }
         }
+
+        /* Printable Report Styles */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #reportPrintArea, #reportPrintArea * {
+                visibility: visible;
+            }
+            #reportPrintArea {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                margin: 0;
+                padding: 10px;
+            }
+            .report-print-header {
+                display: block !important;
+            }
+            .mobile-table-hint, .main-header, .admin-tabs-nav, #reportCustomDateWrap, select, input, button {
+                display: none !important;
+            }
+            .table-responsive-wrapper {
+                border: none !important;
+                box-shadow: none !important;
+                overflow: visible !important;
+            }
+            table {
+                min-width: 100% !important;
+                width: 100% !important;
+                border-collapse: collapse !important;
+            }
+            th, td {
+                border: 1px solid #94a3b8 !important;
+                padding: 6px 8px !important;
+                font-size: 11px !important;
+            }
+        }
     </style>
 </head>
 <body>
@@ -280,6 +319,7 @@
             <a href="/Views/Admin/admin-freeclasses.html" id="tabFreeClasses" class="admin-tab-btn" style="color: #6b7280; border-bottom: 3px solid transparent;">Free Classes</a>
             <a href="/Views/Admin/admin-teachers.html" id="tabTeachers" class="admin-tab-btn" style="color: #6b7280; border-bottom: 3px solid transparent;">টিচার ম্যানেজমেন্ট</a>
             <button id="tabPayments" class="admin-tab-btn" style="color: #6b7280; border-bottom: 3px solid transparent;">পেমেন্ট রিকোয়েস্ট (Pending)</button>
+            <button id="tabReports" class="admin-tab-btn" style="color: #6b7280; border-bottom: 3px solid transparent;">📊 রিপোর্ট ও হিসাব (Reports)</button>
             <button id="tabStudents" class="admin-tab-btn" style="color: #6b7280; border-bottom: 3px solid transparent;">👨‍🎓 স্টুডেন্ট রিকভারি ও সেটিংস</button>
         </div>
 
@@ -510,8 +550,163 @@
                 </div>
             </div>
         </div>
+
+        <!-- Reports & Financial Analytics View -->
+        <div id="viewReports" style="display: none; animation: fadeIn 0.4s ease;">
+            <div style="background: white; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); overflow: hidden; margin-top: 10px; border: 1px solid #f3f4f6;">
+                <div class="admin-card-header" style="background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); padding: 25px 30px; display: flex; flex-direction: column; gap: 5px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+                        <div>
+                            <h2 style="margin: 0; color: white; font-size: 1.8rem; font-weight: 800; letter-spacing: -0.5px;">📊 রিপোর্ট ও আর্থিক অডিট (Reports & Audit)</h2>
+                            <p style="margin: 4px 0 0; color: #dbeafe; font-size: 0.95rem; font-weight: 500;">কোর্স ও ব্যাচ ভিত্তিক সেলস, আয়-ব্যয় অডিট এবং এনরোলমেন্ট রিপোর্ট এক্সপোর্ট ও প্রিন্ট করুন।</p>
+                        </div>
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                            <button type="button" onclick="exportReportToCSV()" style="background: #10b981; color: white; border: none; padding: 10px 18px; border-radius: 8px; font-weight: 700; font-size: 0.9rem; cursor: pointer; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); transition: background 0.2s;">
+                                <i class="fa-solid fa-file-excel"></i> এক্সেল / CSV ডাউনলোড
+                            </button>
+                            <button type="button" onclick="printReportDocument()" style="background: white; color: #1e3a8a; border: none; padding: 10px 18px; border-radius: 8px; font-weight: 700; font-size: 0.9rem; cursor: pointer; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); transition: background 0.2s;">
+                                <i class="fa-solid fa-print"></i> প্রিন্ট / PDF
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="admin-card-body" style="padding: 24px 30px; background: #f8fafc;">
+                    <!-- 4 Summary KPI Cards -->
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px;">
+                        <div style="background: white; border-radius: 12px; padding: 20px; border-left: 5px solid #10b981; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+                            <div style="font-size: 0.85rem; font-weight: 600; color: #64748b;">মোট সফল আয় (Approved Revenue)</div>
+                            <div id="reportKpiRevenue" style="font-size: 1.8rem; font-weight: 800; color: #065f46; margin: 8px 0 4px;">৳ 0</div>
+                            <div style="font-size: 0.75rem; color: #10b981; font-weight: 600;">✓ ফিল্টার অনুযায়ী আদায়কৃত টাকা</div>
+                        </div>
+                        <div style="background: white; border-radius: 12px; padding: 20px; border-left: 5px solid #3b82f6; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+                            <div style="font-size: 0.85rem; font-weight: 600; color: #64748b;">চলতি মাসের আয় (This Month)</div>
+                            <div id="reportKpiMonthRevenue" style="font-size: 1.8rem; font-weight: 800; color: #1e40af; margin: 8px 0 4px;">৳ 0</div>
+                            <div style="font-size: 0.75rem; color: #3b82f6; font-weight: 600;">📅 বর্তমান ইংরেজি মাসের মোট আয়</div>
+                        </div>
+                        <div style="background: white; border-radius: 12px; padding: 20px; border-left: 5px solid #8b5cf6; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+                            <div style="font-size: 0.85rem; font-weight: 600; color: #64748b;">অনুমোদিত শিক্ষার্থী (Approved)</div>
+                            <div id="reportKpiApprovedCount" style="font-size: 1.8rem; font-weight: 800; color: #5b21b6; margin: 8px 0 4px;">0 জন</div>
+                            <div style="font-size: 0.75rem; color: #8b5cf6; font-weight: 600;">👨‍🎓 সক্রিয় ও অনুমোদিত এনরোলমেন্ট</div>
+                        </div>
+                        <div style="background: white; border-radius: 12px; padding: 20px; border-left: 5px solid #f59e0b; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+                            <div style="font-size: 0.85rem; font-weight: 600; color: #64748b;">পেন্ডিং পেমেন্ট (Pending BDT)</div>
+                            <div id="reportKpiPendingRevenue" style="font-size: 1.8rem; font-weight: 800; color: #b45309; margin: 8px 0 4px;">৳ 0</div>
+                            <div id="reportKpiPendingCountSub" style="font-size: 0.75rem; color: #f59e0b; font-weight: 600;">⏳ ০টি আবেদন অনুমোদনের অপেক্ষায়</div>
+                        </div>
+                    </div>
+
+                    <!-- Filter & Controls Toolbar -->
+                    <div style="background: white; padding: 18px 20px; border-radius: 12px; border: 1px solid #e2e8f0; margin-bottom: 20px;">
+                        <div style="display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-end;">
+                            <!-- Report Mode Selector -->
+                            <div style="min-width: 200px;">
+                                <label style="display: block; font-size: 0.82rem; font-weight: 700; color: #475569; margin-bottom: 6px;">রিপোর্ট ক্যাটাগরি</label>
+                                <select id="reportTypeSelect" onchange="switchReportType(this.value)" style="width: 100%; padding: 9px 12px; border-radius: 8px; border: 1.5px solid #cbd5e1; outline: none; font-size: 0.9rem; font-weight: 600; background: #f8fafc; color: #1e293b;">
+                                    <option value="financial">💰 আর্থিক ও পেমেন্ট অডিট (Financial)</option>
+                                    <option value="courses">📚 কোর্স ও ব্যাচ ভিত্তিক সামারি (Courses)</option>
+                                    <option value="students">👨‍🎓 শিক্ষার্থী তালিকা (Students)</option>
+                                </select>
+                            </div>
+
+                            <!-- Date Quick Filter -->
+                            <div style="min-width: 160px;">
+                                <label style="display: block; font-size: 0.82rem; font-weight: 700; color: #475569; margin-bottom: 6px;">সময়কাল (Date Range)</label>
+                                <select id="reportDateQuickFilter" onchange="onReportDateQuickChange(this.value)" style="width: 100%; padding: 9px 12px; border-radius: 8px; border: 1.5px solid #cbd5e1; outline: none; font-size: 0.9rem; font-weight: 600; background: #f8fafc; color: #1e293b;">
+                                    <option value="ALL">সকল সময় (All Time)</option>
+                                    <option value="TODAY">আজকের (Today)</option>
+                                    <option value="7DAYS">গত ৭ দিন (Last 7 Days)</option>
+                                    <option value="THIS_MONTH" selected>চলতি মাস (This Month)</option>
+                                    <option value="LAST_MONTH">গত মাস (Last Month)</option>
+                                    <option value="CUSTOM">কাস্টম তারিখ (Custom)</option>
+                                </select>
+                            </div>
+
+                            <!-- Custom Date Range Inputs (hidden by default) -->
+                            <div id="reportCustomDateWrap" style="display: none; align-items: center; gap: 8px;">
+                                <div>
+                                    <label style="display: block; font-size: 0.82rem; font-weight: 700; color: #475569; margin-bottom: 6px;">শুরু</label>
+                                    <input type="date" id="reportDateFrom" onchange="applyReportFilters()" style="padding: 8px 10px; border-radius: 8px; border: 1.5px solid #cbd5e1; font-size: 0.85rem;">
+                                </div>
+                                <div>
+                                    <label style="display: block; font-size: 0.82rem; font-weight: 700; color: #475569; margin-bottom: 6px;">শেষ</label>
+                                    <input type="date" id="reportDateTo" onchange="applyReportFilters()" style="padding: 8px 10px; border-radius: 8px; border: 1.5px solid #cbd5e1; font-size: 0.85rem;">
+                                </div>
+                            </div>
+
+                            <!-- Course Filter -->
+                            <div style="min-width: 180px;">
+                                <label style="display: block; font-size: 0.82rem; font-weight: 700; color: #475569; margin-bottom: 6px;">কোর্স ফিল্টার</label>
+                                <select id="reportCourseFilter" onchange="applyReportFilters()" style="width: 100%; padding: 9px 12px; border-radius: 8px; border: 1.5px solid #cbd5e1; outline: none; font-size: 0.9rem; font-weight: 600; background: #f8fafc; color: #1e293b;">
+                                    <option value="ALL">সকল কোর্স (All Courses)</option>
+                                </select>
+                            </div>
+
+                            <!-- Status Filter -->
+                            <div style="min-width: 140px;" id="reportStatusFilterWrap">
+                                <label style="display: block; font-size: 0.82rem; font-weight: 700; color: #475569; margin-bottom: 6px;">স্ট্যাটাস</label>
+                                <select id="reportStatusFilter" onchange="applyReportFilters()" style="width: 100%; padding: 9px 12px; border-radius: 8px; border: 1.5px solid #cbd5e1; outline: none; font-size: 0.9rem; font-weight: 600; background: #f8fafc; color: #1e293b;">
+                                    <option value="ALL">সকল স্ট্যাটাস</option>
+                                    <option value="Approved" selected>অনুমোদিত (Approved)</option>
+                                    <option value="Pending">পেন্ডিং (Pending)</option>
+                                    <option value="Rejected">বাতিল (Rejected)</option>
+                                </select>
+                            </div>
+
+                            <!-- Search Filter -->
+                            <div style="flex-grow: 1; min-width: 200px;">
+                                <label style="display: block; font-size: 0.82rem; font-weight: 700; color: #475569; margin-bottom: 6px;">অনুসন্ধান (Search)</label>
+                                <div style="position: relative;">
+                                    <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #94a3b8;"></i>
+                                    <input type="text" id="reportSearchInput" oninput="applyReportFilters()" placeholder="নাম, ফোন বা TrxID..." style="width: 100%; box-sizing: border-box; padding: 9px 12px 9px 34px; border-radius: 8px; border: 1.5px solid #cbd5e1; outline: none; font-size: 0.9rem; background: white;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mobile scroll indicator -->
+                    <div class="mobile-table-hint">
+                        <i class="fa-solid fa-arrows-left-right"></i>
+                        <span>👉 সম্পূর্ণ রিপোর্ট ও কলাম দেখতে ডানে স্ক্রোল (Swipe) করুন</span>
+                    </div>
+
+                    <!-- Printable Report Container -->
+                    <div id="reportPrintArea">
+                        <!-- Print Document Header (Visible only when printed) -->
+                        <div class="report-print-header" style="display: none; padding-bottom: 15px; border-bottom: 2px solid #334155; margin-bottom: 20px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <h1 style="margin: 0; font-size: 1.6rem; color: #0f172a;">PhysicsClassroom BD</h1>
+                                    <div id="printReportTitle" style="font-size: 1.1rem; color: #475569; font-weight: 600; margin-top: 4px;">অফিসিয়াল রিপোর্ট ও অডিট বিবরণী</div>
+                                </div>
+                                <div style="text-align: right; font-size: 0.85rem; color: #64748b;">
+                                    <div>প্রিন্টের তারিখ: <span id="printDateStr"></span></div>
+                                    <div>জেনারেট করেছেন: অ্যাডমিন</div>
+                                </div>
+                            </div>
+                            <div id="printReportMeta" style="margin-top: 10px; font-size: 0.85rem; color: #334155; background: #f1f5f9; padding: 8px 12px; border-radius: 6px;"></div>
+                        </div>
+
+                        <!-- Main Report Table Container -->
+                        <div class="table-responsive-wrapper" style="border: 1px solid #e2e8f0; border-radius: 12px; background: white; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); overflow-x: auto;">
+                            <table id="reportMainTable" style="min-width: 900px; width: 100%; border-collapse: separate; border-spacing: 0;">
+                                <thead id="reportTableHead" style="background: #f1f5f9;">
+                                    <!-- Dynamic headers will be injected here -->
+                                </thead>
+                                <tbody id="reportTableBody">
+                                    <tr><td colspan="8" style="padding: 30px; text-align: center; color: #64748b;">রিপোর্ট ডাটা লোড করা হচ্ছে...</td></tr>
+                                </tbody>
+                                <tfoot id="reportTableFoot" style="background: #f8fafc; font-weight: bold; border-top: 2px solid #cbd5e1;">
+                                    <!-- Totals summary will be injected here -->
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </main>
 
-    <script src="/Scripts/Admin/admin.js?v=20261102_s1"></script>
+    <script src="/Scripts/Admin/admin.js?v=20261103_rep1"></script>
 </body>
 </html>
