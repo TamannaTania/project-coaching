@@ -146,22 +146,28 @@ namespace ProjectCoachingAPI.Controllers
         [HttpGet("admin/all")]
         public async Task<IActionResult> GetAllEnrollments()
         {
-            // In a real app, verify admin role here
-            var enrollments = await _context.Enrollments
-                .Include(e => e.User)
-                .Include(e => e.Course)
-                .OrderByDescending(e => e.EnrollmentDate)
-                .Select(e => new {
-                    id = e.Id,
-                    userName = e.User.Name,
-                    courseTitle = e.Course.Title,
-                    phone = e.PaymentPhone,
-                    trxId = e.TrxId,
-                    status = e.Status,
-                    date = e.EnrollmentDate
-                })
-                .ToListAsync();
-            return Ok(enrollments);
+            try
+            {
+                var enrollments = await _context.Enrollments
+                    .Include(e => e.User)
+                    .Include(e => e.Course)
+                    .OrderByDescending(e => e.EnrollmentDate)
+                    .Select(e => new {
+                        id = e.Id,
+                        userName = (e.User != null && e.User.Name != null) ? e.User.Name : "Student",
+                        courseTitle = (e.Course != null && e.Course.Title != null) ? e.Course.Title : "Course",
+                        phone = e.PaymentPhone ?? "",
+                        trxId = e.TrxId ?? "",
+                        status = e.Status ?? "Pending",
+                        date = e.EnrollmentDate
+                    })
+                    .ToListAsync();
+                return Ok(enrollments);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error loading enrollments: " + ex.Message });
+            }
         }
 
         [HttpPut("admin/approve/{id}")]
@@ -193,7 +199,7 @@ namespace ProjectCoachingAPI.Controllers
 
             // Course-wise enrollments for graph
             var courseStats = await _context.Enrollments
-                .Where(e => e.Status == "Approved")
+                .Where(e => e.Status == "Approved" && e.Course != null)
                 .GroupBy(e => e.Course.Title)
                 .Select(g => new {
                     CourseName = g.Key,
@@ -207,6 +213,23 @@ namespace ProjectCoachingAPI.Controllers
                 pendingRequests,
                 courseStats
             });
+        }
+        [HttpGet("admin/payments")]
+        public async Task<IActionResult> GetRecentPayments()
+        {
+            var payments = await _context.Enrollments
+                .Include(e => e.User)
+                .OrderByDescending(e => e.EnrollmentDate)
+                .Take(10)
+                .Select(e => new {
+                    studentEmail = (e.User != null && !string.IsNullOrEmpty(e.User.Email)) 
+                        ? e.User.Email 
+                        : ((e.User != null && !string.IsNullOrEmpty(e.User.Name)) ? e.User.Name : (e.PaymentPhone ?? "Student")),
+                    transactionId = e.TrxId ?? "-",
+                    isApproved = (e.Status == "Approved")
+                })
+                .ToListAsync();
+            return Ok(payments);
         }
     }
 }

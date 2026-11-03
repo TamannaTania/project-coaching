@@ -34,6 +34,13 @@ if (Directory.Exists(resolvedWebRoot))
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// Add Memory Cache for OTP and Session management
+builder.Services.AddMemoryCache();
+
+// Register Email & SMS Services
+builder.Services.AddScoped<ProjectCoachingAPI.Services.IEmailService, ProjectCoachingAPI.Services.EmailService>();
+builder.Services.AddScoped<ProjectCoachingAPI.Services.ISmsService, ProjectCoachingAPI.Services.SmsService>();
+
 // Add services for Controllers
 builder.Services.AddControllers();
 
@@ -140,7 +147,27 @@ app.MapGet("/index.html", async context =>
     }
 });
 
-// Fallback to index.html for root or SPA paths
-app.MapFallbackToFile("index.html");
+// Fallback to index.html for non-API routes
+app.MapFallback(async context =>
+{
+    if (context.Request.Path.StartsWithSegments("/api"))
+    {
+        context.Response.StatusCode = 404;
+        context.Response.ContentType = "application/json";
+        await context.Response.WriteAsync("{\"error\":\"Endpoint not found\"}");
+        return;
+    }
+    string indexPath = Path.Combine(resolvedWebRoot, "index.html");
+    if (!File.Exists(indexPath)) indexPath = Path.Combine(baseDir, "index.html");
+    if (File.Exists(indexPath))
+    {
+        context.Response.ContentType = "text/html; charset=utf-8";
+        await context.Response.SendFileAsync(indexPath);
+    }
+    else
+    {
+        context.Response.StatusCode = 404;
+    }
+});
 
 app.Run();

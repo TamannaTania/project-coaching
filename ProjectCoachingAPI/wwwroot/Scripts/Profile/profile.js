@@ -193,4 +193,184 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
         });
     }
+
+    // Email verification & update logic for existing/new users
+    async function checkUserEmailStatus() {
+        let email = localStorage.getItem('email') || '';
+        try {
+            const sessRes = await fetch('/api/Auth/validate-session', {
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
+            if (sessRes.ok) {
+                const sdata = await sessRes.json();
+                if (sdata.email) {
+                    email = sdata.email;
+                    localStorage.setItem('email', email);
+                }
+            }
+        } catch(e) {}
+
+        const emailMissingBanner = document.getElementById('emailMissingBanner');
+        const displayUserEmail = document.getElementById('displayUserEmail');
+        const profileEmail = document.getElementById('profileEmail');
+
+        const isEmailMissing = !email || email.trim() === '' || email.includes('@placeholder') || !email.includes('@');
+        
+        if (displayUserEmail) {
+            displayUserEmail.innerText = isEmailMissing ? '❌ কোনো ইমেইল যুক্ত নেই' : email;
+            displayUserEmail.style.color = isEmailMissing ? '#dc2626' : '#0f172a';
+        }
+        if (profileEmail) {
+            profileEmail.innerText = isEmailMissing ? (localStorage.getItem('phone') || 'Student Account') : email;
+        }
+
+        if (emailMissingBanner) {
+            emailMissingBanner.style.display = isEmailMissing ? 'flex' : 'none';
+        }
+    }
+    await checkUserEmailStatus();
+
+    // Banner button -> navigate to settings
+    const btnOpenAddEmailModal = document.getElementById('btnOpenAddEmailModal');
+    if (btnOpenAddEmailModal) {
+        btnOpenAddEmailModal.addEventListener('click', () => {
+            if (tabSettings) tabSettings.click();
+            const updateForm = document.getElementById('updateEmailFormContainer');
+            if (updateForm) updateForm.style.display = 'block';
+            const inputEmail = document.getElementById('inputNewEmail');
+            if (inputEmail) inputEmail.focus();
+        });
+    }
+
+    // Toggle email update form
+    const btnToggleEmailUpdate = document.getElementById('btnToggleEmailUpdate');
+    const updateEmailFormContainer = document.getElementById('updateEmailFormContainer');
+    if (btnToggleEmailUpdate && updateEmailFormContainer) {
+        btnToggleEmailUpdate.addEventListener('click', () => {
+            const isHidden = updateEmailFormContainer.style.display === 'none' || !updateEmailFormContainer.style.display;
+            updateEmailFormContainer.style.display = isHidden ? 'block' : 'none';
+            btnToggleEmailUpdate.innerText = isHidden ? 'বাতিল' : 'পরিবর্তন';
+        });
+    }
+
+    // Send Email OTP
+    const btnSendEmailOtp = document.getElementById('btnSendEmailOtp');
+    const inputNewEmail = document.getElementById('inputNewEmail');
+    const emailOtpAlert1 = document.getElementById('emailOtpAlert1');
+    const emailStep2 = document.getElementById('emailStep2');
+
+    if (btnSendEmailOtp && inputNewEmail) {
+        btnSendEmailOtp.addEventListener('click', async () => {
+            const emailVal = inputNewEmail.value.trim();
+            if (!emailVal || !emailVal.includes('@') || !emailVal.includes('.')) {
+                if (emailOtpAlert1) {
+                    emailOtpAlert1.style.display = 'block';
+                    emailOtpAlert1.style.color = '#dc2626';
+                    emailOtpAlert1.innerText = 'দয়া করে একটি সঠিক ইমেইল ঠিকানা দিন।';
+                }
+                return;
+            }
+
+            btnSendEmailOtp.disabled = true;
+            btnSendEmailOtp.innerText = 'পাঠানো হচ্ছে...';
+            if (emailOtpAlert1) emailOtpAlert1.style.display = 'none';
+
+            try {
+                const res = await fetch('/api/Auth/send-otp', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: emailVal, purpose: 'UpdateEmail' })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    if (emailOtpAlert1) {
+                        emailOtpAlert1.style.display = 'block';
+                        emailOtpAlert1.style.color = '#10b981';
+                        emailOtpAlert1.innerText = '✅ ' + (data.message || 'ওটিপি কোড পাঠানো হয়েছে! আপনার ইনবক্স চেক করুন।');
+                    }
+                    if (emailStep2) emailStep2.style.display = 'block';
+                    const otpInput = document.getElementById('inputEmailOtpCode');
+                    if (otpInput) otpInput.focus();
+                } else {
+                    if (emailOtpAlert1) {
+                        emailOtpAlert1.style.display = 'block';
+                        emailOtpAlert1.style.color = '#dc2626';
+                        emailOtpAlert1.innerText = '❌ ' + (data.message || 'ওটিপি পাঠানো যায়নি!');
+                    }
+                }
+            } catch(e) {
+                if (emailOtpAlert1) {
+                    emailOtpAlert1.style.display = 'block';
+                    emailOtpAlert1.style.color = '#dc2626';
+                    emailOtpAlert1.innerText = 'সার্ভার সমস্যা!';
+                }
+            } finally {
+                btnSendEmailOtp.disabled = false;
+                btnSendEmailOtp.innerText = 'ওটিপি পাঠান';
+            }
+        });
+    }
+
+    // Verify OTP & Save Email
+    const btnVerifyAndSaveEmail = document.getElementById('btnVerifyAndSaveEmail');
+    const inputEmailOtpCode = document.getElementById('inputEmailOtpCode');
+    const emailOtpAlert2 = document.getElementById('emailOtpAlert2');
+
+    if (btnVerifyAndSaveEmail && inputEmailOtpCode) {
+        btnVerifyAndSaveEmail.addEventListener('click', async () => {
+            const emailVal = inputNewEmail ? inputNewEmail.value.trim() : '';
+            const codeVal = inputEmailOtpCode.value.trim();
+
+            if (!codeVal || codeVal.length < 6) {
+                if (emailOtpAlert2) {
+                    emailOtpAlert2.style.display = 'block';
+                    emailOtpAlert2.style.color = '#dc2626';
+                    emailOtpAlert2.innerText = 'দয়া করে ৬-সংখ্যার সঠিক ওটিপি কোড লিখুন।';
+                }
+                return;
+            }
+
+            btnVerifyAndSaveEmail.disabled = true;
+            btnVerifyAndSaveEmail.innerText = 'ভেরিফাই হচ্ছে...';
+            if (emailOtpAlert2) emailOtpAlert2.style.display = 'none';
+
+            try {
+                const res = await fetch('/api/Auth/update-email', {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': 'Bearer ' + token,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email: emailVal, otpCode: codeVal })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    localStorage.setItem('email', emailVal);
+                    if (emailOtpAlert2) {
+                        emailOtpAlert2.style.display = 'block';
+                        emailOtpAlert2.style.color = '#10b981';
+                        emailOtpAlert2.innerText = '🎉 ' + (data.message || 'ইমেইল সফলভাবে ভেরিফাই ও যুক্ত করা হয়েছে!');
+                    }
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1200);
+                } else {
+                    if (emailOtpAlert2) {
+                        emailOtpAlert2.style.display = 'block';
+                        emailOtpAlert2.style.color = '#dc2626';
+                        emailOtpAlert2.innerText = '❌ ' + (data.message || 'ভেরিফিকেশন ব্যর্থ হয়েছে!');
+                    }
+                }
+            } catch(e) {
+                if (emailOtpAlert2) {
+                    emailOtpAlert2.style.display = 'block';
+                    emailOtpAlert2.style.color = '#dc2626';
+                    emailOtpAlert2.innerText = 'সার্ভার সমস্যা!';
+                }
+            } finally {
+                btnVerifyAndSaveEmail.disabled = false;
+                btnVerifyAndSaveEmail.innerText = 'ভেরিফাই ও সেভ';
+            }
+        });
+    }
 });

@@ -161,6 +161,85 @@
             padding: 12px 16px !important;
         }
         
+    
+        /* Mobile Responsiveness for Profile Page */
+        html, body {
+            overflow-x: hidden !important;
+            width: 100% !important;
+            max-width: 100vw !important;
+            background-color: #f8fafc;
+        }
+
+        @media (max-width: 868px) {
+            .main-header {
+                padding: 0 12px !important;
+                height: 60px !important;
+                min-height: 60px !important;
+            }
+            .logo-text {
+                font-size: 1.05rem !important;
+            }
+            .main-header .logo img {
+                height: 28px !important;
+                width: 28px !important;
+            }
+            /* On mobile header, hide the headerAdminBtn because it is already prominently in the sidebar menu */
+            #headerAdminBtn {
+                display: none !important;
+            }
+            .btn-back-home {
+                padding: 6px 14px !important;
+                font-size: 0.82rem !important;
+                white-space: nowrap !important;
+                gap: 5px !important;
+            }
+
+            .profile-container {
+                grid-template-columns: 1fr !important;
+                margin: 1rem auto 2.5rem !important;
+                gap: 1.25rem !important;
+                padding: 0 12px !important;
+            }
+
+            .sidebar {
+                padding: 1.25rem 1rem !important;
+            }
+            .sidebar img {
+                width: 75px !important;
+                height: 75px !important;
+                margin-bottom: 0.5rem !important;
+            }
+            .sidebar h3 {
+                font-size: 1.1rem !important;
+            }
+            .sidebar p {
+                margin: 0.25rem 0 1rem !important;
+            }
+            .sidebar-menu {
+                display: flex !important;
+                flex-wrap: wrap !important;
+                gap: 8px !important;
+                justify-content: center !important;
+            }
+            .sidebar-menu li {
+                flex: 1 1 calc(50% - 8px);
+                min-width: 130px;
+            }
+            .sidebar-menu li a {
+                text-align: center !important;
+                padding: 8px 10px !important;
+                font-size: 0.85rem !important;
+                margin-bottom: 0 !important;
+            }
+
+            .main-content {
+                padding: 1.25rem 1rem !important;
+            }
+            .course-grid {
+                grid-template-columns: 1fr !important;
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -188,8 +267,22 @@
             </ul>
         </aside>
 
-        <!-- Main Content -->
+                <!-- Main Content -->
         <main class="main-content">
+            <!-- Email Missing Alert Banner for Existing Users without Email -->
+            <div id="emailMissingBanner" style="display:none; background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border: 1.5px solid #fde68a; border-radius: 12px; padding: 16px 20px; margin-bottom: 24px; box-shadow: 0 4px 6px -1px rgba(245, 158, 11, 0.08); align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <span style="font-size: 1.8rem; line-height: 1;">⚠️</span>
+                    <div>
+                        <h4 style="margin: 0; color: #92400e; font-size: 0.95rem; font-weight: 700;">আপনার অ্যাকাউন্টে কোনো ইমেইল যুক্ত করা নেই!</h4>
+                        <p style="margin: 2px 0 0; color: #b45309; font-size: 0.85rem;">পাসওয়ার্ড ভুলে গেলে স্বয়ংক্রিয়ভাবে অ্যাকাউন্ট উদ্ধার করতে এখনই একটি ইমেইল ভেরিফাই করে যুক্ত করুন।</p>
+                    </div>
+                </div>
+                <button type="button" id="btnOpenAddEmailModal" style="background: #d97706; color: white; border: none; padding: 8px 18px; border-radius: 50px; font-weight: 700; font-size: 0.85rem; cursor: pointer; box-shadow: 0 2px 4px rgba(217, 119, 6, 0.2); transition: all 0.2s;">
+                    ✉️ ইমেইল যুক্ত করুন
+                </button>
+            </div>
+
             <!-- Courses View -->
             <div id="viewMyCourses">
                 <h2 style="border-bottom: 2px solid #f0f4f8; padding-bottom: 1rem;">আমার এনরোলকৃত কোর্সসমূহ</h2>
@@ -207,11 +300,45 @@
                 </div>
             </div>
 
-            <!-- Settings View -->
+                        <!-- Settings View -->
             <div id="viewSettings" style="display: none;">
                 <h2 style="border-bottom: 2px solid #f0f4f8; padding-bottom: 1rem;">অ্যাকাউন্ট সেটিংস</h2>
                 
-                <div style="max-width: 500px; margin-top: 2rem;">
+                <div style="max-width: 500px; margin-top: 1.5rem; margin-bottom: 2.5rem; padding-bottom: 2rem; border-bottom: 1px solid #e5e7eb;">
+                    <h3 style="font-size: 1.1rem; color: #1f2937; margin-bottom: 0.4rem;">ইমেইল ও সিকিউরিটি</h3>
+                    <p style="color: #6b7280; font-size: 0.85rem; margin-bottom: 1.2rem;">পাসওয়ার্ড রিসেট ওটিপি এবং অ্যাকাউন্টের নোটিফিকেশন পেতে আপনার সচল ইমেইল যুক্ত রাখুন।</p>
+                    
+                    <div id="currentEmailBox" style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px 16px; margin-bottom: 1rem; display: flex; align-items: center; justify-content: space-between;">
+                        <div>
+                            <span style="display:block; font-size: 0.75rem; color: #64748b; font-weight: 600;">বর্তমান নিবন্ধিত ইমেইল:</span>
+                            <span id="displayUserEmail" style="font-weight: 700; color: #0f172a; font-size: 0.95rem;">লোড হচ্ছে...</span>
+                        </div>
+                        <button type="button" id="btnToggleEmailUpdate" style="background: #e2e8f0; border: none; padding: 6px 14px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; cursor: pointer; color: #334155;">পরিবর্তন</button>
+                    </div>
+
+                    <!-- Update Email Form with OTP -->
+                    <div id="updateEmailFormContainer" style="display: none; background: #ffffff; border: 1.5px solid #10b981; border-radius: 10px; padding: 16px;">
+                        <div id="emailStep1">
+                            <label style="display: block; font-weight: 600; font-size: 0.85rem; color: #374151; margin-bottom: 6px;">নতুন ইমেইল ঠিকানা</label>
+                            <div style="display: flex; gap: 8px;">
+                                <input type="email" id="inputNewEmail" placeholder="name@example.com" style="flex: 1; padding: 9px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.9rem; outline: none;">
+                                <button type="button" id="btnSendEmailOtp" style="background: #10b981; color: white; border: none; padding: 9px 16px; border-radius: 6px; font-weight: 600; font-size: 0.85rem; cursor: pointer; white-space: nowrap;">ওটিপি পাঠান</button>
+                            </div>
+                            <div id="emailOtpAlert1" style="display: none; margin-top: 8px; font-size: 0.8rem; font-weight: 500;"></div>
+                        </div>
+
+                        <div id="emailStep2" style="display: none; margin-top: 12px; padding-top: 12px; border-top: 1px dashed #e2e8f0;">
+                            <p style="font-size: 0.8rem; color: #047857; margin-bottom: 8px;">আপনার নতুন ইমেইলে পাঠানো ৬-সংখ্যার ওটিপি কোডটি লিখুন:</p>
+                            <div style="display: flex; gap: 8px;">
+                                <input type="text" id="inputEmailOtpCode" maxlength="6" placeholder="------" style="flex: 1; padding: 9px 12px; border: 1.5px solid #10b981; border-radius: 6px; font-family: monospace; font-size: 1.1rem; font-weight: 700; text-align: center; letter-spacing: 2px;">
+                                <button type="button" id="btnVerifyAndSaveEmail" style="background: #059669; color: white; border: none; padding: 9px 16px; border-radius: 6px; font-weight: 700; font-size: 0.85rem; cursor: pointer; white-space: nowrap;">ভেরিফাই ও সেভ</button>
+                            </div>
+                            <div id="emailOtpAlert2" style="display: none; margin-top: 8px; font-size: 0.8rem; font-weight: 500;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="max-width: 500px; margin-top: 1.5rem;">
                     <h3 style="font-size: 1.1rem; color: #1f2937; margin-bottom: 1.5rem;">পাসওয়ার্ড পরিবর্তন করুন</h3>
                     
                     <form id="changePasswordForm">
@@ -238,6 +365,6 @@
     </div>
 
     <!-- Profile Script -->
-    <script src="/Scripts/Profile/profile.js"></script>
+    <script src="/Scripts/Profile/profile.js?v=20261102_1"></script>
 </body>
 </html>

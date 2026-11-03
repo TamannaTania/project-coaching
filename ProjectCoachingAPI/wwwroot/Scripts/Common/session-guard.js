@@ -1,5 +1,37 @@
 // session-guard.js - Real-time Single Device / Single Session Enforcer
 (function () {
+    // Session Lifespan & Remember Me Guard
+    (function checkSessionLifespan() {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+
+        const isRemembered = localStorage.getItem('remember_me') === 'true';
+        const isSessionCookie = document.cookie.split('; ').some(row => row.startsWith('pc_session=active'));
+        const isSessionStorage = sessionStorage.getItem('pc_session') === 'active';
+
+        if (!isRemembered && !isSessionCookie && !isSessionStorage) {
+            // User did not select 'Remember me' and closed the browser/session
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            localStorage.removeItem('username');
+            localStorage.removeItem('fullName');
+            localStorage.removeItem('name');
+            localStorage.removeItem('email');
+            localStorage.removeItem('phone');
+            localStorage.removeItem('role');
+            sessionStorage.removeItem('pc_session');
+            document.cookie = "pc_session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+        } else {
+            // Keep session active in this browser instance
+            sessionStorage.setItem('pc_session', 'active');
+            if (isRemembered) {
+                document.cookie = "pc_session=active; path=/; max-age=2592000; SameSite=Lax";
+            } else {
+                document.cookie = "pc_session=active; path=/; SameSite=Lax";
+            }
+        }
+    })();
+
     // 1. Ensure a persistent unique device ID for this browser
     let currentDeviceId = localStorage.getItem('deviceId');
     if (!currentDeviceId) {

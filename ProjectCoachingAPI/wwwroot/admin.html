@@ -1,7 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+        <meta charset="UTF-8">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - PhysicsClassroom</title>
     <link rel="icon" type="image/png" href="/favicon.png">
@@ -277,6 +280,7 @@
             <a href="/Views/Admin/admin-freeclasses.html" id="tabFreeClasses" class="admin-tab-btn" style="color: #6b7280; border-bottom: 3px solid transparent;">Free Classes</a>
             <a href="/Views/Admin/admin-teachers.html" id="tabTeachers" class="admin-tab-btn" style="color: #6b7280; border-bottom: 3px solid transparent;">টিচার ম্যানেজমেন্ট</a>
             <button id="tabPayments" class="admin-tab-btn" style="color: #6b7280; border-bottom: 3px solid transparent;">পেমেন্ট রিকোয়েস্ট (Pending)</button>
+            <button id="tabStudents" class="admin-tab-btn" style="color: #6b7280; border-bottom: 3px solid transparent;">👨‍🎓 স্টুডেন্ট রিকভারি ও সেটিংস</button>
         </div>
 
         <!-- Dashboard View -->
@@ -384,7 +388,7 @@
             </div>
         </div>
 
-        <!-- Courses View -->
+                <!-- Courses View -->
         <div id="viewCourses" style="display: none; animation: fadeIn 0.4s ease;">
             <div style="background: white; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); overflow: hidden; margin-top: 10px; border: 1px solid #f3f4f6;">
                 <div class="admin-card-header" style="background: linear-gradient(135deg, #1e293b 0%, #475569 100%); padding: 25px 30px; display: flex; flex-direction: column; gap: 5px;">
@@ -404,34 +408,110 @@
                     <h2 style="margin: 0; color: white; font-size: 1.8rem; font-weight: 800; letter-spacing: -0.5px;">Payment Requests</h2>
                     <p style="margin: 0; color: #d1fae5; font-size: 0.95rem; font-weight: 500;">Review student enrollment requests, verify TrxID, and approve access.</p>
                 </div>
-                <div class="admin-card-body" style="padding: 30px; background: #f8fafc;">
+                <div class="admin-card-body" style="padding: 24px 30px; background: #f8fafc;">
+                    <!-- Filter Toolbar & Search -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; margin-bottom: 20px;">
+                        <div style="display: inline-flex; background: #e2e8f0; padding: 4px; border-radius: 50px; gap: 4px; flex-wrap: wrap;" id="paymentFilterTabs">
+                            <button type="button" onclick="setPaymentFilter('ALL')" class="pay-filter-btn active" data-filter="ALL" style="padding: 8px 18px; border-radius: 50px; border: none; font-weight: 700; font-size: 0.9rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s; background: #ffffff; color: #065f46; box-shadow: 0 2px 4px rgba(0,0,0,0.08);">
+                                <span>সকল</span> <span id="countAll" style="background: #065f46; color: white; padding: 1px 8px; border-radius: 20px; font-size: 0.75rem;">0</span>
+                            </button>
+                            <button type="button" onclick="setPaymentFilter('Pending')" class="pay-filter-btn" data-filter="Pending" style="padding: 8px 18px; border-radius: 50px; border: none; font-weight: 700; font-size: 0.9rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s; background: transparent; color: #64748b;">
+                                <span>পেন্ডিং</span> <span id="countPending" style="background: #f59e0b; color: white; padding: 1px 8px; border-radius: 20px; font-size: 0.75rem;">0</span>
+                            </button>
+                            <button type="button" onclick="setPaymentFilter('Approved')" class="pay-filter-btn" data-filter="Approved" style="padding: 8px 18px; border-radius: 50px; border: none; font-weight: 700; font-size: 0.9rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s; background: transparent; color: #64748b;">
+                                <span>অনুমোদিত</span> <span id="countApproved" style="background: #10b981; color: white; padding: 1px 8px; border-radius: 20px; font-size: 0.75rem;">0</span>
+                            </button>
+                            <button type="button" onclick="setPaymentFilter('Rejected')" class="pay-filter-btn" data-filter="Rejected" style="padding: 8px 18px; border-radius: 50px; border: none; font-weight: 700; font-size: 0.9rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s; background: transparent; color: #64748b;">
+                                <span>বাতিল</span> <span id="countRejected" style="background: #ef4444; color: white; padding: 1px 8px; border-radius: 20px; font-size: 0.75rem;">0</span>
+                            </button>
+                        </div>
+
+                        <!-- Real-time Search Box -->
+                        <div style="position: relative; min-width: 260px; flex-grow: 1; max-w: 380px;">
+                            <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #94a3b8;"></i>
+                            <input type="text" id="paymentSearchInput" oninput="onPaymentSearch(this.value)" placeholder="নাম, ফোন, কোর্স বা TrxID খুঁজুন..." style="width: 100%; box-sizing: border-box; padding: 9px 14px 9px 38px; border-radius: 50px; border: 1.5px solid #cbd5e1; outline: none; font-size: 0.9rem; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.05); transition: border-color 0.2s;">
+                        </div>
+                    </div>
+
                     <div class="mobile-table-hint">
                         <i class="fa-solid fa-arrows-left-right"></i>
                         <span>👉 সম্পূর্ণ টেবিল ও Approve/Reject বাটন দেখতে ডানে স্ক্রোল (Swipe) করুন</span>
                     </div>
-                    <div class="table-responsive-wrapper">
-                        <table style="min-width: 820px; width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
-                            <thead style="background: #f8fafc; text-align: left;">
+
+                    <!-- Scrollable Table Container with Fixed Max Height & Sticky Header -->
+                    <div class="table-responsive-wrapper" style="max-height: 520px; overflow-y: auto; overflow-x: auto; border: 1px solid #e2e8f0; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); scrollbar-width: thin; scrollbar-color: #10b981 #f8fafc;">
+                        <table style="min-width: 820px; width: 100%; border-collapse: separate; border-spacing: 0; background: white;">
+                            <thead style="position: sticky; top: 0; z-index: 10; background: #f1f5f9; box-shadow: 0 2px 4px rgba(0,0,0,0.06);">
                                 <tr>
-                                    <th style="padding: 15px 12px; border-bottom: 1px solid #e5e7eb; white-space: nowrap;">তারিখ</th>
-                                    <th style="padding: 15px 12px; border-bottom: 1px solid #e5e7eb; white-space: nowrap;">স্টুডেন্ট নাম</th>
-                                    <th style="padding: 15px 12px; border-bottom: 1px solid #e5e7eb; white-space: nowrap;">কোর্সের নাম</th>
-                                    <th style="padding: 15px 12px; border-bottom: 1px solid #e5e7eb; white-space: nowrap;">পেমেন্ট নাম্বার</th>
-                                    <th style="padding: 15px 12px; border-bottom: 1px solid #e5e7eb; white-space: nowrap;">TrxID</th>
-                                    <th style="padding: 15px 12px; border-bottom: 1px solid #e5e7eb; white-space: nowrap;">স্ট্যাটাস</th>
-                                    <th style="padding: 15px 12px; border-bottom: 1px solid #e5e7eb; white-space: nowrap;">অ্যাকশন</th>
+                                    <th style="padding: 14px 14px; background: #f1f5f9; border-bottom: 2px solid #cbd5e1; white-space: nowrap; font-weight: 700; color: #1e293b; font-size: 0.9rem; text-align: left;">তারিখ</th>
+                                    <th style="padding: 14px 14px; background: #f1f5f9; border-bottom: 2px solid #cbd5e1; white-space: nowrap; font-weight: 700; color: #1e293b; font-size: 0.9rem; text-align: left;">স্টুডেন্ট নাম</th>
+                                    <th style="padding: 14px 14px; background: #f1f5f9; border-bottom: 2px solid #cbd5e1; white-space: nowrap; font-weight: 700; color: #1e293b; font-size: 0.9rem; text-align: left;">কোর্সের নাম</th>
+                                    <th style="padding: 14px 14px; background: #f1f5f9; border-bottom: 2px solid #cbd5e1; white-space: nowrap; font-weight: 700; color: #1e293b; font-size: 0.9rem; text-align: left;">পেমেন্ট নাম্বার</th>
+                                    <th style="padding: 14px 14px; background: #f1f5f9; border-bottom: 2px solid #cbd5e1; white-space: nowrap; font-weight: 700; color: #1e293b; font-size: 0.9rem; text-align: left;">TrxID</th>
+                                    <th style="padding: 14px 14px; background: #f1f5f9; border-bottom: 2px solid #cbd5e1; white-space: nowrap; font-weight: 700; color: #1e293b; font-size: 0.9rem; text-align: left;">স্ট্যাটাস</th>
+                                    <th style="padding: 14px 14px; background: #f1f5f9; border-bottom: 2px solid #cbd5e1; white-space: nowrap; font-weight: 700; color: #1e293b; font-size: 0.9rem; text-align: left;">অ্যাকশন</th>
                                 </tr>
                             </thead>
                             <tbody id="paymentsTbody">
-                                <tr><td colspan="7" style="padding: 20px; text-align: center;">Loading...</td></tr>
+                                <tr><td colspan="7" style="padding: 24px; text-align: center; color: #64748b;">Loading...</td></tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- Students & Recovery View -->
+        <div id="viewStudents" style="display: none;">
+            <div style="background: white; border-radius: 16px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid #f1f5f9;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 15px; margin-bottom: 20px;">
+                    <div>
+                        <h2 style="margin: 0; font-size: 1.3rem; color: #1e293b; font-weight: 700;">👨‍🎓 শিক্ষার্থী অনুসন্ধান ও অ্যাকাউন্ট রিকভারি</h2>
+                        <p style="margin: 4px 0 0; color: #64748b; font-size: 0.85rem;">যেসব শিক্ষার্থীর ইমেইল যুক্ত নেই বা পাসওয়ার্ড ভুলে গেছেন, তাদের মোবাইল নম্বর বা নাম দিয়ে অনুসন্ধান করে সরাসরি পাসওয়ার্ড রিসেট বা ইমেইল যুক্ত করুন।</p>
+                    </div>
+                </div>
+
+                <!-- Search Bar -->
+                <div style="display: flex; gap: 10px; max-width: 620px; margin-bottom: 24px;">
+                    <div style="position: relative; flex: 1;">
+                        <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #94a3b8;"></i>
+                        <input type="text" id="adminStudentSearchInput" placeholder="মোবাইল নম্বর (যেমন 017...) বা শিক্ষার্থীর নাম লিখুন..." style="width: 100%; box-sizing: border-box; padding: 10px 14px 10px 40px; border-radius: 8px; border: 1.5px solid #cbd5e1; outline: none; font-size: 0.95rem; background: white;">
+                    </div>
+                    <button type="button" id="btnAdminSearchStudent" style="background: #1a9c5c; color: white; border: none; padding: 10px 22px; border-radius: 8px; font-weight: 700; font-size: 0.9rem; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+                        <i class="fa-solid fa-search"></i> খুঁজুন
+                    </button>
+                </div>
+
+                <!-- Search Results Table -->
+                <div class="mobile-table-hint">
+                    <i class="fa-solid fa-arrows-left-right"></i>
+                    <span>👉 সম্পূর্ণ টেবিল দেখতে ডানে স্ক্রোল করুন</span>
+                </div>
+                <div class="table-responsive-wrapper" style="border: 1px solid #e2e8f0; border-radius: 12px; overflow-x: auto;">
+                    <table style="min-width: 820px; width: 100%; border-collapse: separate; border-spacing: 0; background: white;">
+                        <thead style="background: #f8fafc;">
+                            <tr>
+                                <th style="padding: 12px 14px; border-bottom: 2px solid #e2e8f0; font-weight: 700; color: #334155; text-align: left; font-size: 0.85rem;">আইডি</th>
+                                <th style="padding: 12px 14px; border-bottom: 2px solid #e2e8f0; font-weight: 700; color: #334155; text-align: left; font-size: 0.85rem;">শিক্ষার্থীর নাম</th>
+                                <th style="padding: 12px 14px; border-bottom: 2px solid #e2e8f0; font-weight: 700; color: #334155; text-align: left; font-size: 0.85rem;">মোবাইল নম্বর</th>
+                                <th style="padding: 12px 14px; border-bottom: 2px solid #e2e8f0; font-weight: 700; color: #334155; text-align: left; font-size: 0.85rem;">ইমেইল স্ট্যাটাস</th>
+                                <th style="padding: 12px 14px; border-bottom: 2px solid #e2e8f0; font-weight: 700; color: #334155; text-align: left; font-size: 0.85rem;">ডিভাইস লগইন</th>
+                                <th style="padding: 12px 14px; border-bottom: 2px solid #e2e8f0; font-weight: 700; color: #334155; text-align: center; font-size: 0.85rem;">অ্যাকশন</th>
+                            </tr>
+                        </thead>
+                        <tbody id="studentSearchResultsTbody">
+                            <tr>
+                                <td colspan="6" style="padding: 35px; text-align: center; color: #94a3b8; font-size: 0.95rem;">
+                                    🔍 শিক্ষার্থীর মোবাইল নম্বর বা নাম দিয়ে অনুসন্ধান করুন
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </main>
 
-    <script src="/Scripts/Admin/admin.js?v=20261029_3"></script>
+    <script src="/Scripts/Admin/admin.js?v=20261102_s1"></script>
 </body>
 </html>

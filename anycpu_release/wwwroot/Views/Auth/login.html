@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Physics Classroom</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/styles.css">
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        .hero-bg {
+            background: radial-gradient(circle at top right, #064e3b 0%, #0f172a 50%, #022c22 100%);
+        }
+        .glass-card {
+            background: #ffffff;
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.1);
+        }
+        .input-focus {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .input-focus:focus {
+            background-color: #ffffff;
+            border-color: #059669;
+            box-shadow: 0 0 0 4px rgba(5, 150, 105, 0.12);
+        }
+    </style>
+</head>
+<body class="hero-bg min-h-screen flex items-center justify-center p-4 selection:bg-emerald-500 selection:text-white">
+
+    <div class="glass-card max-w-[420px] w-full rounded-3xl p-8 sm:p-10 border border-slate-100">
+        <div class="text-center mb-8">
+            <a href="/" class="inline-block transition-transform hover:scale-105 duration-200">
+                <img src="/Images/logo.png" onerror="this.src='/favicon.png'" alt="Physics Classroom Logo" class="h-14 w-14 mx-auto mb-3 object-contain drop-shadow-sm">
+            </a>
+            <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight">Welcome Back</h1>
+            <p class="text-xs text-slate-500 mt-1.5 font-medium">Log in to your account to continue</p>
+        </div>
+
+        <form id="loginForm" class="space-y-5">
+            <div>
+                <label for="username" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-2">
+                    Phone or Email <span class="text-emerald-600">*</span>
+                </label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                        <i class="fa-regular fa-user text-sm"></i>
+                    </span>
+                    <input type="text" id="username" placeholder="01XXXXXXXXX or name@gmail.com" required
+                        class="input-focus w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-900 placeholder:text-slate-400 outline-none">
+                </div>
+            </div>
+
+            <div>
+                <label for="password" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-2">
+                    Password <span class="text-emerald-600">*</span>
+                </label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                        <i class="fa-solid fa-lock text-sm"></i>
+                    </span>
+                    <input type="password" id="password" placeholder="Enter your password" required
+                        class="input-focus w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-900 placeholder:text-slate-400 outline-none">
+                </div>
+            </div>
+            
+            <!-- Remember Me & Forgot Password -->
+            <div class="flex items-center justify-between text-xs pt-1">
+                <label class="flex items-center gap-2 cursor-pointer text-slate-600 select-none hover:text-slate-900 transition">
+                    <input type="checkbox" id="rememberMe" class="w-4 h-4 text-emerald-600 rounded border-slate-300 focus:ring-emerald-500 cursor-pointer">
+                    <span class="font-semibold text-slate-700">Remember me</span>
+                </label>
+                <a href="javascript:void(0)" id="forgotPasswordBtn" class="font-bold text-emerald-600 hover:text-emerald-700 hover:underline transition">
+                    Forgot password?
+                </a>
+            </div>
+
+            <div id="errorMsg" class="hidden bg-rose-50 border border-rose-200 text-rose-600 p-3 rounded-xl text-xs font-semibold text-center"></div>
+
+            <!-- Single-Device Overwrite Box -->
+            <div id="alreadyLoggedInBox" class="hidden bg-amber-50 border border-amber-200 p-4 rounded-2xl text-center space-y-3">
+                <p class="text-amber-900 text-xs font-bold">
+                    <i class="fa-solid fa-triangle-exclamation mr-1 text-amber-600"></i> Already logged in on another device!
+                </p>
+                <p class="text-[11px] text-slate-600">Do you want to log out of the other device and log in here?</p>
+                <button type="button" id="forceLoginBtn" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-2.5 px-4 rounded-xl text-xs transition shadow-sm">
+                    Yes, Log In Here
+                </button>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" id="submitBtn"
+                class="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold py-3.5 px-6 rounded-xl text-sm transition-all shadow-lg shadow-emerald-600/25 hover:shadow-emerald-600/35 active:scale-[0.99] flex items-center justify-center gap-2">
+                <span>Log In</span>
+                <i class="fa-solid fa-arrow-right text-xs"></i>
+            </button>
+        </form>
+        
+        <div class="mt-8 pt-6 border-t border-slate-100 text-center">
+            <p class="text-xs text-slate-500 font-medium">
+                Don't have an account? 
+                <a href="/Views/Auth/register.html" class="text-emerald-600 font-bold hover:text-emerald-700 hover:underline ml-1">
+                    Sign Up
+                </a>
+            </p>
+        </div>
+    </div>
+
+    <!-- Forgot Password Modal -->
+    <div id="forgotPasswordModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full p-6 sm:p-8 border border-slate-100 transform transition-all">
+            <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-6">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg">
+                        <i class="fa-solid fa-key"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-900">Forgot Password?</h3>
+                        <p class="text-xs text-slate-500 font-medium">Recover your account password</p>
+                    </div>
+                </div>
+                <button type="button" id="closeForgotModal" class="text-slate-400 hover:text-slate-600 text-xl p-1 transition">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Step 1: Request OTP -->
+            <div id="forgotStep1">
+                <p class="text-xs text-slate-600 mb-4 leading-relaxed font-medium">
+                    Enter your registered <strong>Phone number or Email</strong>. A 6-digit verification code (OTP) will be sent to your email.
+                </p>
+
+                <div class="mb-4">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-2">Phone or Email</label>
+                    <input type="text" id="forgotEmailInput" placeholder="01XXXXXXXXX or name@gmail.com" class="input-focus w-full pl-4 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-900 placeholder:text-slate-400 outline-none">
+                </div>
+
+                <div id="forgotAlert" class="hidden mb-4 p-3 rounded-xl text-xs font-semibold"></div>
+
+                <button type="button" id="verifyAccountBtn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 px-4 rounded-xl text-sm transition shadow-md shadow-emerald-600/30 flex items-center justify-center gap-2">
+                    <span>Send Verification Code</span>
+                    <i class="fa-solid fa-paper-plane text-xs"></i>
+                </button>
+            </div>
+
+            <!-- Step 1.5: Enter OTP -->
+            <div id="forgotStepOtp" class="hidden space-y-4">
+                <div class="bg-emerald-50 border border-emerald-200 text-emerald-900 p-3.5 rounded-2xl text-xs">
+                    <div class="flex items-center gap-2 font-bold mb-1">
+                        <i class="fa-solid fa-envelope-circle-check text-emerald-600 text-sm"></i>
+                        <span>Verification Code Sent!</span>
+                    </div>
+                    <div class="text-slate-600">
+                        A 6-digit code has been sent to: <strong id="forgotMaskedEmail" class="text-emerald-800"></strong>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5 text-center">Enter 6-Digit Code</label>
+                    <input type="text" id="forgotOtpInput" maxlength="6" placeholder="------" class="w-full bg-slate-50 border-2 border-emerald-500 rounded-2xl py-3 text-center text-2xl font-mono tracking-[0.5em] font-bold text-emerald-800 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                    <p class="text-[11px] text-center text-slate-500 mt-1.5 font-medium">
+                        ⏱️ Code expires in: <span id="forgotCountdown" class="font-bold text-amber-600">10:00</span>
+                    </p>
+                </div>
+
+                <div id="forgotOtpAlert" class="hidden p-3 rounded-xl text-xs font-semibold"></div>
+
+                <div class="flex gap-2">
+                    <button type="button" id="forgotBackTo1Btn" class="w-1/3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 rounded-xl text-xs transition">
+                        Back
+                    </button>
+                    <button type="button" id="verifyOtpCodeBtn" class="w-2/3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl text-xs transition shadow-md shadow-emerald-600/30 flex items-center justify-center gap-2">
+                        <span>Verify Code</span>
+                        <i class="fa-solid fa-arrow-right text-xs"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 2: Enter New Password -->
+            <div id="forgotStep2" class="hidden space-y-4">
+                <div class="bg-emerald-50 border border-emerald-200 text-emerald-900 p-3 rounded-xl text-xs font-semibold flex items-center gap-2">
+                    <i class="fa-solid fa-shield-check text-emerald-600 text-sm"></i>
+                    <span>Verified Account: <strong id="verifiedUserEmail"></strong></span>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">New Password</label>
+                    <input type="password" id="newPasswordInput" placeholder="Minimum 4 characters" class="input-focus w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-900 placeholder:text-slate-400 outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Confirm Password</label>
+                    <input type="password" id="confirmPasswordInput" placeholder="Re-enter new password" class="input-focus w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-900 placeholder:text-slate-400 outline-none">
+                </div>
+
+                <div id="step2Alert" class="hidden p-3 rounded-xl text-xs font-semibold"></div>
+
+                <div class="pt-2">
+                    <button type="button" id="saveNewPasswordBtn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl text-xs transition shadow-md shadow-emerald-600/30 flex items-center justify-center gap-2">
+                        <span>Save New Password</span>
+                        <i class="fa-solid fa-check text-xs"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 3: Success -->
+            <div id="forgotStep3" class="hidden text-center py-4 space-y-4">
+                <div class="w-16 h-16 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-3xl">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+                <h4 class="text-xl font-bold text-slate-900">Password Changed!</h4>
+                <p class="text-xs text-slate-600 leading-relaxed font-medium">
+                    Your account password has been updated successfully. You can now log in with your new password.
+                </p>
+                <button type="button" id="useNewPasswordToLoginBtn" class="w-full bg-emerald-600 text-white font-bold py-3.5 px-6 rounded-xl text-sm hover:bg-emerald-700 transition shadow-md shadow-emerald-600/30">
+                    Log In Now ➔
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Script -->
+    <script src="/Scripts/Auth/login.js?v=20261103_v3"></script>
+</body>
+</html>
